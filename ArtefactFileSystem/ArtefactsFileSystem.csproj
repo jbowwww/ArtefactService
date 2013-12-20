@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5B486604-0B8B-4214-99DB-C36A69168F5B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>ArtefactsFileSystem</RootNamespace>
+    <AssemblyName>ArtefactsFileSystem</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Runtime.Serialization" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="FileSystem\File.cs" />
+    <Compile Include="FileSystem\Drive.cs" />
+    <Compile Include="FileSystem\Directory.cs" />
+    <Compile Include="FileSystem\FileSystemArtefactCreator.cs" />
+    <Compile Include="FileSystem\FileSystemEntry.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Mappings\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Mappings\Directory.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Drive.hbm.xml" />
+    <EmbeddedResource Include="Mappings\File.hbm.xml" />
+    <EmbeddedResource Include="Mappings\FileSystemEntry.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Artefacts\Artefacts.csproj">
+      <Project>{FC41660D-8F54-437D-9AA7-87E460D73689}</Project>
+      <Name>Artefacts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ArtefactService\ArtefactService.csproj">
+      <Project>{D76CD89A-4341-462E-BBB1-9D756368442C}</Project>
+      <Name>ArtefactService</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,7 @@
+
+Trying to approach things a bit top-down this time around at least to start with
+
+	-	Not entirely decided about whether the classes Artefact, ArtefactLibrary, ArtefactRepository & their interfaces
+		need to be in different projects / output to separate DLLs, for now I guess it doesn't really matter
+		
+		-	There will be a separate project and executable (or maybe eventually a DLL) for the service HOST

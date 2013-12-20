@@ -1,0 +1,46 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/ArtefactRepository.cs">
+    <Files>
+      <File FileName="ArtefactService/IArtefactRepository.cs" Line="27" Column="45" />
+      <File FileName="ArtefactService/ArtefactRepository.cs" Line="52" Column="50" />
+      <File FileName="ArtefactClientTest/ClientTest.cs" Line="9" Column="17" />
+      <File FileName="ArtefactServiceHost/ServiceHost.cs" Line="37" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True" selected="True">
+          <Node name="ArtefactClientTest" expanded="True">
+            <Node name="References" expanded="True" />
+          </Node>
+          <Node name="ArtefactService" expanded="True" />
+          <Node name="ArtefactServiceHost" expanded="True" />
+          <Node name="ArtefactsFileSystem" expanded="True" />
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True">
+          <Option id="NestedNamespaces" value="False" />
+          <Node name="ArtefactClientTest" expanded="True" />
+          <Node name="ArtefactService" expanded="True" />
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>_proxy</Value>
+          <Value>_proxyFactory</Value>
+        </State>
+      </Pad>
+      <Pad Id="ConnectionManagerPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/home/jk/Code/ArtefactService/ArtefactService/WCFTypeResolver.cs" line="25" />
+      <Breakpoint file="/home/jk/Code/ArtefactService/ArtefactService/WCFTypeResolver.cs" line="39" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
