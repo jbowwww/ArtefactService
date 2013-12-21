@@ -29,19 +29,17 @@ namespace Artefacts.FileSystem
 		}
 
 		#region implemented abstract members of Artefacts.CreatorBase
-		public override void Run (object param)
+		public override void Run(object param)
 		{
-			IArtefactRepository proxy = (IArtefactRepository)param;
 			try
 			{
+//				IArtefactRepository<Artefact> proxy = (IArtefactRepository<Artefact>)param;
+				
 				DriveInfo[] driveInfos = DriveInfo.GetDrives();
 				Drive[] drives = new Drive[driveInfos.Length];
 				for (int i = 0; i < driveInfos.Length; i++)
-				{
-					drives[i] = new Drive(driveInfos[i]);
-					base.NotifyCreate(drives[i]);
-//					proxy.AddArtefact((Artefact)drives[i]);
-				}
+//					proxy.Add(drives[i] = new Drive(driveInfos[i]));
+					base.NotifyCreate((Artefact)(drives[i] = new Drive(driveInfos[i])));
 
 				recursionDepth = -1;
 				Queue<Uri> subDirectories = new Queue<Uri>(new Uri[] { BaseUri });
@@ -54,20 +52,16 @@ namespace Artefacts.FileSystem
 							drive = d;
 
 					foreach (string relPath in EnumerateFiles(currentUri))
-					{
-						File file = new File(new System.IO.FileInfo(Path.Combine(currentUri.LocalPath, relPath)), drive);
-						base.NotifyCreate(file);
-//						proxy.AddArtefact(file);
-					}
+//						proxy.Add(new File(new System.IO.FileInfo(Path.Combine(currentUri.LocalPath, relPath)), drive));
+						base.NotifyCreate(new File(new System.IO.FileInfo(Path.Combine(currentUri.LocalPath, relPath)), drive));
 
 					if (RecursionLimit < 0 || ++recursionDepth < RecursionLimit)
 					{
 						foreach (string relPath in EnumerateDirectories(currentUri))
 						{
 							subDirectories.Enqueue(new Uri(currentUri, relPath));
-							Directory directory = new Directory(new DirectoryInfo(Path.Combine(currentUri.LocalPath, relPath)), drive);
-							base.NotifyCreate(directory);
-//							proxy.AddArtefact(directory);
+//							proxy.Add(new Directory(new DirectoryInfo(Path.Combine(currentUri.LocalPath, relPath)), drive));
+							base.NotifyCreate(new Directory(new DirectoryInfo(Path.Combine(currentUri.LocalPath, relPath)), drive));
 						}
 					}
 				}

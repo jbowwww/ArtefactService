@@ -20,6 +20,13 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <Externalconsole>true</Externalconsole>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="MONO_WCF_TRACE" value="/home/jk/Code/Trace.WCF.txt" />
+        <Variable name="MONO_DEBUG" value="casts,gdb,gen-seq-points,handle-sigint,suspend-on-sigsegv" />
+        <Variable name="MONO_TRACE_LISTENER" value="/home/jk/Code/Trace.txt" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
@@ -35,10 +42,23 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
+    <Reference Include="Iesi.Collections">
+      <HintPath>..\..\Resources\CS\NHibernate\Required_Bins\Iesi.Collections.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>..\bin\lib\NHibernate.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Serialize.Linq">
+      <HintPath>..\bin\lib\Serialize.Linq.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="ClientTest.cs" />
+    <Compile Include="Extensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -63,9 +83,9 @@
       <Name>ArtefactServiceHost</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\ArtefactFileSystem\ArtefactsFileSystem.csproj">
+    <ProjectReference Include="..\ArtefactFileSystem\ArtefactFileSystem.csproj">
       <Project>{5B486604-0B8B-4214-99DB-C36A69168F5B}</Project>
-      <Name>ArtefactsFileSystem</Name>
+      <Name>ArtefactFileSystem</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

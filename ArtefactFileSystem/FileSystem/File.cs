@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 
 namespace Artefacts.FileSystem
 {
-	[DataContract(IsReference = true)]
+	[DataContract]	//(IsReference = true)]
 	public class File : FileSystemEntry
 	{
 		public static Type[] GetArtefactTypes ()

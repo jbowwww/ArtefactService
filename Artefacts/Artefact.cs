@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+using System.Reflection;
 
 namespace Artefacts
 {
-	[DataContract(IsReference = true)]
+	[DataContract]	//(IsReference = true)]
 //	[MessageContract]
 //	[KnownType(typeof(Artefacts.FileSystem.Drive))]
 //	[KnownType(typeof(Artefacts.FileSystem.File))]
@@ -13,7 +14,6 @@ namespace Artefacts
 	[KnownType("GetArtefactTypes")]
 	public abstract class Artefact : IArtefact
 	{
-		[ThreadStatic]
 		private static List<Type> _artefactTypes = null;
 		public static List<Type> ArtefactTypes {
 			get
@@ -22,7 +22,12 @@ namespace Artefacts
 			}
 		}
 
-		public static Type[] GetArtefactTypes ()
+		public static Type[] GetArtefactTypes()
+		{
+			return ArtefactTypes.ToArray();
+		}
+
+		public static Type[] GetArtefactTypes(ICustomAttributeProvider provider)
 		{
 			return ArtefactTypes.ToArray();
 		}

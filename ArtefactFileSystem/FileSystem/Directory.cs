@@ -5,7 +5,7 @@ using System.ServiceModel;
 
 namespace Artefacts.FileSystem
 {
-	[DataContract(IsReference = true)]
+	[DataContract]	//(IsReference = true)]
 	public class Directory : FileSystemEntry
 	{
 public static Type[] GetArtefactTypes ()

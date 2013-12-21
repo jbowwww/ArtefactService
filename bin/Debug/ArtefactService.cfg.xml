@@ -1,8 +1,0 @@
-<Configuration>
-	<Assembly name="ArtefactService"></Assembly>
-	<Assembly name="ArtefactServiceHost">
-		<ArtefactTypeLibrary>
-			<Assembly name="ArtefactFileSystem" />
-		</ArtefactTypeLibrary>
-	</Assembly>	
-</Configuration>

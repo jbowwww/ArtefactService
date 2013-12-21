@@ -1,40 +1,53 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq.Expressions;
 using System.ServiceModel;
-using System.ServiceModel.Description;
-using System.Runtime.Serialization;
 
-using NHibernate;
-using NHibernate.Criterion;
+using Serialize.Linq.Extensions;
+using Serialize.Linq.Nodes;
 
 namespace Artefacts.Services
 {
-	/// <summary>
-	/// I artefact repository.
-	/// </summary>
-	/// <remarks>
-	/// Interface defines service implemented by <see cref="ArtefactRepository"/> and exposes to clients
-	/// </remarks>
+//	public interface IArtefactRepository : IArtefactRepository<Artefact> { }
+	
 	[ServiceContract]
-	[ServiceKnownType(typeof(NHibernate.Linq.NhQueryable<Artefact>))]
-	public interface IArtefactRepository
+//	[ServiceKnownType(typeof(NHibernate.Linq.NhQueryable<Artefact>))]
+//	[ServiceKnownType(typeof(List<Artefact>))]
+	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
+	public interface IArtefactRepository<TArtefact> : IRepository
+		where TArtefact : Artefact
 	{
 		[OperationContract]
-		int AddArtefact(Artefact artefact);
+		int Add(TArtefact artefact);
+		
+		[OperationContract]
+		int GetId(TArtefact artefact);
+		
+		[OperationContract]
+		TArtefact GetById(int id);
+		
+		[OperationContract]
+		PagingOptions GetDefaultPagingOptions();
+		
+		[OperationContract]
+		void SetDefaultPagingOptions(PagingOptions pagingOptions);
+			
+		[OperationContract]
+		List<TArtefact> GetAll();
+		
+		[OperationContract]
+		TArtefact[] RunLinq(ExpressionNode exNode);
 
 		[OperationContract]
-		[ServiceKnownType(typeof(List<Artefact>))]
-		IList<Artefact> /*IQueryable<Artefact>*/ Query();
+		QueryResult RunQuery(Func<Artefact, bool> queryFunc, PagingOptions pagingOptions = null);
 
 		[OperationContract]
-		IEnumerable<Artefact> Get(IDetachedQuery query);
-
+		void Update(TArtefact artefact);
+		
 		[OperationContract]
-		IEnumerable<Artefact> GetCr(DetachedCriteria criteria);
-
-		[OperationContract]
-		void Subscribe(ICreator creator);
+		void Remove(TArtefact artefact);
 	}
+	
+	public interface IRepository { }
 }
 

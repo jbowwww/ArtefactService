@@ -14,7 +14,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtefactServiceHost", "Arte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtefactClientTest", "ArtefactClientTest\ArtefactClientTest.csproj", "{DF2BDA77-4F99-4327-85CC-2C7F1A5C4645}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtefactsFileSystem", "ArtefactFileSystem\ArtefactsFileSystem.csproj", "{5B486604-0B8B-4214-99DB-C36A69168F5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtefactFileSystem", "ArtefactFileSystem\ArtefactFileSystem.csproj", "{5B486604-0B8B-4214-99DB-C36A69168F5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,12 +61,14 @@ Global
 		$3.EventAddBraceStyle = NextLine
 		$3.EventRemoveBraceStyle = NextLine
 		$3.StatementBraceStyle = NextLine
-		$3.ElseNewLinePlacement = NewLine
-		$3.ElseIfNewLinePlacement = NewLine
-		$3.CatchNewLinePlacement = NewLine
-		$3.FinallyNewLinePlacement = NewLine
-		$3.WhileNewLinePlacement = NewLine
+		$3.PlaceElseOnNewLine = True
+		$3.PlaceCatchOnNewLine = True
+		$3.PlaceFinallyOnNewLine = True
+		$3.BeforeMethodDeclarationParentheses = False
 		$3.BeforeMethodCallParentheses = False
+		$3.BeforeConstructorDeclarationParentheses = False
+		$3.BeforeIndexerDeclarationBracket = False
+		$3.BeforeDelegateDeclarationParentheses = False
 		$3.NewParentheses = False
 		$3.SpacesBeforeBrackets = False
 		$3.inheritsSet = Mono
@@ -74,8 +76,8 @@ Global
 		$3.scope = text/x-csharp
 		$0.TextStylePolicy = $4
 		$4.FileWidth = 120
-		$4.TabsToSpaces = False
-		$4.inheritsSet = VisualStudio
+		$4.TabWidth = 4
+		$4.inheritsSet = Mono
 		$4.inheritsScope = text/plain
 		$4.scope = text/plain
 		$0.StandardHeader = $5

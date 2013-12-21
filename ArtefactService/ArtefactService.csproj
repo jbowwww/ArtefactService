@@ -50,16 +50,24 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
+    <Reference Include="Serialize.Linq">
+      <HintPath>..\bin\lib\Serialize.Linq.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="ArtefactRepository.cs" />
-    <Compile Include="IArtefactRepository.cs" />
     <Compile Include="ArtefactTypeLibrary.cs" />
     <Compile Include="IArtefactTypeLibrary.cs" />
-    <Compile Include="ArtefactRepositorySessionFactory.cs" />
     <Compile Include="ServiceFormatterExtensions.cs" />
     <Compile Include="WCFTypeResolver.cs" />
+    <Compile Include="IArtefactService.cs" />
+    <Compile Include="ArtefactService.cs" />
+    <Compile Include="IArtefactRepository.cs" />
+    <Compile Include="NhBootStrap.cs" />
+    <Compile Include="WCFDataSerializerSurrogate.cs" />
+    <Compile Include="PagingOptions.cs" />
+    <Compile Include="QueryResult.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -75,7 +83,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ArtefactService.config">
+    <None Include="ArtefactService.config.exclude">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

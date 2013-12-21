@@ -5,7 +5,7 @@ using System.ServiceModel;
 
 namespace Artefacts.FileSystem
 {
-	[DataContract(IsReference = true)]
+	[DataContract]	//(IsReference = true)]
 	public class Drive : Artefact
 	{
 		public static Type[] GetArtefactTypes ()
