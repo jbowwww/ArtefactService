@@ -1,0 +1,177 @@
+
+		//** REMOVE - ...?! **/
+
+Artefact.cs
+//		public static Type[] GetArtefactTypes(ICustomAttributeProvider provider)
+//		{
+//			ServiceKnownTypeAttribute[] staticKnownTypes = (ServiceKnownTypeAttribute[])
+//				provider.GetCustomAttributes(typeof(ServiceKnownTypeAttribute), true);
+//			Type[] knownTypes = new Type[ArtefactTypes.Count + staticKnownTypes.Length];
+//			Array.ConvertAll<ServiceKnownTypeAttribute, Type>(staticKnownTypes, (input) => input.Type).CopyTo(knownTypes, 0);
+//			ArtefactTypes.CopyTo(knownTypes, staticKnownTypes.Length);
+//			return knownTypes;
+//		}
+		
+
+ClientTest.cs
+//				RunTest("Artefact[] RunLinq()", () =>
+//					#region Test method
+//				{
+//					Expression<Func<Artefact, bool>> query = a => a.TimeCreated > new DateTime(2013, 12, 21, 7, 44, 40);
+//					ExpressionNode exNode = query.ToExpressionNode();
+//					Artefact[] artefacts = _repoProxy.RunLinq(exNode);
+//					Console.WriteLine("{0} artefacts returned", artefacts.Length);
+//					foreach (Artefact artefact in artefacts)
+//						Console.WriteLine(artefact.ToString());
+//				});
+//					#endregion
+				
+//				RunTest("IQueryable<Artefact> GetAll() (NHibernate ISession.Query<>)", () =>
+//					#region Test method
+//				{
+//					IEnumerable<Artefact> artefacts = _repoProxy.GetAll();
+//					Console.WriteLine("{0} artefacts returned", artefacts.Count());
+//					foreach (Artefact artefact in artefacts)
+//						Console.WriteLine(artefact.ToString());
+//				});
+//					#endregion
+
+////		[ClientTestMethod(Order=2, Name="DetachedCriteria.For<Artefact>()")]
+//		private static void TestQueryArtefactsDetached()
+//		{
+//			DetachedCriteria criteria = DetachedCriteria.For<Artefact>().Add(Restrictions.Where<Artefact>(a => a.Id > 512));
+//			
+//			object qId = _clientProxy.CreateQueryCrit(criteria);
+//			Console.WriteLine("queryId={0}, Count={1}", qId, _clientProxy.QueryCount(qId));
+//			foreach (Artefact artefact in _clientProxy.QueryResults(qId))
+//				Console.WriteLine(artefact.ToString());
+//		}
+//		
+
+////		[ClientTestMethod(Order=3, Name="RepositoryClientProxy<Artefact>.CreateQuery_HQL()")]
+//		private static void TestQueryArtefactsHQL()
+//		{
+//			string hql = "select Directory from Directory d inner join d.Drive";
+//			object qId = _clientProxy.CreateQuery_HQL(hql);
+//			Console.WriteLine("queryId={0}, Count={1}", qId, _clientProxy.QueryCount(qId));
+//			foreach (Artefact artefact in _clientProxy.QueryResults(qId))
+//				Console.WriteLine(artefact.ToString());
+//		}
+		
+ArtefactService.cs
+
+		class ArtefactServiceDataContractSerializerOperationBehaviour :
+			DataContractSerializerOperationBehavior
+		{
+			public ArtefactServiceDataContractSerializerOperationBehaviour(OperationDescription operation) :
+				base(operation)
+			{
+			}
+
+			public override XmlObjectSerializer CreateSerializer(Type type, string name, string ns, System.Collections.Generic.IList<Type> knownTypes)
+			{
+				List<Type> _knownTypes = new List<Type>(knownTypes);
+				_knownTypes.AddRange(ArtefactService.ArtefactTypes);
+				return base.CreateSerializer(type, name, ns, _knownTypes);
+			}
+
+			public override XmlObjectSerializer CreateSerializer(Type type, System.Xml.XmlDictionaryString name, System.Xml.XmlDictionaryString ns, System.Collections.Generic.IList<Type> knownTypes)
+			{
+				List<Type> _knownTypes = new List<Type>(knownTypes);
+				_knownTypes.AddRange(ArtefactService.ArtefactTypes);
+				return base.CreateSerializer(type, name, ns, _knownTypes);
+			}
+		}
+		
+		class ArtefactServiceDataContractSerializerOperationBehaviour :
+			DataContractSerializerOperationBehavior
+		{
+			public ArtefactServiceDataContractSerializerOperationBehaviour(OperationDescription operation) :
+				base(operation)
+			{
+			}
+
+			public override XmlObjectSerializer CreateSerializer(Type type, string name, string ns, System.Collections.Generic.IList<Type> knownTypes)
+			{
+				List<Type> _knownTypes = new List<Type>(knownTypes);
+				_knownTypes.AddRange(ArtefactService.ArtefactTypes);
+				return base.CreateSerializer(type, name, ns, _knownTypes);
+			}
+
+			public override XmlObjectSerializer CreateSerializer(Type type, System.Xml.XmlDictionaryString name, System.Xml.XmlDictionaryString ns, System.Collections.Generic.IList<Type> knownTypes)
+			{
+				List<Type> _knownTypes = new List<Type>(knownTypes);
+				_knownTypes.AddRange(ArtefactService.ArtefactTypes);
+				return base.CreateSerializer(type, name, ns, _knownTypes);
+			}
+		}
+		
+				#region IArtefactService implementation
+		public Uri GetRepositoryAddress<TArtefact>()
+			where TArtefact : Artefact
+		{
+			ServiceEndpoint endpoint = OperationContext.Current.Host.Description.Endpoints.Find(typeof(IArtefactRepository<TArtefact>));
+			return endpoint == null ? new Uri(string.Empty) : endpoint.Address.Uri;
+		}
+		
+		public void AddRepository(IRepository repository)
+		{
+//			Type TArtefactRepo = repository.GetType().GetInterface("IArtefactRepository<Artefact>`1");
+//			Type TElement = TArtefactRepo.GetElementType();
+			_repositories.Add(repository.GetType().GetInterface("IArtefactRepository`1").GetGenericArguments()[0], repository);
+		}
+
+		public void AddTypedRepository<TArtefact>(IArtefactRepository<TArtefact> repository)
+			where TArtefact : Artefact
+		{
+			_repositories.Add(typeof(TArtefact), repository);
+		}
+		
+//		public Guid GetSessionId()
+//		{
+//			return Session.GetSessionImplementation().SessionId;
+//		}
+//		
+//		public long GetSessionTimestamp()
+//		{
+//			return Session.GetSessionImplementation().Timestamp;
+//		}
+
+		public void BeginTransaction()
+		{
+			if (Transaction == null)
+				Session.BeginTransaction();
+//			Transaction = 
+			else if (!Transaction.IsActive)
+				Transaction.Begin();
+			else
+				throw new TransactionException("Transaction is already active");
+		}
+		
+		public void EndTransaction(bool commit)
+		{
+			if (Transaction == null)
+				throw new TransactionException("Current transaction does not exist");
+			else if (!Transaction.IsActive)
+				throw new TransactionException("Current transaction is not active");
+			if (commit)
+				Transaction.Commit();
+			else
+				Transaction.Rollback();
+			Transaction.Dispose();
+//			Transaction = null;
+		}
+		#endregion
+		
+		//			var r = (from a in _clientProxy.Artefacts
+//				where a.TimeCreated.Ticks > new DateTime(2013, 12, 21, 7, 44, 40).Ticks
+////			         orderby a.TimeCreated
+//				select a);
+//					r.ArtefactRepository = _repoProxy;
+//			Expression<Func<Artefact, bool>> expr = artefact => artefact.TimeCreated.Ticks > new DateTime(2014, 01, 03, 12, 12, 12).Ticks;
+			Func<IQueryable<Artefact>, IQueryable<Artefact>> myFunc = artefacts => artefacts.Where(a => a.Id > 2);
+			byte[] b = myFunc.Method.GetMethodBody().GetILAsByteArray();
+//			var q = 
+//					from a2 in (from a in _clientProxy.Artefacts where a.Id > 2 select a) where a2.TimeCreated > DateTime.MinValue select a2;
+			
+						object res = _clientProxy.CreateQueryIL(b);

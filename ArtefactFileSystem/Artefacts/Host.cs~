@@ -1,0 +1,39 @@
+using System;
+using System.IO;
+using System.Diagnostics;
+using System.Runtime.Serialization;
+using System.ServiceModel;
+
+namespace Artefacts.FileSystem
+{
+	[DataContract]	//(IsReference = true)]
+	[ArtefactFormatString("[Host: HostId={HostId}]")]
+	public class Host : Artefact
+	{
+		[DataMember]
+		public virtual string HostId { get; set; }
+		
+		public Host(bool createNew = true)
+		{
+			if (createNew)
+			{
+//				System.AppDomain.CurrentDomain.DomainManager.EntryAssembly.HostContext;
+				Process getDiskSerialProcess = Process.Start(
+				new ProcessStartInfo("hostid")
+				{
+					RedirectStandardOutput = true,
+					RedirectStandardError = true,
+					UseShellExecute = false
+				});
+				getDiskSerialProcess.WaitForExit(1111);
+				HostId = getDiskSerialProcess.StandardOutput.ReadLine();
+			}
+		}
+		
+		private Host()
+		{
+			
+		}
+	}
+}
+

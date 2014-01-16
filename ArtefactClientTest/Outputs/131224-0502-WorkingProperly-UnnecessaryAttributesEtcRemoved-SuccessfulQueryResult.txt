@@ -1,0 +1,109 @@
+ ServiceHost: Opening
+ServiceHost: Opened
+Service: Artefacts.Services.ArtefactService
+Name: http://tempuri.org//ArtefactService
+Configuration Name: 
+Base Addresses (0): 
+Endpoints (2):
+	NetTcpBinding_IArtefactService Explicit net.tcp://localhost:3333/ArtefactService System.ServiceModel.NetTcpBinding
+	NetTcpBinding_IArtefactRepository`1 Explicit net.tcp://localhost:3334/ArtefactRepository System.ServiceModel.NetTcpBinding
+ChannelDispatchers (2):
+	Opened : net.tcp://localhost:3333/ArtefactService
+	Opened : net.tcp://localhost:3334/ArtefactRepository
+Extensions (1):
+	System.ServiceModel.Description.ServiceMetadataExtension
+
+
+
+Client Service Proxy: System.ServiceModel.MonoInternal.ClientRuntimeChannel
+Service Artefact Repositroy: System.ServiceModel.MonoInternal.ClientRuntimeChannel
+
+
+########
+# RunTest: Start: QueryResult RunQuery(Func<Artefact, bool> queryFunc, PagingOptions pagingOptions)
+########
+
+NHibernate: select artefact0_.Id as Id0_, artefact0_.TimeCreated as TimeCrea2_0_, artefact0_.TimeUpdated as TimeUpda3_0_, artefact0_.TimeChecked as TimeChec4_0_, artefact0_1_.Label as Label1_, artefact0_2_.Path as Path2_, artefact0_2_.Drive as Drive2_, artefact0_2_.Attributes as Attributes2_, artefact0_2_.CreationTime as Creation5_2_, artefact0_2_.AccessTime as AccessTime2_, artefact0_2_.ModifyTime as ModifyTime2_, artefact0_4_.Size as Size4_, case when artefact0_3_.Id is not null then 3 when artefact0_4_.Id is not null then 4 when artefact0_1_.Id is not null then 1 when artefact0_2_.Id is not null then 2 when artefact0_.Id is not null then 0 end as clazz_ from Artefact artefact0_ left outer join Drive artefact0_1_ on artefact0_.Id=artefact0_1_.Id left outer join FileSystemEntry artefact0_2_ on artefact0_.Id=artefact0_2_.Id left outer join Directory artefact0_3_ on artefact0_.Id=artefact0_3_.Id left outer join File artefact0_4_ on artefact0_.Id=artefact0_4_.Id where ?p0=1;?p0 = True [Type: Boolean (0)]
+NHibernate: select artefact0_.Id as Id0_, artefact0_.TimeCreated as TimeCrea2_0_, artefact0_.TimeUpdated as TimeUpda3_0_, artefact0_.TimeChecked as TimeChec4_0_, artefact0_1_.Label as Label1_, artefact0_2_.Path as Path2_, artefact0_2_.Drive as Drive2_, artefact0_2_.Attributes as Attributes2_, artefact0_2_.CreationTime as Creation5_2_, artefact0_2_.AccessTime as AccessTime2_, artefact0_2_.ModifyTime as ModifyTime2_, artefact0_4_.Size as Size4_, case when artefact0_3_.Id is not null then 3 when artefact0_4_.Id is not null then 4 when artefact0_1_.Id is not null then 1 when artefact0_2_.Id is not null then 2 when artefact0_.Id is not null then 0 end as clazz_ from Artefact artefact0_ left outer join Drive artefact0_1_ on artefact0_.Id=artefact0_1_.Id left outer join FileSystemEntry artefact0_2_ on artefact0_.Id=artefact0_2_.Id left outer join Directory artefact0_3_ on artefact0_.Id=artefact0_3_.Id left outer join File artefact0_4_ on artefact0_.Id=artefact0_4_.Id where ?p0=1;?p0 = True [Type: Boolean (0)]
+68 artefacts currently in repository
+[Artefact: Drive: Id=98304, TimeCreated=21/12/2013 9:23:25 PM, TimeUpdated=21/12/2013 9:23:25 PM, TimeChecked=21/12/2013 9:23:25 PM]
+[Artefact: Drive: Id=98305, TimeCreated=21/12/2013 9:23:31 PM, TimeUpdated=21/12/2013 9:23:31 PM, TimeChecked=21/12/2013 9:23:31 PM]
+[Artefact: Drive: Id=98306, TimeCreated=21/12/2013 9:23:31 PM, TimeUpdated=21/12/2013 9:23:31 PM, TimeChecked=21/12/2013 9:23:31 PM]
+[Artefact: Drive: Id=98307, TimeCreated=21/12/2013 9:23:32 PM, TimeUpdated=21/12/2013 9:23:32 PM, TimeChecked=21/12/2013 9:23:32 PM]
+[Artefact: Drive: Id=98308, TimeCreated=21/12/2013 9:23:32 PM, TimeUpdated=21/12/2013 9:23:32 PM, TimeChecked=21/12/2013 9:23:32 PM]
+[Artefact: Drive: Id=98309, TimeCreated=21/12/2013 9:23:32 PM, TimeUpdated=21/12/2013 9:23:32 PM, TimeChecked=21/12/2013 9:23:32 PM]
+[Artefact: Drive: Id=98310, TimeCreated=21/12/2013 9:23:32 PM, TimeUpdated=21/12/2013 9:23:32 PM, TimeChecked=21/12/2013 9:23:32 PM]
+[Artefact: Drive: Id=98311, TimeCreated=21/12/2013 9:23:32 PM, TimeUpdated=21/12/2013 9:23:32 PM, TimeChecked=21/12/2013 9:23:32 PM]
+[Artefact: Drive: Id=98312, TimeCreated=21/12/2013 9:23:32 PM, TimeUpdated=21/12/2013 9:23:32 PM, TimeChecked=21/12/2013 9:23:32 PM]
+[Artefact: Drive: Id=98313, TimeCreated=21/12/2013 9:23:32 PM, TimeUpdated=21/12/2013 9:23:32 PM, TimeChecked=21/12/2013 9:23:32 PM]
+[Artefact: Drive: Id=98314, TimeCreated=21/12/2013 9:23:32 PM, TimeUpdated=21/12/2013 9:23:32 PM, TimeChecked=21/12/2013 9:23:32 PM]
+[Artefact: Drive: Id=98315, TimeCreated=21/12/2013 9:23:33 PM, TimeUpdated=21/12/2013 9:23:33 PM, TimeChecked=21/12/2013 9:23:33 PM]
+[Artefact: Drive: Id=98316, TimeCreated=21/12/2013 9:23:33 PM, TimeUpdated=21/12/2013 9:23:33 PM, TimeChecked=21/12/2013 9:23:33 PM]
+[Artefact: Drive: Id=98317, TimeCreated=21/12/2013 9:23:33 PM, TimeUpdated=21/12/2013 9:23:33 PM, TimeChecked=21/12/2013 9:23:33 PM]
+[Artefact: Drive: Id=98318, TimeCreated=21/12/2013 9:23:33 PM, TimeUpdated=21/12/2013 9:23:33 PM, TimeChecked=21/12/2013 9:23:33 PM]
+[Artefact: Drive: Id=98319, TimeCreated=21/12/2013 9:23:33 PM, TimeUpdated=21/12/2013 9:23:33 PM, TimeChecked=21/12/2013 9:23:33 PM]
+[Artefact: Drive: Id=98320, TimeCreated=21/12/2013 9:23:33 PM, TimeUpdated=21/12/2013 9:23:33 PM, TimeChecked=21/12/2013 9:23:33 PM]
+[Artefact: Drive: Id=98321, TimeCreated=21/12/2013 9:23:33 PM, TimeUpdated=21/12/2013 9:23:33 PM, TimeChecked=21/12/2013 9:23:33 PM]
+[Artefact: Directory: Id=98322, TimeCreated=21/12/2013 9:23:34 PM, TimeUpdated=21/12/2013 9:23:34 PM, TimeChecked=21/12/2013 9:23:34 PM]
+[Artefact: Directory: Id=98323, TimeCreated=21/12/2013 9:23:34 PM, TimeUpdated=21/12/2013 9:23:34 PM, TimeChecked=21/12/2013 9:23:34 PM]
+[Artefact: Directory: Id=98324, TimeCreated=21/12/2013 9:23:34 PM, TimeUpdated=21/12/2013 9:23:34 PM, TimeChecked=21/12/2013 9:23:34 PM]
+[Artefact: Directory: Id=98325, TimeCreated=21/12/2013 9:23:34 PM, TimeUpdated=21/12/2013 9:23:34 PM, TimeChecked=21/12/2013 9:23:34 PM]
+[Artefact: File: Id=98326, TimeCreated=21/12/2013 9:23:34 PM, TimeUpdated=21/12/2013 9:23:34 PM, TimeChecked=21/12/2013 9:23:34 PM]
+[Artefact: File: Id=98327, TimeCreated=21/12/2013 9:23:34 PM, TimeUpdated=21/12/2013 9:23:34 PM, TimeChecked=21/12/2013 9:23:34 PM]
+[Artefact: File: Id=98328, TimeCreated=21/12/2013 9:23:34 PM, TimeUpdated=21/12/2013 9:23:34 PM, TimeChecked=21/12/2013 9:23:34 PM]
+[Artefact: File: Id=98329, TimeCreated=21/12/2013 9:23:35 PM, TimeUpdated=21/12/2013 9:23:35 PM, TimeChecked=21/12/2013 9:23:35 PM]
+[Artefact: File: Id=98330, TimeCreated=21/12/2013 9:23:35 PM, TimeUpdated=21/12/2013 9:23:35 PM, TimeChecked=21/12/2013 9:23:35 PM]
+[Artefact: File: Id=98331, TimeCreated=21/12/2013 9:23:35 PM, TimeUpdated=21/12/2013 9:23:35 PM, TimeChecked=21/12/2013 9:23:35 PM]
+[Artefact: File: Id=98332, TimeCreated=21/12/2013 9:23:35 PM, TimeUpdated=21/12/2013 9:23:35 PM, TimeChecked=21/12/2013 9:23:35 PM]
+[Artefact: File: Id=98333, TimeCreated=21/12/2013 9:23:35 PM, TimeUpdated=21/12/2013 9:23:35 PM, TimeChecked=21/12/2013 9:23:35 PM]
+[Artefact: File: Id=98334, TimeCreated=21/12/2013 9:23:35 PM, TimeUpdated=21/12/2013 9:23:35 PM, TimeChecked=21/12/2013 9:23:35 PM]
+[Artefact: File: Id=98335, TimeCreated=21/12/2013 9:23:35 PM, TimeUpdated=21/12/2013 9:23:35 PM, TimeChecked=21/12/2013 9:23:35 PM]
+[Artefact: File: Id=98336, TimeCreated=21/12/2013 9:23:36 PM, TimeUpdated=21/12/2013 9:23:36 PM, TimeChecked=21/12/2013 9:23:36 PM]
+[Artefact: File: Id=98337, TimeCreated=21/12/2013 9:23:36 PM, TimeUpdated=21/12/2013 9:23:36 PM, TimeChecked=21/12/2013 9:23:36 PM]
+[Artefact: File: Id=98338, TimeCreated=21/12/2013 9:23:36 PM, TimeUpdated=21/12/2013 9:23:36 PM, TimeChecked=21/12/2013 9:23:36 PM]
+[Artefact: File: Id=98339, TimeCreated=21/12/2013 9:23:36 PM, TimeUpdated=21/12/2013 9:23:36 PM, TimeChecked=21/12/2013 9:23:36 PM]
+[Artefact: File: Id=98340, TimeCreated=21/12/2013 9:23:36 PM, TimeUpdated=21/12/2013 9:23:36 PM, TimeChecked=21/12/2013 9:23:36 PM]
+[Artefact: File: Id=98341, TimeCreated=21/12/2013 9:23:37 PM, TimeUpdated=21/12/2013 9:23:37 PM, TimeChecked=21/12/2013 9:23:37 PM]
+[Artefact: File: Id=98342, TimeCreated=21/12/2013 9:23:37 PM, TimeUpdated=21/12/2013 9:23:37 PM, TimeChecked=21/12/2013 9:23:37 PM]
+[Artefact: File: Id=98343, TimeCreated=21/12/2013 9:23:37 PM, TimeUpdated=21/12/2013 9:23:37 PM, TimeChecked=21/12/2013 9:23:37 PM]
+[Artefact: File: Id=98344, TimeCreated=21/12/2013 9:23:37 PM, TimeUpdated=21/12/2013 9:23:37 PM, TimeChecked=21/12/2013 9:23:37 PM]
+[Artefact: File: Id=98345, TimeCreated=21/12/2013 9:23:37 PM, TimeUpdated=21/12/2013 9:23:37 PM, TimeChecked=21/12/2013 9:23:37 PM]
+[Artefact: File: Id=98346, TimeCreated=21/12/2013 9:23:37 PM, TimeUpdated=21/12/2013 9:23:37 PM, TimeChecked=21/12/2013 9:23:37 PM]
+[Artefact: File: Id=98347, TimeCreated=21/12/2013 9:23:37 PM, TimeUpdated=21/12/2013 9:23:37 PM, TimeChecked=21/12/2013 9:23:37 PM]
+[Artefact: File: Id=98348, TimeCreated=21/12/2013 9:23:37 PM, TimeUpdated=21/12/2013 9:23:37 PM, TimeChecked=21/12/2013 9:23:37 PM]
+[Artefact: File: Id=98349, TimeCreated=21/12/2013 9:23:38 PM, TimeUpdated=21/12/2013 9:23:38 PM, TimeChecked=21/12/2013 9:23:38 PM]
+[Artefact: File: Id=98350, TimeCreated=21/12/2013 9:23:38 PM, TimeUpdated=21/12/2013 9:23:38 PM, TimeChecked=21/12/2013 9:23:38 PM]
+[Artefact: File: Id=98351, TimeCreated=21/12/2013 9:23:38 PM, TimeUpdated=21/12/2013 9:23:38 PM, TimeChecked=21/12/2013 9:23:38 PM]
+[Artefact: File: Id=98352, TimeCreated=21/12/2013 9:23:38 PM, TimeUpdated=21/12/2013 9:23:38 PM, TimeChecked=21/12/2013 9:23:38 PM]
+[Artefact: File: Id=98353, TimeCreated=21/12/2013 9:23:38 PM, TimeUpdated=21/12/2013 9:23:38 PM, TimeChecked=21/12/2013 9:23:38 PM]
+[Artefact: File: Id=98354, TimeCreated=21/12/2013 9:23:38 PM, TimeUpdated=21/12/2013 9:23:38 PM, TimeChecked=21/12/2013 9:23:38 PM]
+[Artefact: File: Id=98355, TimeCreated=21/12/2013 9:23:38 PM, TimeUpdated=21/12/2013 9:23:38 PM, TimeChecked=21/12/2013 9:23:38 PM]
+[Artefact: File: Id=98356, TimeCreated=21/12/2013 9:23:38 PM, TimeUpdated=21/12/2013 9:23:38 PM, TimeChecked=21/12/2013 9:23:38 PM]
+[Artefact: File: Id=98357, TimeCreated=21/12/2013 9:23:39 PM, TimeUpdated=21/12/2013 9:23:39 PM, TimeChecked=21/12/2013 9:23:39 PM]
+[Artefact: File: Id=98358, TimeCreated=21/12/2013 9:23:39 PM, TimeUpdated=21/12/2013 9:23:39 PM, TimeChecked=21/12/2013 9:23:39 PM]
+[Artefact: File: Id=98359, TimeCreated=21/12/2013 9:23:39 PM, TimeUpdated=21/12/2013 9:23:39 PM, TimeChecked=21/12/2013 9:23:39 PM]
+[Artefact: File: Id=98360, TimeCreated=21/12/2013 9:23:39 PM, TimeUpdated=21/12/2013 9:23:39 PM, TimeChecked=21/12/2013 9:23:39 PM]
+[Artefact: File: Id=98361, TimeCreated=21/12/2013 9:23:39 PM, TimeUpdated=21/12/2013 9:23:39 PM, TimeChecked=21/12/2013 9:23:39 PM]
+[Artefact: File: Id=98362, TimeCreated=21/12/2013 9:23:39 PM, TimeUpdated=21/12/2013 9:23:39 PM, TimeChecked=21/12/2013 9:23:39 PM]
+[Artefact: File: Id=98363, TimeCreated=21/12/2013 9:23:39 PM, TimeUpdated=21/12/2013 9:23:39 PM, TimeChecked=21/12/2013 9:23:39 PM]
+[Artefact: Directory: Id=98364, TimeCreated=21/12/2013 9:23:40 PM, TimeUpdated=21/12/2013 9:23:40 PM, TimeChecked=21/12/2013 9:23:40 PM]
+[Artefact: File: Id=98365, TimeCreated=21/12/2013 9:23:40 PM, TimeUpdated=21/12/2013 9:23:40 PM, TimeChecked=21/12/2013 9:23:40 PM]
+[Artefact: File: Id=98366, TimeCreated=21/12/2013 9:23:40 PM, TimeUpdated=21/12/2013 9:23:40 PM, TimeChecked=21/12/2013 9:23:40 PM]
+[Artefact: File: Id=98367, TimeCreated=21/12/2013 9:23:40 PM, TimeUpdated=21/12/2013 9:23:40 PM, TimeChecked=21/12/2013 9:23:40 PM]
+[Artefact: File: Id=98368, TimeCreated=21/12/2013 9:23:40 PM, TimeUpdated=21/12/2013 9:23:40 PM, TimeChecked=21/12/2013 9:23:40 PM]
+[Artefact: File: Id=98369, TimeCreated=21/12/2013 9:23:40 PM, TimeUpdated=21/12/2013 9:23:40 PM, TimeChecked=21/12/2013 9:23:40 PM]
+[Artefact: File: Id=98370, TimeCreated=21/12/2013 9:23:40 PM, TimeUpdated=21/12/2013 9:23:40 PM, TimeChecked=21/12/2013 9:23:40 PM]
+[Artefact: File: Id=98371, TimeCreated=21/12/2013 9:23:41 PM, TimeUpdated=21/12/2013 9:23:41 PM, TimeChecked=21/12/2013 9:23:41 PM]
+
+########
+# RunTest: Success
+
+
+Exiting...
+Stopping service host thread... 
+ServiceHost: Closing
+ServiceHost: Closed
+done.
+
+Press any key to continue...
+

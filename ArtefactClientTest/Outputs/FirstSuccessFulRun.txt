@@ -1,0 +1,29 @@
+02/12/13 ~16:55
+
+First successful run of WCF client/server and NHibernate persistence on the server end. Output was:
+
+Starting service host thread...
+
+Service: Artefacts.Services.ArtefactRepository (http://tempuri.org/ArtefactRepository)
+NetTcpBinding_IArtefactRepository Explicit net.tcp://localhost:3333/ArtefactRepository System.ServiceModel.NetTcpBinding
+
+Client created: [ArtefactRepositoryProxy: State=Opened]
+NetTcpBinding_IArtefactRepository Explicit net.tcp://localhost:3333/ArtefactRepository System.ServiceModel.NetTcpBinding
+Already initialized
+
+[Artefact: Id=(null), TimeCreated=1/01/0001 12:00:00 AM, TimeUpdated=1/01/0001 12:00:00 AM, TimeChecked=1/01/0001 12:00:00 AM]
+
+Calling service operation AddArtefact...
+NHibernate: select next_hi from hibernate_unique_key for update
+NHibernate: update hibernate_unique_key set next_hi = ?p0 where next_hi = ?p1;?p0 = 2 [Type: Int32 (0)], ?p1 = 1 [Type: Int32 (0)]
+NHibernate: INSERT INTO Artefact (TimeCreated, TimeUpdated, TimeChecked, Id) VALUES (?p0, ?p1, ?p2, ?p3);?p0 = 1/01/0001 12:00:00 AM [Type: DateTime (0)], ?p1 = 1/01/0001 12:00:00 AM [Type: DateTime (0)], ?p2 = 1/01/0001 12:00:00 AM [Type: DateTime (0)], ?p3 = 32768 [Type: Int32 (0)]
+32768)
+
+[Artefact: Id=32768, TimeCreated=1/01/0001 12:00:00 AM, TimeUpdated=1/01/0001 12:00:00 AM, TimeChecked=1/01/0001 12:00:00 AM]
+
+Stopping service host thread...
+Stopped cleanly
+
+
+Press any key to continue...
+
