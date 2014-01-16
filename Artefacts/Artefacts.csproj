@@ -44,12 +44,15 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
-    <Compile Include="IArtefact.cs" />
-    <Compile Include="Artefact.cs" />
     <Compile Include="IWorker.cs" />
     <Compile Include="ICreator.cs" />
     <Compile Include="IReceiver.cs" />
     <Compile Include="CreatorBase.cs" />
+    <Compile Include="Host.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Artefacts\Artefact.cs" />
+    <Compile Include="Artefacts\IArtefact.cs" />
+    <Compile Include="Artefacts\ArtefactFormatStringAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -57,9 +60,9 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Mappings\blank.hbm.xml" />
+    <None Include="Artefacts\blank.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Mappings\Artefact.hbm.xml" />
+    <EmbeddedResource Include="Artefacts\Artefact.hbm.xml" />
   </ItemGroup>
 </Project>

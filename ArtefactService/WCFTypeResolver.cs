@@ -15,12 +15,12 @@ namespace Artefacts.Services
 	{
 		private XmlDictionary _typeDictionary = new XmlDictionary();
 
-		public WCFTypeResolver ()
+		public WCFTypeResolver()
 		{
 		}
 
 		#region implemented abstract members of System.Runtime.Serialization.DataContractResolver
-		public override Type ResolveName (string typeName, string typeNamespace, Type declaredType, DataContractResolver knownTypeResolver)
+		public override Type ResolveName(string typeName, string typeNamespace, Type declaredType, DataContractResolver knownTypeResolver)
 		{
 			if (typeof(System.Linq.IQueryable).IsAssignableFrom(declaredType))
 			{
@@ -29,16 +29,28 @@ namespace Artefacts.Services
 				if (type != null)
 					return type;
 			}
+			else if (typeName.StartsWith("ExpressionNode`1["))
+			{
+				string tn = typeNamespace + "." + typeName.Substring(0, typeName.IndexOf('['));
+				Type t = Type.GetType(tn);
+				return t;
+			}
 			return knownTypeResolver.ResolveName(typeName, typeNamespace, declaredType, knownTypeResolver);
 		}
 
-		public override bool TryResolveType (
+		public override bool TryResolveType(
 			Type type, Type declaredType, DataContractResolver knownTypeResolver,
 			out XmlDictionaryString typeName, out XmlDictionaryString typeNamespace)
 		{
 			if (declaredType.IsSubclassOf(typeof(System.Linq.IQueryable)))
 			{
 				typeName = _typeDictionary.Add(type.Name);
+				typeNamespace = _typeDictionary.Add(type.Namespace);
+				return true;
+			}
+			else if (type.Name.StartsWith("ExpressionNode`1"))
+			{
+				typeName = _typeDictionary.Add("ExpressionNode`1[" + type.GetGenericArguments()[0].Name + "]");
 				typeNamespace = _typeDictionary.Add(type.Namespace);
 				return true;
 			}

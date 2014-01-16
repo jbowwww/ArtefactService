@@ -5,16 +5,31 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artefacts", "Artefacts\Arte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtefactService", "ArtefactService\ArtefactService.csproj", "{D76CD89A-4341-462E-BBB1-9D756368442C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Design", "Design", "{38AC2112-0268-4687-BCBC-CD7086FC6756}"
-	ProjectSection(SolutionItems) = preProject
-		Solution Overview.txt = Solution Overview.txt
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtefactServiceHost", "ArtefactServiceHost\ArtefactServiceHost.csproj", "{2A68C8C7-F066-41EA-A476-F1F27EF77E52}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtefactClientTest", "ArtefactClientTest\ArtefactClientTest.csproj", "{DF2BDA77-4F99-4327-85CC-2C7F1A5C4645}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtefactFileSystem", "ArtefactFileSystem\ArtefactFileSystem.csproj", "{5B486604-0B8B-4214-99DB-C36A69168F5B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Design", "Design", "{AD5F9385-1EB6-4EE2-BD8C-B375EB7A0C0A}"
+	ProjectSection(SolutionItems) = preProject
+		Design\Solution Overview.txt = Design\Solution Overview.txt
+		Design\XML_Comments.cs = Design\XML_Comments.cs
+		Design\Removed_Code_Recycle_Bin.txt = Design\Removed_Code_Recycle_Bin.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Removed Code Files", "Removed Code Files", "{ABC7B4C9-272A-43E9-A015-9FFD54F140D0}"
+	ProjectSection(SolutionItems) = preProject
+		Design\IArtefactService.cs = Design\IArtefactService.cs
+		Design\ClientQueryProvider.cs = Design\ClientQueryProvider.cs
+		Design\ServerQueryProvider.cs = Design\ServerQueryProvider.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backed Up and Old Version Code Files", "Backed Up and Old Version Code Files", "{AA098B01-8AA1-42BF-885E-CDF7040D97FE}"
+	ProjectSection(SolutionItems) = preProject
+		Design\QueryResult.cs = Design\QueryResult.cs
+		Design\Queryable-nongeneric.cs = Design\Queryable-nongeneric.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +59,8 @@ Global
 		{FC41660D-8F54-437D-9AA7-87E460D73689}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{ABC7B4C9-272A-43E9-A015-9FFD54F140D0} = {AD5F9385-1EB6-4EE2-BD8C-B375EB7A0C0A}
+		{AA098B01-8AA1-42BF-885E-CDF7040D97FE} = {AD5F9385-1EB6-4EE2-BD8C-B375EB7A0C0A}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = ArtefactClientTest\ArtefactClientTest.csproj

@@ -1,3 +1,10 @@
+30/12/13 -
+	See Output/*.txt for successful test outputs
+	About to attempt improving Artefacts.Drive class to include a disk serial number as reported by shell command:
+		/sbin/udevadm info --query=property --name=sda
+			- What does it report for non-HD partitions??
+---------------------------------
+
 02/12/13 - 
 	Think I now have :
 		A basic WCF service running, currently with one operation, AddArtefact, which persists the passed artefact

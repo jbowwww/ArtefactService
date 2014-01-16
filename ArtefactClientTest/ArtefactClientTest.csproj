@@ -22,9 +22,11 @@
     <Externalconsole>true</Externalconsole>
     <EnvironmentVariables>
       <EnvironmentVariables>
-        <Variable name="MONO_WCF_TRACE" value="/home/jk/Code/Trace.WCF.txt" />
         <Variable name="MONO_DEBUG" value="casts,gdb,gen-seq-points,handle-sigint,suspend-on-sigsegv" />
-        <Variable name="MONO_TRACE_LISTENER" value="/home/jk/Code/Trace.txt" />
+        <Variable name="MONO_WCF_TRACE" value="/home/jk/Code/ArtefactService/bin/Trace.WCF.xml" />
+        <Variable name="MONO_TRACE_LISTENER" value="/home/jk/Code/ArtefactService/bin/Trace.txt" />
+        <Variable name="MONO_XMLSERIALIZER_DEBUG" value="1" />
+        <Variable name="MONO_TRACE" value="N:System.Runtime.Remoting.Activation.ActivationServices" />
       </EnvironmentVariables>
     </EnvironmentVariables>
   </PropertyGroup>
@@ -54,18 +56,30 @@
       <HintPath>..\bin\lib\Serialize.Linq.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\bin\lib\MySql.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Remoting" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="ClientTest.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="ClientTestMethodAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="Notes.txt" />
-    <None Include="FirstSuccessFulRun.txt" />
-    <None Include="err.txt" />
-    <None Include="SuccessfulPersistenceOfAllFileSystemArtefacts.txt" />
+    <None Include="Outputs\131224-0120-UsingRunTest-RunWithExceptions.txt" />
+    <None Include="Outputs\FirstSuccessFulRun.txt" />
+    <None Include="Outputs\SuccessfulPersistenceOfAllFileSystemArtefacts.txt" />
+    <None Include="Outputs\131224-0502-WorkingProperly-UnnecessaryAttributesEtcRemoved-SuccessfulQueryResult.txt" />
+    <None Include="Outputs\131224-0606.txt" />
+    <None Include="Outputs\131229-2100-UsingArtefactFormatStringAttribute.txt" />
+    <None Include="Outputs\131230-0330.txt" />
+    <None Include="Outputs\131230-0625.txt" />
+    <None Include="Outputs\140117-0028-BasicQueryableFunctionalityWorking.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Artefacts\Artefacts.csproj">
@@ -87,5 +101,8 @@
       <Project>{5B486604-0B8B-4214-99DB-C36A69168F5B}</Project>
       <Name>ArtefactFileSystem</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Outputs\" />
   </ItemGroup>
 </Project>
