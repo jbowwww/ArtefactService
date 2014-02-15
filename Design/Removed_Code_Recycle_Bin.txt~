@@ -1,5 +1,137 @@
+//31/1/14 on
+//--------------------
 
-		//** REMOVE - ...?! **/
+RepositoryClientProxy.cs
+//Expression expression = 
+//				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) },
+//				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()));
+//			//				(Queryable<Artefact>)QueryProvider.CreateQuery<Artefact>(expression);
+
+ClientExpressionVisitor.cs
+//
+//		public Expression Visit(Expression exp, out bool isCountExpression)
+//		{
+//			isCountExpression = this.IsCountExpression;
+//			Expression translatedExpression = base.Visit(exp);
+//			isCountExpression = this.IsCountExpression;
+//		}		
+//		protected override Expression VisitMethodCall(MethodCallExpression m)
+//		{
+//			using (IDisposable vmsu = new VisitationMethodStackUpdater(VisitStack, m))
+//			{
+//				if (VisitStack.Count == 1 && m.Arguments.Count == 0 && m.Method.Name == "Count"
+//					&& typeof(IEnumerable).IsAssignableFrom(m.Method.DeclaringType)
+//					&& typeof(long).IsAssignableFrom(m.Method.ReturnType))
+//				{
+//					IsCountExpression = true;
+//					return base.Visit(m.Object);
+//				}
+//				return base.VisitMethodCall(m);
+//			}
+//		}
+//
+
+ClientQueryProvider.cs
+
+//			if (expression.IsMethodCallExpression())
+//			{
+//				MethodCallExpression mce = (MethodCallExpression)expression;
+//				if (mce.Arguments.Count == 1 && typeof(IEnumerable).IsAssignableFrom(mce.Arguments[0].Type)
+//				    && (!typeof(IEnumerable).IsAssignableFrom(expression.Type)))
+//					return Repository.QueryMethodCall(mce.Arguments[0].Id(), mce.Method.DeclaringType.FullName + ":" + mce.Method.Name);
+//				else
+//					throw new ArgumentOutOfRangeException("expression", expression, "Unsupported MethodCallExpression");
+//			}
+//			else
+//				throw new ArgumentOutOfRangeException("expression", expression, "Could not execute expression");
+//		}
+//				 && (typeof(int).IsAssignableFrom(expression.Type) || typeof(long).IsAssignableFrom(expression.Type)))
+//					mce.Method.Name.Equals("Count"))
+//					return Repository.QueryCount(((MethodCallExpression)expression).Arguments[0].Id());
+//				else
+//					throw new InvalidOperationException("Invalid expression " + expression.ToString());
+//			}
+//			else if (typeof(Artefact).IsAssignableFrom(expression.Type))
+//				return Repository.QueryResult(expression.Id());
+//			else
+//				throw new Exception("This shouldn't happen: expression = " + expression.ToString());
+//				return Repository.CreateQuery(expression.Id());
+//
+//
+//
+//			return (TResult)Convert.ChangeType(Execute(expression), typeof(TResult));
+//			if (typeof(TResult) == typeof(Int32))
+//			{
+//				ExpressionNode en = expression.ToExpressionNode();
+//				MemoryStream ms = new MemoryStream();
+//				System.Runtime.Serialization.Formatters.Binary.BinaryFormatter bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+//				bf.Serialize(ms, en);
+//				string s = Convert.ToBase64String(ms.GetBuffer(), Base64FormattingOptions.InsertLineBreaks);
+//				object queryId = _repo.CreateQuery_EN_Binary(ms.GetBuffer());
+//				int count = _repo.QueryCount(queryId);
+//				return (TResult)Convert.ChangeType(count, typeof(TResult));
+//			}
+//			else if (typeof(Artefact).IsAssignableFrom(typeof(TResult)))
+//			{
+//				return (TResult)
+//			}
+//				throw new NotSupportedException();
+//
+//
+//		private System.Linq.Expressions.Expression PrepareExpression(System.Linq.Expressions.Expression expression)
+//		{
+//			BindingFlags bf =
+//				BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy |
+//				BindingFlags.GetField | BindingFlags.GetProperty | BindingFlags.Instance | BindingFlags.Static;
+//			
+//			if (expression is System.Linq.Expressions.MethodCallExpression)
+//			{
+//				System.Linq.Expressions.MethodCallExpression mce = (System.Linq.Expressions.MethodCallExpression)expression;
+//				List<System.Linq.Expressions.Expression> newArgs = new List<System.Linq.Expressions.Expression>();
+//				foreach (System.Linq.Expressions.Expression arg in mce.Arguments)
+//					newArgs.Add(PrepareExpression(arg));
+//				return System.Linq.Expressions.Expression.Call(mce.Method, newArgs);
+//			}
+//			else if (expression is System.Linq.Expressions.UnaryExpression)
+//			{
+//				System.Linq.Expressions.UnaryExpression ue = (System.Linq.Expressions.UnaryExpression)expression;
+//				return System.Linq.Expressions.Expression.MakeUnary(ue.NodeType, ue.Operand, ue.Type, ue.Method);
+//			}
+//			else if (expression is System.Linq.Expressions.BinaryExpression)
+//			{
+//				System.Linq.Expressions.BinaryExpression be = (System.Linq.Expressions.BinaryExpression)expression;
+//				return System.Linq.Expressions.Expression.MakeBinary(be.NodeType, be.Left, be.Right);
+//			}
+//			else if (expression is System.Linq.Expressions.MemberExpression)
+//			{
+//				System.Linq.Expressions.MemberExpression me = (System.Linq.Expressions.MemberExpression)expression;	// this one def not going to work
+//				return System.Linq.Expressions.Expression.Constant(me.Member.DeclaringType.InvokeMember(me.Member.Name, bf, null, me.Expression, new object[] { }));
+//			}
+//			else
+//				return expression;
+//		}
+
+ArtefactRepository.cs
+//					Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) }, 
+//					Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()))),
+//					this);
+//					Expression.Property(null, "Session")), this);			
+//				Session.Query<Artefact>();
+//				new QueryableNhProxy<Artefact>((NhQueryable<Artefact>)_nhQueryProvider.CreateQuery<Artefact>(
+//					Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) }, 				
+//				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()))), this);
+//					Expression.Property(null, "Session"))), this);
+//				QueryableNhProxy
+//				new Artefacts.Services.Queryable<Artefact>(_nhQueryProvider, this, Expression.Constant(Session.Query<Artefact>(), typeof(System.Linq.IQueryable<Artefact>)));
+//				new QueryableNhProxy<Artefact>((NhQueryable<Artefact>) _nhQueryProvider.CreateQuery<Artefact>(// new Queryable<Artefact>(_nhQueryProvider, this, )
+//				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) },
+//				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()))), this);
+//				Expression.Property(null, "Session")));
+	
+
+//--------------------
+
+				//** REMOVE - ...?! **/
 
 Artefact.cs
 //		public static Type[] GetArtefactTypes(ICustomAttributeProvider provider)

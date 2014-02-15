@@ -89,7 +89,8 @@ namespace ArtefactClientTest
 		private const string _runTestFormatStart = "\n########\n# RunTest: Start: {0}\n########\n";
 		private const string _runTestFormatSuccess = "\n########\n# RunTest: Success: {0}\n########\n";
 		private const string _runTestOutputUnknownError = "\n########\n# RunTest: Failed: {0}\n########\n";
-		private const string _runTestFormatError = "\n########\n# RunTest: Failed: {0}\n########\n{2}\n";
+		private const string _runTestFormatError = "\n########\n# RunTest: Failed: {0}\n########\n";
+		private const string _runTestFormatException = "{0}: {1}\n{2}\n";
 //		private const string _runTestOutputSuffix = "\n";
 		#endregion
 		
@@ -115,9 +116,25 @@ namespace ArtefactClientTest
 				testMethod();
 				output.WriteLine(_runTestFormatSuccess, name);
 			}
+			catch (FaultException<ExceptionDetail> ex)
+			{
+				output.WriteLine(_runTestFormatError, name);
+				output.WriteLine(_runTestFormatException, ex.GetType().FullName, ex.Message, ex.StackTrace);
+				int indent = 0;
+				for (ExceptionDetail detail = ex.Detail; detail != null; detail = detail.InnerException)
+					output.WriteLine(string.Concat(" ------ Inner Exception ------\n",
+						string.Format(_runTestFormatException, detail.Type, detail.Message, detail.StackTrace))
+							.Replace("\n", string.Concat("\n", new string(' ', ++indent * 2))).TrimStart('\n'));
+			}
 			catch (Exception ex)
 			{
-				output.WriteLine(_runTestFormatError, name, ex.GetType().FullName, ex.ToString());
+				output.WriteLine(_runTestFormatError, name);
+				output.WriteLine(_runTestFormatException, ex.GetType().FullName, ex.Message, ex.StackTrace);
+				int indent = 0;
+				for (Exception innerEx = ex.InnerException; innerEx != null; innerEx = innerEx.InnerException)
+					output.WriteLine(string.Concat("\n ------ Inner Exception ------\n",
+						string.Format(_runTestFormatException, innerEx.GetType().FullName, innerEx.Message, innerEx.StackTrace))
+							.Replace("\n", string.Concat("\n", new string(' ', ++indent * 2))).TrimStart('\n'));
 			}
 			finally
 			{
@@ -137,9 +154,26 @@ namespace ArtefactClientTest
 				output.WriteLine(_runTestFormatSuccess, name);
 				return true;
 			}
+			catch (FaultException<ExceptionDetail> ex)
+			{
+				output.WriteLine(_runTestFormatError, name);
+				output.WriteLine(_runTestFormatException, ex.GetType().FullName, ex.Message, ex.StackTrace);
+				int indent = 0;
+				for (ExceptionDetail detail = ex.Detail; detail != null; detail = detail.InnerException)
+					output.WriteLine(string.Concat(" ------ Inner Exception ------\n",
+						string.Format(_runTestFormatException, detail.Type, detail.Message, detail.StackTrace))
+							.Replace("\n", string.Concat("\n", new string(' ', ++indent * 2))).TrimStart('\n'));
+				return false;
+			}
 			catch (Exception ex)
 			{
-				output.WriteLine(_runTestFormatError, name, ex.GetType().FullName, ex.ToString());
+				output.WriteLine(_runTestFormatError, name);
+				output.WriteLine(_runTestFormatException, ex.GetType().FullName, ex.Message, ex.StackTrace);
+				int indent = 0;
+				for (Exception innerEx = ex.InnerException; innerEx != null; innerEx = innerEx.InnerException)
+					output.WriteLine(string.Concat("\n ------ Inner Exception ------\n",
+						string.Format(_runTestFormatException, innerEx.GetType().FullName, innerEx.Message, innerEx.StackTrace))
+							.Replace("\n", string.Concat("\n", new string(' ', ++indent * 2))).TrimStart('\n'));
 				return false;
 			}
 			finally
@@ -150,33 +184,43 @@ namespace ArtefactClientTest
 		#endregion
 		
 		#region Test methods executed by RunTest
-//		[ClientTestMethod(Order=1, Name="IEnumerator<Artefact> RepositoryClientProxy<Artefact>.Artefacts")]
-		private static void TestQueryAllArtefacts()
+//		[ClientTestMethod(Order=5, Name="int RepositoryClientProxy<Artefact>.Artefacts.Count()")]
+		private static void TestQueryArtefactsCount()
 		{
 			Console.WriteLine("{0} artefacts currently in repository", _clientProxy.Artefacts.Count());
+		}
+		
+//		[ClientTestMethod(Order=10, Name="IQueryable<Artefact> RepositoryClientProxy<Artefact>.Artefacts")]
+		private static void TestQueryAllArtefacts()
+		{
 			foreach (Artefact artefact in _clientProxy.Artefacts)
 				Console.WriteLine(artefact.ToString());
 		}
 
-		[ClientTestMethod(Order=2, Name="IEnumerator<Artefact> RepositoryClientProxy<Artefact>.Artefacts")]
-		private static void TestQueryArtefactsEN()
+//		[ClientTestMethod(Order=20, Name="IEnumerator<Artefact> RepositoryClientProxy<Artefact>.Artefacts using LINQ statement")]
+		private static void TestQueryArtefacts_Linq_Statement()
 		{
-//			var q = from a in _clientProxy.Artefacts
-//				where a.Id > 512
-//					select a;
-			
-//			var q = _clientProxy.Artefacts.Where((a) => true).Select<Artefact, Artefact>((a) => a);//(a) => a.Id > 512);
-			
-			foreach (Artefact artefact in _clientProxy.Artefacts) //q)
+			var q = from a in _clientProxy.Artefacts
+				where a.Id > 32799
+					select a;
+			foreach (Artefact artefact in q)
 				Console.WriteLine(artefact.ToString());
 		}
 		
-//		[ClientTestMethod(Order=3, Name="FileSystemArtefactCreator")]
+//		[ClientTestMethod(Order=30, Name="IEnumerator<Aertefact> RepositoryClientProxy<Artefact>.Artefacts using LINQ method syntax")]
+		private static void TestQueryArtefacts_Linq_Method()
+		{
+			var q = _clientProxy.Artefacts.Where((a) => a.Id > 32799);
+			foreach (Artefact artefact in q)
+				Console.WriteLine(artefact.ToString());
+		}
+		
+		[ClientTestMethod(Order=40, Name="FileSystemArtefactCreator")]
 		private static void TestFileSystemArtefactCreator()
 		{
 			_fsCreator = new FileSystemArtefactCreator(_clientProxy)
 			{
-				BaseUri = new Uri("file:///media/Scarydoor/mystuff/moozik/samples/mycollections/")
+				BasePath = "/media/Scarydoor/mystuff/moozik/samples/mycollections/"
 			};
 			_fsCreator.Run(null);
 		}
@@ -194,54 +238,26 @@ namespace ArtefactClientTest
 			Thread.Sleep(ServiceHostStartDelay);
 			
 			_clientProxy = new RepositoryClientProxy<Artefact>(new NetTcpBinding(SecurityMode.None), "net.tcp://localhost:3334/ArtefactRepository");
-//			DataContractResolver resolver = new WCFTypeResolver();
-				
-//			_proxyFactory = new ChannelFactory<IArtefactService>(
-//				new NetTcpBinding(SecurityMode.None), "net.tcp://localhost:3333/ArtefactService");
-//			_proxyFactory.Endpoint.Binding.CloseTimeout = DefaultTimeout;
-//			_proxyFactory.Endpoint.Binding.OpenTimeout = DefaultTimeout;
-//			_proxyFactory.Endpoint.Binding.ReceiveTimeout = DefaultTimeout;
-//			_proxyFactory.Endpoint.Binding.SendTimeout = DefaultTimeout;
-////			ArtefactService.AddTypeResolver(_proxyFactory.Endpoint, resolver);
-//			_proxy = _proxyFactory.CreateChannel();//_proxyFactory.Endpoint);// new EndpointAddress());
-//			_repoProxyFactory = new ChannelFactory<IRepository<Artefact>>(
-//				new NetTcpBinding(SecurityMode.None), "net.tcp://localhost:3334/ArtefactRepository");
-//			_repoProxyFactory.Endpoint.Binding.CloseTimeout = DefaultTimeout;
-//			_repoProxyFactory.Endpoint.Binding.OpenTimeout = DefaultTimeout;
-//			_repoProxyFactory.Endpoint.Binding.ReceiveTimeout = DefaultTimeout;
-//			_repoProxyFactory.Endpoint.Binding.SendTimeout = DefaultTimeout;
-//			ArtefactService.AddTypeResolver(_repoProxyFactory.Endpoint, resolver);
-//			_repoProxy = _repoProxyFactory.CreateChannel();
-
+			
 			Console.WriteLine("\nService Artefact Repository: {0}\n", _clientProxy.ToString());
 		}
 		
 		public static void Main(string[] args)
-		{			
-			try
+		{
+			Init();
+			RunTests();
+			Console.WriteLine("\nExiting...");
+			if (_serviceHostThread != null)
 			{
-				Init();
-				RunTests();
-			}
-			catch (Exception ex)
-			{
-				Console.Error.WriteLine("\nException: " + ex.ToString());
-			}
-			finally
-			{
-				Console.WriteLine("\nExiting...");
-				if (_serviceHostThread != null)
-				{
-					Console.WriteLine("Stopping service host thread... ");
-					ArtefactServiceHost.StopAsyncThread();
-					if (_serviceHostThread.Join(3880))
-						Console.WriteLine("done.");
-					else
-						Console.WriteLine("Error!");
-				}
+				Console.WriteLine("Stopping service host thread... ");
+				ArtefactServiceHost.StopAsyncThread();
+				if (_serviceHostThread.Join(3880))
+					Console.WriteLine("done.");
 				else
-					Console.WriteLine("Service host thread null");
+					Console.WriteLine("Error!");
 			}
+			else
+				Console.WriteLine("Service host thread null");
 		}
 	}
 }

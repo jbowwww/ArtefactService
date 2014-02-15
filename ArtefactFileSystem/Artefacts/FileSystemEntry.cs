@@ -6,17 +6,14 @@ using System.ServiceModel;
 namespace Artefacts.FileSystem
 {
 	[DataContract]	//(IsReference = true)]
-	[ArtefactFormatString("[FileSystemEntry: Drive={DriveId} Path={Path} Attributes={Attributes} CreationTime={CreationTime} AccessTime={AccessTime} ModifyTime={ModifyTime}]")]
+	[ArtefactFormatString("[FileSystemEntry: Drive={Drive} Path={Path} Attributes={Attributes} CreationTime={CreationTime} AccessTime={AccessTime} ModifyTime={ModifyTime}]")]
 	public class FileSystemEntry : Artefact
 	{
-		public static Type[] GetArtefactTypes()
-		{
-			return Artefact.GetArtefactTypes();
-		}
+		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
 
-		public virtual int? DriveId { 
-			get { return Drive == null ? -1 : Drive.Id; }
-		}
+//		public virtual int? DriveId { 
+//			get { return Drive == null ? -1 : Drive.Id; }
+//		}
 		
 		[DataMember]
 		public virtual Drive Drive { get; set; }
@@ -39,8 +36,15 @@ namespace Artefacts.FileSystem
 		public virtual string Directory {
 			get { return System.IO.Path.GetDirectoryName(Path); }
 		}
-
-		public FileSystemEntry (FileSystemInfo fsInfo, Drive drive = null)
+		
+		protected FileSystemEntry(FileSystemInfo fsInfo, Drive drive = null)
+		{
+			Init(fsInfo, drive);
+		}
+		
+		protected FileSystemEntry() {}
+		
+		protected virtual void Init(FileSystemInfo fsInfo, Drive drive = null)
 		{
 			Drive = drive;
 			Path = fsInfo.FullName;
@@ -49,9 +53,13 @@ namespace Artefacts.FileSystem
 			AccessTime = fsInfo.LastAccessTime;
 			ModifyTime = fsInfo.LastWriteTime;
 		}
-
-		protected FileSystemEntry()
+		
+		public override bool Equals(object obj)
 		{
+			if (!base.Equals(obj))
+				return false;
+			FileSystemEntry fse = (FileSystemEntry)obj;
+			return Drive == fse.Drive && Path == fse.Path;
 		}
 	}
 }

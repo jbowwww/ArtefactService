@@ -58,20 +58,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="IArtefactTypeLibrary.cs" />
-    <Compile Include="ServiceFormatterExtensions.cs" />
     <Compile Include="NhBootStrap.cs" />
-    <Compile Include="WCFDataSerializerSurrogate.cs" />
     <Compile Include="PagingOptions.cs" />
-    <Compile Include="WCFTypeResolver.cs" />
     <Compile Include="IRepository.cs" />
-    <Compile Include="Queryable.cs" />
-    <Compile Include="ArtefactRepository.cs" />
+    <Compile Include="ExpressionVisitor.cs" />
+    <Compile Include="ArtefactServiceConfiguration.cs" />
+    <Compile Include="Extensions\Expression.cs" />
+    <Compile Include="Extensions\ServiceModel.cs" />
+    <Compile Include="CurrentlyUnused\MyDataContractBehaviour.cs" />
+    <Compile Include="CurrentlyUnused\WCFDataSerializerSurrogate.cs" />
+    <Compile Include="CurrentlyUnused\WCFTypeResolver.cs" />
     <Compile Include="RepositoryClientProxy.cs" />
+    <Compile Include="ArtefactRepository.cs" />
+    <Compile Include="Queryable.cs" />
     <Compile Include="ClientQueryProvider.cs" />
-    <Compile Include="MyDataContractBehaviour.cs" />
-    <Compile Include="QuerySerializationBinder.cs" />
-    <Compile Include="QueryResult.cs" />
+    <Compile Include="ClientQueryVisitor.cs" />
+    <Compile Include="ServerQueryVisitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -90,6 +92,11 @@
     <None Include="ArtefactService.config.exclude">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="ArtefactTypeLibrary.cs" />
+    <None Include="TODO.txt" />
+    <None Include="CurrentlyUnused\QuerySerializationBinder.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+    <Folder Include="CurrentlyUnused\" />
   </ItemGroup>
 </Project>

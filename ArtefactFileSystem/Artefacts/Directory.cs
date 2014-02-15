@@ -9,17 +9,31 @@ namespace Artefacts.FileSystem
 	[ArtefactFormatString("[Directory: ]")]
 	public class Directory : FileSystemEntry
 	{
-		public static Type[] GetArtefactTypes ()
+		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+		
+		public Directory(string path)
 		{
-			return Artefact.GetArtefactTypes();
+			
 		}
-
-		public Directory (DirectoryInfo dInfo, Drive drive) :
-			base(dInfo, drive)
+		
+		public Directory(DirectoryInfo dInfo, Drive drive)
 		{
+			Init(dInfo, drive);
 		}
 
 		protected Directory() {}
+		
+		protected virtual void Init(DirectoryInfo dInfo, Drive drive)
+		{
+			base.Init(dInfo, drive);
+		}
+		
+		public override Artefact Update()
+		{
+			base.Update();
+			Init(new DirectoryInfo(Path), Drive.GetDriveContainingPath(Path));		// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
+			return this;
+		}
 	}
 }
 

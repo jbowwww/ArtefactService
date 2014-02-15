@@ -69,5 +69,6 @@
     <EmbeddedResource Include="Artefacts\Mappings\Drive.hbm.xml" />
     <EmbeddedResource Include="Artefacts\Mappings\File.hbm.xml" />
     <EmbeddedResource Include="Artefacts\Mappings\FileSystemEntry.hbm.xml" />
+    <EmbeddedResource Include="Artefacts\Mappings\Disk.hbm.xml" />
   </ItemGroup>
 </Project>

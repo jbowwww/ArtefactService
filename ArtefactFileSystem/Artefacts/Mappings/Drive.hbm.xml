@@ -4,6 +4,7 @@
                    namespace="Artefacts.FileSystem"> 
 	<joined-subclass name="Drive" extends="Artefacts.Artefact">
 		<key column="Id" />
+		<!--<many-to-one name="Disk" class="Disk" cascade="all" />-->
 		<property name="Partition" />
 		<property name="Label" unique="true" />
 		<property name="Format" />

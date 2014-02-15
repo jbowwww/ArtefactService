@@ -5,7 +5,7 @@
 	<joined-subclass name="FileSystemEntry" extends="Artefacts.Artefact">
 		<key column="Id" />
 		<property name="Path" not-null="true" unique="true" />
-		<many-to-one name="Drive" class="Drive" cascade="none" />
+		<many-to-one name="Drive" class="Drive" /> <!-- cascade="all" />-->
 		<property name="Attributes" />
 		<property name="CreationTime" />
 		<property name="AccessTime" />

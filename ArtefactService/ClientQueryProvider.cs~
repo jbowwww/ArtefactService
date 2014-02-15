@@ -1,71 +1,71 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.Serialization;
-using System.Xml;
-using System.Xml.Serialization;
-using System.IO;
-using System.Text;
-
-using Serialize.Linq;
-using Serialize.Linq.Serializers;
-using Serialize.Linq.Nodes;
-using Serialize.Linq.Extensions;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
 
 namespace Artefacts.Services
 {
-	public class ClientQueryProvider<TArtefact> :
-		IQueryProvider
-		where TArtefact : Artefact
+	/// <summary>
+	/// Client query provider.
+	/// </summary>
+	/// <exception cref="ArgumentOutOfRangeException">
+	/// Is thrown when an argument passed to a method is invalid because it is outside the allowable range of values as
+	/// specified by the method.
+	/// </exception>
+	/// <remarks>
+	/// //	where TArtefact : Artefact
+	/// </remarks>
+	public class ClientQueryProvider<TArtefact> : IQueryProvider
 	{
-		private IRepository<TArtefact> _repo = null;
+		public IRepository<TArtefact> Repository { get; private set; }
 		
-		public ClientQueryProvider(IRepository<TArtefact> channel)
+		public ExpressionVisitor QueryVisitor { get; private set; }
+
+		public Dictionary<Expression, IQueryable> QueryCache { get; private set; }
+		
+		public BinaryFormatter BinaryFormatter { get; private set; }
+		
+		public ClientQueryProvider(IRepository<TArtefact> repository)
 		{
-			_repo = channel;
+			Repository = repository;
+			QueryVisitor = new ClientQueryVisitor((IRepository<Artefact>)Repository);
+			QueryCache = new Dictionary<Expression, IQueryable>();
+			BinaryFormatter = new BinaryFormatter();
 		}
 
 		#region IQueryProvider implementation
-		public IQueryable CreateQuery(System.Linq.Expressions.Expression expression)
+		public IQueryable CreateQuery(Expression expression)
 		{
-			return (this as IQueryProvider).CreateQuery<Artefact>(expression);
+			if (!expression.IsEnumerable())
+				throw new ArgumentOutOfRangeException("expression", expression, "IQueryable IQueryProvider.CreateQuery: Expression should be IEnumerable");
+			Expression newExpression = QueryVisitor.Visit(expression); 
+			Queryable<TArtefact> query = new Queryable<TArtefact>(this, Repository, newExpression);
+			object qId = Repository.CreateQuery(newExpression.ToBinary(BinaryFormatter));			// TODO: In future you may not want to wait for and return the queryId from server: it is only the expression as a string, and if you wait for it it will delay until the server has deserialized expression tree, which might be non-trivial if the expression is complex
+//			if (query.QueryId != qId)
+//				throw new InvalidOperationException("QueryId mismatch between client and server");
+			return (IQueryable)query;
 		}
 
-		public object Execute(System.Linq.Expressions.Expression expression)
+		IQueryable<TElement> IQueryProvider.CreateQuery<TElement>(Expression expression)
 		{
-//			StringBuilder sb = new StringBuilder();
-//			System.Xml.Serialization.XmlSerializer xs = new System.Xml.Serialization.XmlSerializer(typeof(System.Linq.Expressions.Expression));
-//			
-//			xs.Serialize(new StringWriter(sb), expression.ToXml());
-			
-//			 System.Xml.Serialization.XmlSerializer.GenerateSerializer(new Type[] { typeof(ExpressionNode) },
-				
-//			dcs.WriteObject(XmlDictionaryWriter.CreateDictionaryWriter(XmlWriter.Create(sb)), expression, new WCFTypeResolver());
-
-			ExpressionNode en = expression.ToExpressionNode();
-//			return _repo.CreateQuery(en);
-			
-			MemoryStream ms = new MemoryStream();
-			System.Runtime.Serialization.Formatters.Binary.BinaryFormatter bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-			bf.Serialize(ms, en);
-			string s = Convert.ToBase64String(ms.GetBuffer(), Base64FormattingOptions.InsertLineBreaks);
-//			return null;
-			
-			return _repo.CreateQuery_EN_Binary(ms.GetBuffer());
+			return (IQueryable<TElement>)CreateQuery(expression);
 		}
 
-		IQueryable<TElement> IQueryProvider.CreateQuery<TElement>(System.Linq.Expressions.Expression expression)
+		public object Execute(Expression expression)
 		{
-			if (!typeof(Artefact).IsAssignableFrom(typeof(TElement)))
-				throw new ArgumentOutOfRangeException("TElement", typeof(TElement), "TElement should derive from Artefact");
-			return (IQueryable<TElement>)new Queryable<TArtefact>(this, _repo, expression);
+			if (expression.IsEnumerable())
+				throw new ArgumentOutOfRangeException("expression", expression, "IQueryable IQueryProvider.Execute: Expression should not be IEnumerable");
+			Expression newExpression = QueryVisitor.Visit(expression); 
+			return Repository.QueryExecute(newExpression.ToBinary(BinaryFormatter));	
 		}
 
-		TResult IQueryProvider.Execute<TResult>(System.Linq.Expressions.Expression expression)
+		TResult IQueryProvider.Execute<TResult>(Expression expression)
 		{
-			ExpressionNode en = expression.ToExpressionNode();
-			_repo.CreateQuery(en);
-			return default(TResult);
+			return (TResult)Execute(expression);
 		}
 		#endregion
 	}

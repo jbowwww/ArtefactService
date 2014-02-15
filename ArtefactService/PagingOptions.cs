@@ -3,14 +3,20 @@ using System.Runtime.Serialization;
 
 namespace Artefacts.Services
 {
-	[DataContract]
+	/// <summary>
+	/// Paging options for <see cref="IRepository"/> query results
+	/// </summary>
 	[Serializable]
 	public class PagingOptions
 	{
-		[DataMember]
+		/// <summary>
+		/// Page size
+		/// </summary>
 		public int PageSize;
 		
-		[DataMember]
-		public int StartIndex;
+		/// <summary>
+		/// Start index.
+		/// </summary>
+//		public int StartIndex;
 	}
 }

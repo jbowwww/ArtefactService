@@ -54,8 +54,16 @@ namespace Artefacts
 			}
 		}
 		
-		protected Host()
-		{			
+		protected Host() {}
+		
+		public override bool Equals(object obj)
+		{
+			if (System.Object.ReferenceEquals(this, obj))
+				return true;
+			if (obj == null || obj.GetType() != this.GetType())
+				return false;
+			Host h = (Host)obj;
+			return base.Equals(obj) && HostId == h.HostId;
 		}
 	}
 }

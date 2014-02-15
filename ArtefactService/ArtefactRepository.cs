@@ -9,7 +9,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.ServiceModel;
 using System.ServiceModel.Description;
 using System.ServiceModel.Dispatcher;
-using WCFChannel = System.ServiceModel.Channels;
+//using WCFChannel = System.ServiceModel.Channels;
 using System.Reflection;
 using System.Diagnostics;
 
@@ -18,9 +18,7 @@ using Serialize.Linq.Extensions;
 using Serialize.Linq.Nodes;
 
 using NHibernate;
-//using NHibernate.Cfg;
 using NHibernate.Linq;
-//using NHibernate.Criterion;
 
 namespace Artefacts.Services
 {
@@ -36,87 +34,73 @@ namespace Artefacts.Services
 //		IncludeExceptionDetailInFaults=true,
 //		InstanceContextMode=InstanceContextMode.Single,
 //		ConcurrencyMode=ConcurrencyMode.Single)]
-	[ServiceBehavior(
-		IncludeExceptionDetailInFaults=true,
+	[ServiceBehavior(IncludeExceptionDetailInFaults=true,
 		InstanceContextMode=InstanceContextMode.Single,
 		ConcurrencyMode=ConcurrencyMode.Single)]
-	public class ArtefactRepository :
-		IRepository<Artefact>
-	{
-//		#region Static members (store and return Type arrays for WCF service known types)
-//		private static List<Type> _artefactTypes = null;
-//		public static List<Type> ArtefactTypes {
-//			get
-//			{
-//				return _artefactTypes != null ? _artefactTypes : _artefactTypes = new List<Type>();
-//			}
-//		}
-//		public static Type[] GetArtefactTypes(ICustomAttributeProvider provider)
-//		{
-//			ServiceKnownTypeAttribute[] staticKnownTypes = provider == null ?
-//				new ServiceKnownTypeAttribute[] {} :
-//				(ServiceKnownTypeAttribute[])provider.GetCustomAttributes(typeof(ServiceKnownTypeAttribute), true);
-//			ServiceKnownTypeAttribute[] hardcodeKnownTypes = new ServiceKnownTypeAttribute[]
-//			{
-//				new ServiceKnownTypeAttribute(typeof(NhQueryable<Artefact>))
-//			};
-//			Type[] knownTypes = new Type[ArtefactTypes.Count + staticKnownTypes.Length + hardcodeKnownTypes.Length];
-//			Array.ConvertAll<ServiceKnownTypeAttribute, Type>(staticKnownTypes,
-//				(input) => input.Type).CopyTo(knownTypes, 0);
-//			Array.ConvertAll<ServiceKnownTypeAttribute, Type>(hardcodeKnownTypes,
-//				(input) => input.Type).CopyTo(knownTypes, staticKnownTypes.Length);
-//			ArtefactTypes.CopyTo(knownTypes, hardcodeKnownTypes.Length);
-//			return knownTypes;
-//		}
-//		#endregion
-		
+	public class ArtefactRepository : IRepository<Artefact>
+	{		
 		#region Static members
-//		private static ISession _session;
-		
-		public static ITransaction Transaction {
-			get { return Session.Transaction; }
-		}
-		
-		public static ISession Session {
-			get { return NhBootStrap.Session; }
-//			{
-//				ISession ret = _session != null && _session.IsOpen ? _session : _session = NhBootStrap.Session;
-//				if (ret == null)
-//					throw new NullReferenceException("ArtefactService.Session == null");
-//				return ret;
-//			}
-		}
+		/// <summary>
+		/// Constant artefact update age limit.
+		/// </summary>
+		/// <remarks>May not remain constant - make configurable by clients</remarks>
+		public static TimeSpan ArtefactUpdateAgeLimit = new TimeSpan(0, 1, 0);
+		public static ITransaction Transaction { get { return Session.Transaction; } }
+		public static ISession Session { get { return NhBootStrap.Session; } }
 		#endregion
 		
 		#region Private fields
+		private Dictionary<int, Artefact> _artefactCache;
 		private Dictionary<object, IQueryable<Artefact>> _queryCache;
-		private Dictionary<object, ICriteria> _queryCritCache;
-		private Dictionary<object, IQuery> _queryHqlCache;
-		private Dictionary<object, QueryResult<Artefact>> _queryResultCache;
+		private Dictionary<object, int> _countCache;
+//		private Dictionary<object, QueryResult<Artefact>> _queryResultCache;
 		private ConcurrentQueue<object> _queryExecuteQueue;
+		private INhQueryProvider _nhQueryProvider;
+		private BinaryFormatter _binaryFormatter;
 		#endregion
+
+		public ArtefactServiceConfiguration Configuration { get; private set; }
+		
+		public ExpressionVisitor QueryVisitor { get; protected set; }
 		
 		public ArtefactRepository()
 		{
-//			_session = null;
+			Configuration = new ArtefactServiceConfiguration();
+
+			_artefactCache = new Dictionary<int, Artefact>();
 			_queryCache = new Dictionary<object, IQueryable<Artefact>>();
-			_queryCritCache = new Dictionary<object, ICriteria>();
-			_queryHqlCache = new Dictionary<object, IQuery>();
-			_queryResultCache = new Dictionary<object, QueryResult<Artefact>>();
-//			Transaction = null;
+			_countCache = new Dictionary<object, int>();
+//			_queryResultCache = new Dictionary<object, QueryResult<Artefact>>();
+			_queryExecuteQueue = new ConcurrentQueue<object>();
+
+			_nhQueryProvider = new DefaultQueryProvider(Session.GetSessionImplementation());
+			_binaryFormatter = new BinaryFormatter();
+			QueryVisitor = new ServerQueryVisitor(this);
+			
+			Expression expression = 
+				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) },
+				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()));
+			Artefacts = new NhQueryable<Artefact>(_nhQueryProvider, expression);
+//				_nhQueryProvider.CreateQuery<Artefact>(expression);
+//			Session.Query<Artefact>();
+//				new Queryable<Artefact>(this, _nhQueryProvider, expression);
+//				new QueryableNhProxy<Artefact>(new NhQueryable<Artefact>(_nhQueryProvider, Expression.Empty));			//				(NhQueryable<Artefact>)_nhQueryProvider.CreateQuery<Artefact>(Expression.Empty));
+			Queryables = new ConcurrentDictionary<Type, IQueryable>();
+			Queryables.Add(typeof(Artefact), Artefacts);
 		}
 
-		#region IRepository[Artefact] implementation
-		
+		#region IRepository[Artefact] implementation		
 		#region Add/Get/Update/Remove singular artefact operations
 		public int Add(Artefact artefact)
 		{
 			ITransaction transaction = null;
+			int id = -1;
 			try
 			{
 				if (Session.Transaction == null || !Session.Transaction.IsActive)
 					transaction = Session.BeginTransaction();
-				int id = (int)Session.Save(artefact);
+				artefact.Id = id = (int)Session.Save(artefact);
+				_artefactCache.Add(id, artefact);
 				if (transaction != null)
 					transaction.Commit();
 				return id;
@@ -125,7 +109,14 @@ namespace Artefacts.Services
 			{
 				if (transaction != null)
 					transaction.Rollback();
-				throw Error(ex, artefact); 		//new KeyValuePair<string, object>("artefact", artefact));
+				if (!artefact.IsTransient)
+				{
+					if (transaction == null)
+						Session.Delete(artefact);
+					if (_artefactCache.ContainsKey(id))
+						_artefactCache.Remove(id);
+				}
+				throw Error(ex, artefact);
 			}
 			finally
 			{
@@ -138,11 +129,11 @@ namespace Artefacts.Services
 		{
 			try
 			{
-				return (int)Session.GetIdentifier(artefact);
+				return artefact.IsTransient ? (artefact.Id = (int)Session.GetIdentifier(artefact)).Value : artefact.Id.Value;
 			}
 			catch (Exception ex)
 			{
-				throw Error(ex, artefact); 		// new KeyValuePair<string, object>("artefact", artefact));
+				throw Error(ex, artefact);
 			}
 		}
 
@@ -150,11 +141,12 @@ namespace Artefacts.Services
 		{
 			try
 			{
-				return Session.Get<Artefact>(id);
+				return _artefactCache.ContainsKey(id) && (_artefactCache[id].UpdateAge > ArtefactUpdateAgeLimit)
+					? _artefactCache[id] : _artefactCache[id] = Session.Get<Artefact>(id);
 			}
 			catch (Exception ex)
 			{
-				throw Error(ex, id); 		// new KeyValuePair<string, object>("id", id));
+				throw Error(ex, id);
 			}
 		}
 
@@ -165,7 +157,13 @@ namespace Artefacts.Services
 			{
 				if (Session.Transaction == null || !Session.Transaction.IsActive)
 					transaction = Session.BeginTransaction();
-				Update(artefact);
+//				int id = artefact.Id.Value;
+//				if (_artefactCache.ContainsKey(id))
+//					_artefactCache[id].CopyMembersFrom(artefact);
+//				else
+//					_artefactCache[id] = artefact;
+//				Session.Update(artefact, artefact.Id);						// TODO: Think about this: if Session.Update fails _artefactCache will be invalid??
+				Session.Merge(artefact);						// TODO: Think about this: if Session.Update fails _artefactCache will be invalid??
 				if (transaction != null)
 					transaction.Commit();
 			}
@@ -173,7 +171,7 @@ namespace Artefacts.Services
 			{
 				if (transaction != null)
 					transaction.Rollback();
-				throw Error(ex, artefact); 		// new KeyValuePair<string, object>("artefact", artefact));
+				throw Error(ex, artefact);
 			}
 			finally
 			{
@@ -185,19 +183,28 @@ namespace Artefacts.Services
 		public void Remove(Artefact artefact)
 		{
 			ITransaction transaction = null;
+//			int id = -1;
 			try
 			{
-				if (Session.Transaction == null || !Session.Transaction.IsActive)
-					transaction = Session.BeginTransaction();
-				Session.Delete(artefact);
-				if (transaction != null)
-					transaction.Commit();
+				if (!artefact.IsTransient)
+				{
+					int id = artefact.Id.Value;
+					if (Session.Transaction == null || !Session.Transaction.IsActive)
+						transaction = Session.BeginTransaction();
+					Session.Delete(artefact.Id);
+					if (_artefactCache.ContainsKey(id))
+						_artefactCache.Remove(id);
+					if (transaction != null)
+						transaction.Commit();
+				}
 			}
 			catch (Exception ex)
 			{
 				if (transaction != null)
 					transaction.Rollback();
-				throw Error(ex, artefact); 		// new KeyValuePair<string, object>("artefact", artefact));
+//				else
+//					Session.Save(artefact, id);
+				throw Error(ex, artefact);
 			}
 			finally
 			{
@@ -207,109 +214,143 @@ namespace Artefacts.Services
 		}
 		#endregion
 		
-		#region Collections/Enumerables/Queryables
-		public object CreateQuery(ExpressionNode expressionNode)
+		#region Query methods		
+		/// <summary>
+		/// Create a query (serialized using binary formatter)
+		/// </summary>
+		/// <returns>The query identifier</returns>
+		/// <param name="binary">Binary</param>
+		/// <remarks>
+		/// // TODO: I think I just need to traverse the expression tree from en.ToExpression(),
+		/// find the expression node representing the root query from the client side (RepositoryClientProxy.Artefacts)
+		/// The expression corresponding to that node is (currently, see source in mentioned class)  method call expression
+		/// to ISession.Query<>(). As a 1st parameter (maybe.. I think..?) this will take the ISession paramter. From client side
+		/// this is probably null, initialise it to this.Session before creating the query
+		/// Do this and this shit might even work?!
+		/// 16/1/14: ^^ It appears that this may well be false - may be almost working
+		/// 17/1/14: ^^ Not quite, still have trouble with certain things, e.g. using a string variable to compare with
+		///							an artefact's member value - tries to serialize the object containing the string instance the
+		///							variable references, when I just wanted to use the string value
+		///							-	I think one way or another I will have to write code to traverse the expression trees, to prepare them when and as necessary
+		/// </remarks>
+		public object CreateQuery(byte[] binary)
 		{
 			try
 			{
-//				System.Linq.Expressions.Expression expression = new Serialize.Linq.Serializers.JsonSerializer().Deserialize<System.Linq.Expressions.Expression>(expressionNode);
-//				ExpressionNode expression = new Serialize.Linq.Serializers.JsonSerializer().Deserialize<ExpressionNode>(expressionNode);
-				object queryId = expressionNode.GetHashCode();
-//				System.Linq.Expressions.Expression expression = expressionNode.ToExpression();
-				
+				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
+				if (expression.Type.GetInterface("System.Collections.IEnumerable") == null)
+					throw new ArgumentOutOfRangeException("expression", expression, "Not IEnumerable");
+				object queryId = expression.ToString();
 				if (!_queryCache.ContainsKey(queryId))
 				{
-					IQueryable<Artefact> queryable = Session.Query<Artefact>().Provider.CreateQuery<Artefact>(expressionNode.ToExpression());
-					_queryCache.Add(queryId, queryable);
-				}
-//				new System.Threading.Thread(
-//					() =>
-//				{
-//					
-//				});
-				return queryId;
-			}
-			catch (Exception ex)
-			{
-				throw Error(ex, expressionNode); 		// new KeyValuePair<string, object>("expressionNode", expressionNode));
-			}
-		}
-		
-		public object CreateQuery_EN_Binary(byte[] binary)
-		{
-			try
-			{
-				BinaryFormatter bf = new BinaryFormatter() { Binder = new QuerySerializationBinder() };
-				ExpressionNode en = (ExpressionNode)bf.Deserialize(new System.IO.MemoryStream(binary));		//, delegate(System.Runtime.Remoting.Messaging.Header[] headers) {	return null; });
-				Expression expression = en.ToExpression();
-				object queryId = en.ToString();
-				if (!_queryCache.ContainsKey(queryId))
-				{
-					// TODO: I think I just need to traverse the expression tree from en.ToExpression(),
-					// find the expression node representing the root query from the client side (RepositoryClientProxy.Artefacts)
-					// The expression corresponding to that node is (currently, see source in mentioned class)  method call expression
-					// to ISession.Query<>(). As a 1st parameter (maybe.. I think..?) this will take the ISession paramter. From client side
-					// this is probably null, initialise it to this.Session before creating the query
-					// Do this and this shit might even work?!
-					// 16/1/14: ^^ It appears that this may well be false - may be almost working
-					
-//					IQueryable<Artefact> q = Session.Query<Artefact>().Provider.CreateQuery<Artefact>(en.ToExpression());
-//					_queryCache.Add(queryId, q);
-					
-					IQueryable<Artefact> qBase;
-					QueryResult<Artefact> qrBase;
-					if (_queryCache.ContainsKey(string.Empty))
-						qBase = _queryCache[string.Empty];
-					else
-					{
-						qBase = new NhQueryable<Artefact>(Session.GetSessionImplementation());
-						_queryCache.Add(string.Empty, qBase);
-						qrBase = new QueryResult<Artefact>(qBase);
-						_queryResultCache.Add(string.Empty, qrBase);
-					}					
-					
-					IQueryable<Artefact> q = qBase.Provider.CreateQuery<Artefact>(expression);
-					_queryCache.Add(queryId, q);
-//					q.ToList().Count;
-					
-					QueryResult<Artefact> qr = new QueryResult<Artefact>(q);
-					_queryResultCache.Add(queryId, qr);
-					
+					IQueryable<Artefact> q =
+//						new NhQueryable<Artefact>(Artefacts.Provider, expression);
+//						Artefacts.Provider.Execute<IQueryable<Artefact>>(expression);
+					Artefacts.Provider.CreateQuery<Artefact>(expression);
+					_queryCache.Add(queryId, q);					//(Queryable<Artefact>)				// Session.Query<Artefact>().Provider.CreateQuery<Artefact>(en.ToExpression());
 				}
 				return queryId;
 			}
 			catch (Exception ex)
 			{
-				throw Error(ex, binary);				//, new KeyValuePair<string, object>("binary", binary));
+				throw Error(ex, binary);
 			}
 		}
 		
 		public int QueryCount(object queryId)
 		{
-//			return _queryHqlCache[queryId].List<Artefact>().Count;
-//			return _queryCritCache[queryId].List().Count;
-//			int c = _queryCache[queryId].Count();		// COunt() extension method does not seem to be supported
-//			return c;
-//			(_queryCache[queryId] as NhQueryable<Artefact>).
-			int c = _queryResultCache[queryId].Count;
-			return c;
+			try
+			{
+				IQueryable<Artefact> query = _queryCache[queryId];
+				int count = _countCache.ContainsKey(queryId) ?
+					_countCache[queryId] :
+					_countCache[queryId] = query.Count();
+	//					_nhQueryProvider.Execute<int>(query.Expression);
+				return count;
+			}
+			catch (Exception ex)
+			{
+				throw Error(ex, queryId);
+			}
+		}
+		
+		public Artefact QueryResult(object queryId)
+		{
+			try
+			{
+				IQueryable<Artefact> query = _queryCache[queryId];
+				Artefact artefact = _nhQueryProvider.Execute<Artefact>(query.Expression);
+				return artefact;
+			}
+			catch (Exception ex)
+			{
+				throw Error(ex, queryId);
+			}
 		}
 		
 		public Artefact[] QueryResults(object queryId, int startIndex = 0, int count = -1)
 		{
-			return (count == -1 ?
-				_queryResultCache[queryId].Results.Skip(startIndex) :
-				_queryResultCache[queryId].Results.Skip(startIndex).Take(count)).ToArray();
-//			return (count == -1 ?
-//				_queryHqlCache[queryId].List<Artefact>().Skip(startIndex) :
-//				_queryHqlCache[queryId].List<Artefact>().Skip(startIndex).Take(count)).ToArray();
-//			return (count == -1 ?
-//				_queryCritCache[queryId].List<Artefact>().Skip(startIndex) :
-//				_queryCritCache[queryId].List<Artefact>().Skip(startIndex).Take(count)).ToArray();
-//			return (count == -1 ?
-//				_queryCache[queryId].Skip(startIndex) :
-//				_queryCache[queryId].Skip(startIndex).Take(count)).ToArray();
+			try
+			{	
+				IQueryable<Artefact> query = _queryCache[queryId];
+				Artefact[] results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
+					query.Skip(startIndex) : // with a new custom server-side query provider, and implement caching??
+					query.Skip(startIndex).Take(count)).ToArray();
+				foreach (Artefact artefact in results)
+				{
+					int id = artefact.Id.Value;
+					if (_artefactCache.ContainsKey(id))
+					{
+						if (_artefactCache[id] != artefact)
+							_artefactCache[id].CopyMembersFrom(artefact);
+					}
+					else
+						_artefactCache[id] = artefact;
+				}
+				return results;
+			}
+			catch (Exception ex)
+			{
+				throw Error(ex, queryId, startIndex, count);
+			}
 		}
+		
+		public object QueryMethodCall(object queryId, string methodName)//  MethodInfo method)
+		{
+			try
+			{
+				IQueryable<Artefact> query = _queryCache[queryId];
+				string[] methodFullName = methodName.Split(':');
+				MethodInfo method = typeof(System.Linq.Enumerable).GetMethod(methodFullName[1], new Type[] { typeof(IEnumerable<Artefact>) });
+					//Type.GetType(methodFullName[0]).GetMethod(methodFullName[1]);
+				object result = method.Invoke(query, new object[] { });		// currently can't use methods with parameters - need to serialize them
+				return result;
+			}
+			catch (Exception ex)
+			{
+				throw Error(ex, queryId);
+			}
+		}
+		
+		public object QueryExecute(byte[] binary)
+		{
+			try
+			{
+				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
+				object result = Artefacts.Provider.Execute(expression);
+				return result;
+			}
+			catch (Exception ex)
+			{
+				throw Error(ex, binary);
+			}			
+		}
+		#endregion
+		
+		#region Collections/Enumerables/Queryables
+		public IQueryable<Artefact> Artefacts { get; private set; }
+		
+		public IDictionary<Type, IQueryable> Queryables { get; private set; }
 		#endregion
 		
 		#region Get/Set default paging options
@@ -323,7 +364,6 @@ namespace Artefacts.Services
 			throw new NotImplementedException();
 		}
 		#endregion
-		
 		#endregion
 		
 		/// <summary>
@@ -342,29 +382,26 @@ namespace Artefacts.Services
 		private FaultException Error(Exception ex, params object[] details)
 		{
 			StackFrame errorFrame = new StackFrame(1, true);
-			Console.WriteLine("{0}.{1} [{2}:{3},{4}]: Exception: {5}\n{6}\n",
-				errorFrame.GetMethod().DeclaringType, errorFrame.GetMethod().Name, errorFrame.GetFileName(),
-				errorFrame.GetFileLineNumber(), errorFrame.GetFileColumnNumber(), ex.GetType().FullName, ex.ToString());
-			
 			MethodBase mb = errorFrame.GetMethod();
 			ParameterInfo[] pi = errorFrame.GetMethod().GetParameters();
-			StringBuilder action = new StringBuilder(mb.DeclaringType.FullName);
-			action.AppendFormat(".{0}(", mb.Name);
+			StringBuilder action = new StringBuilder();
+			action.AppendFormat("{0}:{1}.{2}(", mb.DeclaringType.Assembly.GetName().Name, mb.DeclaringType.FullName, mb.Name);
 			for (int i = 0; i < pi.Length; i++)
-				action.AppendFormat("{0}={1}{2}", pi[i].Name, details[i], i == pi.Length - 1 ? string.Empty : ", ");
-			action.Append(")");
-			
+				action.AppendFormat("\n\t{0}={1}{2}{3}", pi[i].Name, details[i].ToString().Contains('\n') ? "\n\t  " : "",
+					details[i].ToString().Replace("\n", "\n\t  "), i == pi.Length - 1 ? "" : ",");
+			action.AppendFormat("){0}[{1}:{2},{3}]:\n{4}: {5}\n{6}\n", pi.Length > 0 ? "\n" : " ",
+				errorFrame.GetFileName(), errorFrame.GetFileLineNumber(), errorFrame.GetFileColumnNumber(),
+				ex.GetType().FullName, ex.Message, ex.StackTrace);
+			string actionStr = action.ToString();
+			if (Configuration.OutputExceptions)
+				Console.WriteLine("\n{0}\n", actionStr);
 			FaultException<ExceptionDetail> retEx = new FaultException<ExceptionDetail>(
-				new ExceptionDetail(ex),
-				"Exception caught on ArtefactService",
+				new ExceptionDetail(ex), actionStr, // ex.GetType().FullName + " caught on ArtefactService",
 				FaultCode.CreateSenderFaultCode(errorFrame.GetMethod().Name, mb.DeclaringType.FullName),
-				action.ToString());					//				OperationContext.Current.IncomingMessageHeaders.Action);
-		
-			return retEx;							
+				OperationContext.Current.IncomingMessageHeaders.Action);
+			foreach (object detail in details)
+				retEx.Data.Add(retEx.Data.Count, detail);			
+			return retEx;
 		}
 	}
 }
-
-//new FaultReason(string.Format("Fault exception: {0}: {1}", ex.GetType().Name, ex.Message)),
-//				new FaultCode(ex.GetType().Name, ex.GetType().Namespace),
-//				

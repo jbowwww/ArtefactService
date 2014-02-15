@@ -41,22 +41,59 @@ namespace Artefacts
 		}
 		
 		/// <summary>
+		/// Backing store for <see cref="Artefact.GetTypeHeirarchy"/>
+		/// </summary>
+		private static Dictionary<Type, Type[]> _typeHeirarchies = null;
+		
+		/// <summary>
+		/// Gets a type's inheritance heirarchy
+		/// </summary>
+		/// <returns>A <see cref="System.Type"/> array representing the type heirarchy</returns>
+		/// <param name="artefactType">Artefact type</param>
+		public static Type[] GetTypeHeirarchy(Type artefactType)
+		{
+			if (_typeHeirarchies == null)
+				_typeHeirarchies = new Dictionary<Type, Type[]>();
+			if (_typeHeirarchies.ContainsKey(artefactType))
+				return _typeHeirarchies[artefactType];
+			List<Type> heirarchy = new List<Type>();
+			for (Type T = artefactType; T.BaseType != null; T = T.BaseType)
+				heirarchy.Add(T);
+			heirarchy.Reverse();
+			return _typeHeirarchies[artefactType] = heirarchy.ToArray();
+		}
+		
+		/// <summary>
 		/// Gets the inheritance level of the type <paramref name="artefactType"/> relative to <c>typeof<see cref="Artefact"/></c>
 		/// </summary>
-		/// <param name="artefactType">Artefact type</param>
+		/// <typeparam name="TArtefact"><see cref="Artefacts.Artefact"/> type</typeparam>
 		/// <exception cref="ArgumentException">Is thrown when an argument passed to a method is invalid</exception>
-		public static int GetInheritanceLevel(Type artefactType)
+		public static int GetInheritanceLevel<TArtefact>()
+			where TArtefact : Artefact
 		{
-			if (!artefactType.IsSubclassOf(typeof(Artefact)))
-				throw new ArgumentException("Not derived from class Artefact", "artefactType");
-			
-			int i;
-			for (i = 0; artefactType != typeof(Artefact); artefactType = artefactType.BaseType)
-				i++;
-			return i;
+//			if (!artefactType.IsSubclassOf(typeof(Artefact)))
+//				throw new ArgumentException("Not derived from class Artefact", "artefactType");
+			return GetTypeHeirarchy(typeof(TArtefact)).Length - 2;
 		}
 		#endregion
-
+		
+		#region Properties
+		public virtual bool IsTransient {
+			get { return !this.Id.HasValue; }
+		}
+		
+		public virtual TimeSpan CreatedAge {
+			get { return DateTime.Now - TimeCreated; }
+		}
+		
+		public virtual TimeSpan UpdateAge {
+			get { return DateTime.Now - TimeUpdated; }
+		}
+		
+		public virtual TimeSpan CheckedAge {
+			get { return DateTime.Now - TimeChecked; }
+		}
+		
 		#region IArtefact implementation
 		[DataMember]
 		public virtual int? Id { get; set; }
@@ -70,39 +107,51 @@ namespace Artefacts
 		[DataMember]
 		public virtual DateTime TimeChecked { get; set; }
 		#endregion
-
+		#endregion
+		
 		public Artefact()
 		{
 			TimeCreated = TimeUpdated = TimeChecked = DateTime.Now;
 		}
 		
-		public virtual TimeSpan UpdateAge {
-			get { return DateTime.Now - TimeUpdated; }
+		public virtual Artefact Update()
+		{
+			TimeUpdated = DateTime.Now;
+			return this;
 		}
-
-		private Type[] _typeHierarchy = null;
-		public virtual Type[] TypeHeirarchy {
-			get
-			{
-				if (_typeHierarchy != null)
-					return _typeHierarchy;
-				List<Type> heirarchy = new List<Type>();
-				for (Type T = this.GetType(); T != typeof(System.Object); T = T.BaseType)
-					heirarchy.Add(T);
-				heirarchy.Reverse();
-				return _typeHierarchy = heirarchy.ToArray();
-			}	
+		
+		public virtual void CopyMembersFrom(Artefact source)
+		{
+//			TimeCreated = source.TimeCreated;
+			TimeChecked = source.TimeChecked;
+			TimeUpdated = source.TimeUpdated;
 		}
+		
+		public override bool Equals(object obj)
+		{
+			if (obj == null)
+				return false;
+			if (System.Object.ReferenceEquals(this, obj))
+				return true;
+			if (obj.GetType() != this.GetType())
+				return false;
+			return true;
+		}
+//			Artefact artefact = (Artefact)obj;
+//			return TimeCreated == artefact.TimeCreated
+//				&& TimeUpdated == artefact.TimeUpdated
+//				&& TimeChecked == artefact.TimeChecked;
 		
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder(1024);
 			string artefactString = string.Empty;
-			for (int i = 0; i < TypeHeirarchy.Length; i++)
+			Type[] typeHeirarchy = Artefact.GetTypeHeirarchy(this.GetType());
+			for (int i = 0; i < typeHeirarchy.Length; i++)
 			{
 				if (/* i > 0 && */ artefactString.Length > 0)
 					sb.Append('\n').Append(' ', i * 2);
-				artefactString = GetArtefactString(TypeHeirarchy[i]);
+				artefactString = GetArtefactString(typeHeirarchy[i]);
 				sb.Append(artefactString);
 			}
 			return sb.ToString();

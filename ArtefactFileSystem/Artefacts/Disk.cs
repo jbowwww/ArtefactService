@@ -36,17 +36,17 @@ namespace Artefacts.FileSystem
 		
 		public Disk(string deviceName, Host mostRecentHost = null)
 		{
-			MostRecentHost = mostRecentHost != null ? mostRecentHost : Host.Current;	
+//			MostRecentHost = mostRecentHost != null ? mostRecentHost : Host.Current;	
 			DeviceName = deviceName;
 			Process getDiskSerialProcess = Process.Start(
-				new ProcessStartInfo("udevadm", string.Format("info --query=property --name={0} | grep ID_SERIAL=", deviceName))
+				new ProcessStartInfo("udevadm", string.Format("info --query=property --name={0}", deviceName))			//  | grep ID_SERIAL=
 			{
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
 				UseShellExecute = false
 			});
 			getDiskSerialProcess.WaitForExit(1111);
-			string serialOut = getDiskSerialProcess.StandardOutput.ReadLine();
+			string serialOut = getDiskSerialProcess.StandardOutput.ReadToEnd().Trim().Grep("ID_SERIAL=");
 			if (string.IsNullOrEmpty(serialOut) || !serialOut.StartsWith("ID_SERIAL="))
 				throw new InvalidDataException("Unexpected output data from udevadm command");
 //				{
@@ -54,12 +54,20 @@ namespace Artefacts.FileSystem
 //						new KeyValuePair<string, object>[]
 //					{ new KeyValuePair<string, object>("serialOut", serialOut) })
 //				};
-			Serial = serialOut.Substring(10);
+			Serial = serialOut.Substring(10).Trim();
 		}
 		
 		protected Disk()
 		{
 			
+		}
+		
+		public override bool Equals(object obj)
+		{
+			if (!base.Equals(obj))
+				return false;
+			Disk d = (Disk)obj;
+			return Serial == d.Serial;
 		}
 	}
 }

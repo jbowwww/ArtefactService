@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+using System.Reflection;
 
 using NHibernate.Criterion;
 
@@ -13,9 +13,16 @@ using Serialize.Linq.Nodes;
 namespace Artefacts.Services
 {
 	[ServiceContract]
+	[ServiceKnownType(typeof(Queryable<Artefact>))]
 	public interface IRepository<TArtefact>
-		where TArtefact : Artefact
+//		where TArtefact : Artefact
 	{
+		#region Collections/Enumerables/Queryables
+		IQueryable<Artefact> Artefacts { get; }
+		
+		IDictionary<Type, IQueryable> Queryables { get; }
+		#endregion
+		
 		#region Add/Get/Update/Remove singular artefact operations
 		[OperationContract]
 		int Add(TArtefact artefact);
@@ -33,19 +40,24 @@ namespace Artefacts.Services
 		void Remove(TArtefact artefact);
 		#endregion
 		
-		#region Collections/Enumerables/Queryables
+		#region Query Methods
 		[OperationContract]
-//		[XmlSerializerFormat]
-		object CreateQuery(ExpressionNode expressionNode);
-		
-		[OperationContract]
-		object CreateQuery_EN_Binary(byte[] binary);
+		object CreateQuery(byte[] binary);
 		
 		[OperationContract]
 		int QueryCount(object queryId);
 		
 		[OperationContract]
-		Artefact[] QueryResults(object queryId, int startIndex = 0, int count = -1);
+		TArtefact QueryResult(object queryId);
+		
+		[OperationContract]
+		TArtefact[] QueryResults(object queryId, int startIndex = 0, int count = -1);
+		
+		[OperationContract]
+		object QueryMethodCall(object queryId, string methodName);// MethodInfo method);
+		
+		[OperationContract]
+		object QueryExecute(byte[] binary);
 		#endregion
 		
 		#region Get/Set default paging options

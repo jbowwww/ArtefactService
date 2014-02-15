@@ -1,9 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.IO;
 using System.Runtime.Serialization;
-using System.Xml.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+//using System.Xml.Serialization;
 
 namespace Artefacts.Services
 {
@@ -11,21 +14,18 @@ namespace Artefacts.Services
 	/// Queryable.
 	/// </summary>
 	/// <remarks>
-	///	-	TODO: A generic version of this class?
-	/// 	-	TODO: Tidy up attributes (most/all are related to serialization), remove unnecessary
+	/// Removed this to see if it would make things easier for IQueryProvider.CreateQuery<TElement>()
+	/// 	//		where TArtefact : Artefact
 	/// </remarks>
-	[Serializable]
-	public class Queryable<TArtefact> :
-		System.Linq.IQueryable<TArtefact>
-		where TArtefact : Artefact
+	public class Queryable<TArtefact> : IOrderedQueryable<TArtefact>
 	{
-		public class QueryResultEnumerator :
+		public class QueryableEnumerator :
 			IEnumerator<TArtefact>
 		{
-			private readonly Queryable<TArtefact> _queryable;
+			internal Queryable<TArtefact> _queryable;
 			internal int index;
 
-			public QueryResultEnumerator(Queryable<TArtefact> queryable)
+			public QueryableEnumerator(Queryable<TArtefact> queryable)
 			{
 				_queryable = queryable;
 				Reset();
@@ -33,14 +33,20 @@ namespace Artefacts.Services
 			
 			#region IEnumerator[Artefact] implementation
 			public TArtefact Current {
-				get { return index < 0 || index >= _queryable.TotalCount ? null : _queryable[index]; }
+//				get { return index < 0 || index >= _queryable.Count() ? null : _queryable[index]; }
+				get
+				{
+					if (index < 0)
+						throw new InvalidOperationException("Enumerator does not have a current item");
+					return _queryable[index];
+				}
 			}
 			#endregion
 
 			#region IEnumerator implementation
 			public bool MoveNext()
 			{
-				return ++index < _queryable.TotalCount;
+				return ++index < _queryable.Count;
 			}
 
 			public void Reset()
@@ -49,7 +55,7 @@ namespace Artefacts.Services
 			}
 
 			object IEnumerator.Current {
-				get { return (object)((this as IEnumerator<Artefact>).Current); }
+				get { return (object)((this as IEnumerator<TArtefact>).Current); }
 			}
 			#endregion
 
@@ -60,85 +66,72 @@ namespace Artefacts.Services
 			}
 			#endregion
 		}
-		
-		#region Private fields
-		[NonSerialized]
-		private static PagingOptions _defaultPagingOptions = new PagingOptions() { StartIndex = 0, PageSize = 10 };
-		
-		[NonSerialized]
-		private object _serverQueryId = null;
-		
-		[DataMember]
-		private int[] _artefactIds;
-		
-		[NonSerialized]
-		private TArtefact[] _artefacts;
-		
-		[NonSerialized]
-		private int _count = -1;
-		
-		[NonSerialized]
-		private PagingOptions _paging = null;
-		
-		[NonSerialized]
-		private Expression _expression;
-		
-		[NonSerialized]
-		private System.Linq.IQueryProvider _provider;
-		#endregion
-		
-		#region Properties & Indexers
-		public IRepository<TArtefact> Repository {
-			get;
-			private set;
-		}
-
-		[XmlIgnore]
-		[IgnoreDataMember]
-		public object ServerQueryId {
+	
+		#region Static members
+		public static PagingOptions DefaultPagingOptions {
 			get
 			{
-				return _serverQueryId != null ? _serverQueryId : _serverQueryId = Provider.Execute(Expression);
+				return new PagingOptions()
+				{
+				//					StartIndex = 0,
+					PageSize = 10
+				};
 			}
 		}
+		#endregion
 		
-		[XmlIgnore]
-		[IgnoreDataMember]
-		public int TotalCount {
-			get { return _count >= 0 ? _count : _count = Repository.QueryCount(ServerQueryId); }
-		}
+		#region Private fields
+		private int _count = -1;
+		private TArtefact[] _artefacts;
+		private PagingOptions _paging;
+		#endregion
 		
-		public int LoadedCount {
-			get;
-			private set;
-		}
+		#region Properties & indexers
+		/// <summary>
+		/// Gets or sets the time created.
+		/// </summary>
+		/// <remarks>
+		/// Queryables could even be artefacts themselves?? 
+		/// </remarks>
+		public DateTime TimeCreated { get; private set; }
+		
+		public DateTime TimeRetrieved { get; private set; }
+		
+		public IRepository<TArtefact> Repository { get; protected set; }
+		
+		public Type ElementType { get { return typeof(TArtefact); } }
 
-		[XmlIgnore] 
-		[IgnoreDataMember]
+		public object QueryId { get { return Expression.ToString(); } }
+//			get { return _serverQueryId != null ? _serverQueryId : _serverQueryId = Provider.Execute(Expression); }
+		
+		public Expression Expression { get; private set; }
+
+		public IQueryProvider Provider { get; private set; }
+		
+		public int Count { get { return _count >= 0 ? _count : _count = Repository.QueryCount(QueryId); } }
+		
+		public int LoadedCount { get; private set; }
+
 		public PagingOptions Paging {
-			get
-			{ return _paging != null ? _paging : _defaultPagingOptions; }
+			get { return _paging != null ? _paging : DefaultPagingOptions; }
+			private set { _paging = value; }
 		}
 		
-		[XmlIgnore]
-		[IgnoreDataMember]
 		public int NumPages {
-			get { return TotalCount == 0 || Paging.PageSize == 0 ? 0 : (int)Math.Ceiling((decimal)TotalCount / Paging.PageSize); }
+			get { return Count == 0 || Paging.PageSize == 0 ? 0 : (int)Math.Ceiling((decimal)Count / Paging.PageSize); }
 		}
-				
-		[XmlIgnore]
-		[IgnoreDataMember]
+		
 		public TArtefact this[int index] {
 			get
 			{
 				if (_artefacts == null)
-					_artefacts = new TArtefact[TotalCount];
+					_artefacts = new TArtefact[Count];
 				if (_artefacts[index] == null)
 				{
 					int pageSize = Paging.PageSize;
 					int pageWithIndex = index / pageSize;
 					int pageStartIndex = pageWithIndex * pageSize;
-					Repository.QueryResults(ServerQueryId, pageStartIndex, pageSize).CopyTo(_artefacts, pageStartIndex);
+					Repository.QueryResults(QueryId, pageStartIndex, pageSize).CopyTo(_artefacts, pageStartIndex);
 					LoadedCount += pageSize;
 				}
 				return _artefacts[index];
@@ -146,46 +139,19 @@ namespace Artefacts.Services
 		}
 		#endregion
 		
-		#region IQueryable implementation
-		[XmlIgnore]
-		[IgnoreDataMember]
-		public Type ElementType {
-			get;
-			private set;
-		}
-
-		[XmlIgnore]
-		[IgnoreDataMember]
-		public Expression Expression {
-			get { return _expression; }
-			private set { _expression = value; }
-		}
-		
-		[XmlIgnore]
-		[IgnoreDataMember]
-		public System.Linq.IQueryProvider Provider {
-			get { return _provider; }
-			private set { _provider = value; }
-		}
-		#endregion
-		
-		public Queryable(System.Linq.IQueryProvider provider, IRepository<TArtefact> repository, Expression expression = null)
+		internal Queryable(IQueryProvider provider, IRepository<TArtefact> repository, Expression expression)
 		{
-			ElementType = typeof(TArtefact);
-//			Expression = expression != null ? expression : Expression.f(this);		//.Empty();
-			Expression = expression;
-			if (provider == null)
-				throw new ArgumentNullException("provider");
+			TimeCreated = DateTime.Now;
+			TimeRetrieved = DateTime.MinValue;
 			Provider = provider;
-			if (repository == null)
-				throw new ArgumentNullException("repository");
 			Repository = repository;
+			Expression = expression;
 		}
 		
 		#region IEnumerable & IEnumerable[Artefact] implementation
 		public IEnumerator<TArtefact> GetEnumerator()
 		{
-			return new QueryResultEnumerator(this);
+			return new QueryableEnumerator(this);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -193,5 +159,6 @@ namespace Artefacts.Services
 			return (IEnumerator)(this as IEnumerable<TArtefact>).GetEnumerator();
 		}
 		#endregion
+		
 	}
 }

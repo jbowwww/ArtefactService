@@ -13,6 +13,55 @@ namespace Artefacts.Services
 	{	
 		public static TimeSpan DefaultTimeout = new TimeSpan(0, 0, 10);
 		
+		public static TimeSpan Timeout = DefaultTimeout;
+		public static TextWriter Output;
+		public static TextWriter Error;
+		
+		private void ApplyServiceHostBehaviours(ServiceHost host)
+		{
+			foreach (ServiceEndpoint endpoint in host.Description.Endpoints)
+			{
+				foreach (OperationDescription operation in endpoint.Contract.Operations)
+				{
+					DataContractSerializerOperationBehavior dcsb = operation.Behaviors.Find<DataContractSerializerOperationBehavior>();
+					if (dcsb == null)
+						operation.Behaviors.Add(dcsb = new MyDataContractBehaviour(operation));
+					dcsb.DataContractResolver = new WCFTypeResolver();
+					dcsb.DataContractSurrogate = new WCFDataSerializerSurrogate();
+				}
+			}
+		}
+		
+		private static void ApplyServiceHostSettings(ServiceHost host)
+		{
+			host.OpenTimeout = host.CloseTimeout = Timeout;
+			
+			ServiceDebugBehavior sdb = host.Description.Behaviors.Find<ServiceDebugBehavior>();
+			if (sdb == null)
+				host.Description.Behaviors.Add(sdb = new ServiceDebugBehavior());
+			sdb.IncludeExceptionDetailInFaults = true;
+			
+			host.AddServiceEndpoint(typeof(IRepository<Artefact>),
+				new NetTcpBinding(SecurityMode.None)
+				{
+					MaxBufferSize = 16384,
+					ReaderQuotas = new System.Xml.XmlDictionaryReaderQuotas()
+					{
+						MaxStringContentLength = 16384
+					}
+				},
+				new Uri("net.tcp://localhost:3334/ArtefactRepository"));
+			
+//			ApplyServiceHostBehaviours(host);
+			
+			host.Opened += (sender, e) => Output.WriteLine("{0}: Opened", host.GetType().Name);
+			host.Opening += (sender, e) => Output.WriteLine("{0}: Opening", host.GetType().Name);
+			host.Closed += (sender, e) => Output.WriteLine("{0}: Closed", host.GetType().Name);
+			host.Closing += (sender, e) => Output.WriteLine("{0}: Closing", host.GetType().Name);
+			host.Faulted += (sender, e) => Output.WriteLine("{0}: Faulted", host.GetType().Name);
+			host.UnknownMessageReceived += (sender, e) => Output.WriteLine("{0}: UnknownMessageReceived", host.GetType().Name);
+		}
+		
 		/// <summary>
 		/// Builds the service host.
 		/// </summary>
@@ -26,51 +75,12 @@ namespace Artefacts.Services
 			if (error == null)
 				error = Console.Error;
 
+			Timeout = timeout;
+			Output = output;
+			Error = error;
+			
 			ServiceHost sh = new ServiceHost(typeof(ArtefactRepository));
-			timeout = timeout == default(TimeSpan) ? DefaultTimeout == default(TimeSpan) ? default(TimeSpan) : DefaultTimeout : timeout;
-			if (timeout != null)
-			{
-				sh.OpenTimeout = sh.CloseTimeout = timeout;
-			}
-			
-//			sh.AddServiceEndpoint(typeof(IArtefactService),
-//				new NetTcpBinding(SecurityMode.None),
-//				new Uri("net.tcp://localhost:3333/ArtefactService"));
-			sh.AddServiceEndpoint(typeof(IRepository<Artefact>),
-				new NetTcpBinding(SecurityMode.None)
-				{
-					MaxBufferSize = 16384,
-					ReaderQuotas = new System.Xml.XmlDictionaryReaderQuotas()
-					{
-						MaxStringContentLength = 16384
-					}
-				},
-				new Uri("net.tcp://localhost:3334/ArtefactRepository"));
-			
-			ServiceDebugBehavior sdb = sh.Description.Behaviors.Find<ServiceDebugBehavior>();
-			if (sdb == null)
-				sh.Description.Behaviors.Add(sdb = new ServiceDebugBehavior());
-			sdb.IncludeExceptionDetailInFaults = true;
-//			ArtefactService.AddTypeResolver(sh, new WCFTypeResolver());
-			
-//			foreach (ServiceEndpoint endpoint in sh.Description.Endpoints)
-//			{
-//				foreach (OperationDescription operation in endpoint.Contract.Operations)
-//				{
-//					DataContractSerializerOperationBehavior dcsb = operation.Behaviors.Find<DataContractSerializerOperationBehavior>();
-//					if (dcsb == null)
-//						operation.Behaviors.Add(dcsb = new MyDataContractBehaviour(operation));
-//					dcsb.DataContractResolver = new WCFTypeResolver();
-//					dcsb.DataContractSurrogate = new WCFDataSerializerSurrogate();
-//				}
-//			}
-			
-			sh.Opened += (sender, e) => output.WriteLine("{0}: Opened", sh.GetType().Name);
-			sh.Opening += (sender, e) => output.WriteLine("{0}: Opening", sh.GetType().Name);
-			sh.Closed += (sender, e) => output.WriteLine("{0}: Closed", sh.GetType().Name);
-			sh.Closing += (sender, e) => output.WriteLine("{0}: Closing", sh.GetType().Name);
-			sh.Faulted += (sender, e) => output.WriteLine("{0}: Faulted", sh.GetType().Name);
-			sh.UnknownMessageReceived += (sender, e) => output.WriteLine("{0}: UnknownMessageReceived", sh.GetType().Name);
+			ApplyServiceHostSettings(sh);
 			
 			return sh;
 		}
