@@ -10,11 +10,9 @@ namespace Artefacts
 	/// <summary>
 	/// The base abstract Artefact class
 	/// </summary>
-	[DataContract]	//(IsReference = true)]
-	[KnownType("GetArtefactTypes")]
-	[ArtefactFormatString("[Artefact: Id={Id} TimeCreated={TimeCreated} TimeUpdated={TimeUpdated} TimeChecked={TimeChecked}]")]
-	public abstract class Artefact :
-		IArtefact
+	[DataContract, KnownType("GetArtefactTypes")]
+	[ArtefactFormat("[Artefact: Id={Id} TimeCreated={TimeCreated} TimeUpdated={TimeUpdated} TimeChecked={TimeChecked}]")]
+	public abstract class Artefact : IArtefact
 	{
 		#region Static members (store and return Type arrays for WCF service known types)
 		/// <summary>
@@ -137,6 +135,11 @@ namespace Artefacts
 				return false;
 			return true;
 		}
+
+				public override int GetHashCode()
+		{
+						return Convert.ToInt32(TimeCreated.Ticks) + Convert.ToInt32(TimeUpdated.Ticks) + Convert.ToInt32(TimeChecked.Ticks);
+		}
 //			Artefact artefact = (Artefact)obj;
 //			return TimeCreated == artefact.TimeCreated
 //				&& TimeUpdated == artefact.TimeUpdated
@@ -144,25 +147,7 @@ namespace Artefacts
 		
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder(1024);
-			string artefactString = string.Empty;
-			Type[] typeHeirarchy = Artefact.GetTypeHeirarchy(this.GetType());
-			for (int i = 0; i < typeHeirarchy.Length; i++)
-			{
-				if (/* i > 0 && */ artefactString.Length > 0)
-					sb.Append('\n').Append(' ', i * 2);
-				artefactString = GetArtefactString(typeHeirarchy[i]);
-				sb.Append(artefactString);
-			}
-			return sb.ToString();
-		}
-		
-		private string GetArtefactString(Type artefactType)
-		{
-			object[] attrs = artefactType.GetCustomAttributes(typeof(ArtefactFormatStringAttribute), false);
-			ArtefactFormatStringAttribute afsAttr = attrs.Length > 0 ?
-				(ArtefactFormatStringAttribute)attrs[0] : new ArtefactFormatStringAttribute();
-			return afsAttr.GetArtefactString(this);
+			return ArtefactFormatAttribute.GetString(this);
 		}
 	}
 }

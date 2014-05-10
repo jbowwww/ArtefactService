@@ -51,8 +51,8 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Artefacts\Artefact.cs" />
     <Compile Include="Artefacts\IArtefact.cs" />
-    <Compile Include="Artefacts\ArtefactFormatStringAttribute.cs" />
     <Compile Include="Artefacts\Host.cs" />
+    <Compile Include="Artefacts\ArtefactFormatAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -60,10 +60,13 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Artefacts\blank.hbm.xml" />
+    <None Include="Artefacts\Mappings\blank.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Artefacts\Artefact.hbm.xml" />
-    <EmbeddedResource Include="Artefacts\Host.hbm.xml" />
+    <EmbeddedResource Include="Artefacts\Mappings\Artefact.hbm.xml" />
+    <EmbeddedResource Include="Artefacts\Mappings\Host.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Artefacts\Mappings\" />
   </ItemGroup>
 </Project>

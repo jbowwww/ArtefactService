@@ -156,7 +156,7 @@ namespace Artefacts.Services
 					sh = BuildServiceHost(timeout);
 					sh.Open();
 					
-					output.WriteLine(sh.ToString(true));
+					output.WriteLine(sh.ToString());
 					while (!_exitServiceHost)
 						Thread.Sleep(333);
 				}

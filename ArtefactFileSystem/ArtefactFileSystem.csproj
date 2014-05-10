@@ -33,6 +33,14 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
+    <Reference Include="Artefacts">
+      <HintPath>..\bin\Debug\Artefacts.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ArtefactService">
+      <HintPath>..\bin\Debug\ArtefactService.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -49,16 +57,6 @@
     <Folder Include="Client\" />
     <Folder Include="Server\" />
     <Folder Include="Artefacts\Mappings\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Artefacts\Artefacts.csproj">
-      <Project>{FC41660D-8F54-437D-9AA7-87E460D73689}</Project>
-      <Name>Artefacts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ArtefactService\ArtefactService.csproj">
-      <Project>{D76CD89A-4341-462E-BBB1-9D756368442C}</Project>
-      <Name>ArtefactService</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Server\FileSystemRepository.cs" />

@@ -6,10 +6,10 @@ using System.ServiceModel;
 namespace Artefacts.FileSystem
 {
 	[DataContract]	//(IsReference = true)]
-	[ArtefactFormatString("[FileSystemEntry: Drive={Drive} Path={Path} Attributes={Attributes} CreationTime={CreationTime} AccessTime={AccessTime} ModifyTime={ModifyTime}]")]
+	[ArtefactFormat("[FileSystemEntry: Drive={Drive} Path={Path} Attributes={Attributes} CreationTime={CreationTime} AccessTime={AccessTime} ModifyTime={ModifyTime}]")]
 	public class FileSystemEntry : Artefact
 	{
-		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+//		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
 
 //		public virtual int? DriveId { 
 //			get { return Drive == null ? -1 : Drive.Id; }
@@ -60,6 +60,11 @@ namespace Artefacts.FileSystem
 				return false;
 			FileSystemEntry fse = (FileSystemEntry)obj;
 			return Drive == fse.Drive && Path == fse.Path;
+		}
+
+				public override int GetHashCode()
+		{
+						return Convert.ToInt32(Path);
 		}
 	}
 }

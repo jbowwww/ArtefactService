@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.ServiceModel;
+using System.Reflection;
 
 using Artefacts.Services;
 
@@ -11,9 +13,13 @@ namespace Artefacts.FileSystem
 {
 	public class FileSystemArtefactCreator : CreatorBase
 	{
+		#region Thread-static singleton instance
+		[ThreadStatic]
+				public static FileSystemArtefactCreator Singleton;
+		#endregion
+		
 		#region Properties & fields
 		public int RecursionLimit = -1;
-		public IRepository<Artefact> Repository { get; private set; }
 		public Uri BaseUri { get; private set; }
 		public string BasePath {
 			get { return BaseUri.LocalPath; }
@@ -23,24 +29,89 @@ namespace Artefacts.FileSystem
 			get { return BaseUri.Query; }
 			set { BaseUri = new UriBuilder(BaseUri.Scheme, BaseUri.Host, BaseUri.Port, BaseUri.LocalPath, value).Uri; }
 		}
+		
+		public IRepository<Artefact> Repository { get; private set; }
+//		public IQueryable Artefacts { get; private set; }
+		public IQueryable FileEntries {
+			get { return Repository.Queryables[typeof(FileSystemEntry)]; }
+			private set { Repository.Queryables[typeof(FileSystemEntry)] = value; }
+		}
+		public IQueryable Files {
+			get { return Repository.Queryables[typeof(File)]; }
+			private set { Repository.Queryables[typeof(File)] = value; }
+		}
+		public IQueryable Directories {
+			get { return Repository.Queryables[typeof(Directory)]; }
+			private set { Repository.Queryables[typeof(Directory)] = value; }
+		}
+		public IQueryable Drives {
+			get { return Repository.Queryables[typeof(Drive)]; }
+			private set { Repository.Queryables[typeof(Drive)] = value; }
+		}
+		public IQueryable Disks {
+			get { return Repository.Queryables[typeof(Disk)]; }
+			private set { Repository.Queryables[typeof(Disk)] = value; }
+		}
+		public Host ThisHost = new Host(true);
 		#endregion
 		
+		#region Constructors & Initialization
 		public FileSystemArtefactCreator(IRepository<Artefact> repository)
 		{
+			if (Singleton != null)
+				throw new InvalidOperationException("FileSystemArtefactCreator.c'tor: Singleton is not null");
+			Singleton = this;
+			
+			BaseUri = new UriBuilder(Uri.UriSchemeFile, "localhost", 0, "/", "?*").Uri;
+			
 			if (repository == null)
 				throw new ArgumentNullException("repository");
 			Repository = repository;
-			BaseUri = new UriBuilder(Uri.UriSchemeFile, "localhost", 0, "/", "?*").Uri;
+			
+//			Artefacts = Repository.Artefacts.OfType
+			FileEntries = QueryBase<FileSystemEntry>();
+			Files = QueryBase<File>();
+			Directories = QueryBase<Directory>();
+			Drives = QueryBase<Drive>();
+			Disks = QueryBase<Disk>();			
 		}
-
+//			BuildTypedQueryable<Artefacts.FileSystem.FileSystemEntry>();
+//			BuildTypedQueryable<Artefacts.FileSystem.File>();
+//			BuildTypedQueryable<Artefacts.FileSystem.Directory>();
+//			BuildTypedQueryable<Artefacts.FileSystem.Drive>();
+//			BuildTypedQueryable<Artefacts.FileSystem.Disk>();
+			                          
+		internal IQueryable QueryBase<TArtefact>()
+		{
+			IQueryable q = Repository.Artefacts.OfType<TArtefact>().AsQueryable();
+			return q;
+		}
+//			const BindingFlags bf = BindingFlags.Public | BindingFlags.Static;
+//			Expression expression =
+//				Expression.Call(typeof(NHibernate.Linq.LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) },
+//				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", bf).GetGetMethod()));
+//			return Repository.Artefacts.Provider.CreateQuery(expression);				//			Repository.Queryables.Add(typeof(TArtefact),
+//		}
+		#endregion
+		
 		#region implemented abstract members of Artefacts.CreatorBase
 		public override void Run(object param)
 		{
+			// Initialise
 			Drive.Repository = Repository;
 			int recursionDepth = -1;
 			Queue<Uri> subDirectories = new Queue<Uri>(new Uri[] { BaseUri });
+			
+			// Using the initial BaseUri(s), create queries for directories and files underneath the directory path,
+			// and get the Drive(s) that the initial directory(s) are positioned on
+			
+//						Disks = new query
+			
+			// Recurse subdirectories
 			while (subDirectories.Count > 0)
 			{
+								Disk[] Disks = Disk.Disks.ToArray();
+
 				Uri currentUri = subDirectories.Dequeue();
 //				Queryable<Artefact> q =
 //					(Queryable<Artefact>)

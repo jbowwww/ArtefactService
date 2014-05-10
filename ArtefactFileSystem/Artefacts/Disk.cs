@@ -1,21 +1,52 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Diagnostics;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+using System.Diagnostics;
 
 namespace Artefacts.FileSystem
 {
 	[DataContract]	//(IsReference = true)]
-	[ArtefactFormatString("[Disk: Serial={Serial} MostRecentHost={MostRecentHostId}] DeviceName={DeviceName}")]
+	[ArtefactFormat("[Disk: Serial={Serial} MostRecentHost={MostRecentHostId}] DeviceName={DeviceName}")]
 	public class Disk : Artefact
 	{
-		public static Type[] GetArtefactTypes()
-		{
-			return Artefact.GetArtefactTypes();
-		}
+//		public static Type[] GetArtefactTypes()
+//		{
+//			return Artefact.GetArtefactTypes();
+//		}
 		
+				private static List<Disk> _disks;
+				public static List<Disk> Disks {
+						get { return _disks != null ? _disks : _disks =GetDisks(Host.Current); }
+				}
+
+				private static List<Disk> GetDisks(Host host)
+				{
+						List<Disk> disks = new List<Disk>();
+						Process lsblkProcess = Process.Start(
+								new ProcessStartInfo("lsblk")
+								{
+										RedirectStandardOutput = true,
+										RedirectStandardError = true,
+										UseShellExecute = false,
+								});
+						lsblkProcess.WaitForExit(1600);
+						string lsblkOutput;
+						while (!string.IsNullOrEmpty(lsblkOutput = lsblkProcess.StandardOutput.ReadLine()))
+						{
+								string[] tokens = lsblkOutput.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+								if (lsblkOutput.Contains("disk"))
+									disks.Add(new Disk(tokens[0], host));
+						}
+						return disks;
+				}
+
+				public virtual void RefreshDisks()
+				{
+						_disks = null;
+				}
+
 		[DataMember]
 		public virtual string Serial { get; set; }
 		
@@ -68,6 +99,11 @@ namespace Artefacts.FileSystem
 				return false;
 			Disk d = (Disk)obj;
 			return Serial == d.Serial;
+		}
+
+				public override int GetHashCode()
+		{
+						return Convert.ToInt32(Serial);
 		}
 	}
 }

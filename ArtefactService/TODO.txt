@@ -1,0 +1,11 @@
+
+25/1/14
+
+- Should have bloody backed up a few hours ago as I had queries working quite well. Got around my problem with FileSystemArtefacatCreator trying to serialize
+temporary types as part of a MemberAccessExpression (e.g. for (a as Drive).Label == driveInfo[i].VolumeLabel)
+- So, to get it working again as it was a few hours ago, I think I need to:
+	- Queryable<> should implement an Artefacts.Services.IQueryable<> that inherits from System.Linq.IQueryable<>, defines additional member TOtalCount
+	- I removed a Server-side NHQueryableProxy<> that implemented Artefacts.Services.IQueryable<> as well, reimplement this and ArtefactRepository.Artefacts should
+	 be an instance of this on the server side. Client side is an instance of QUeryable<> 
+- An issue that remains is how to handle expressions that return types other than IQueryable<>/IEnumerable<> ? e.g. Count() First() FirstOrDefault()
+	- I think this is what I was experimenting with when I broke the functionality I had achieved

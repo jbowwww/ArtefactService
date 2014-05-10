@@ -2,101 +2,70 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D76CD89A-4341-462E-BBB1-9D756368442C}</ProjectGuid>
+    <ProjectGuid>{3FD32DA5-7D90-48AB-AF70-C72FF209BF78}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Artefacts.Services</RootNamespace>
+    <RootNamespace>ArtefactService</RootNamespace>
     <AssemblyName>ArtefactService</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="Iesi.Collections">
-      <HintPath>..\bin\lib\Iesi.Collections.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="log4net">
-      <HintPath>..\bin\lib\log4net.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MySql.Data">
-      <HintPath>..\bin\lib\MySql.Data.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="NHibernate">
-      <HintPath>..\bin\lib\NHibernate.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-    <Reference Include="Serialize.Linq">
-      <HintPath>..\bin\lib\Serialize.Linq.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Runtime.Remoting" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="NhBootStrap.cs" />
-    <Compile Include="PagingOptions.cs" />
-    <Compile Include="IRepository.cs" />
-    <Compile Include="ExpressionVisitor.cs" />
-    <Compile Include="ArtefactServiceConfiguration.cs" />
-    <Compile Include="Extensions\Expression.cs" />
-    <Compile Include="Extensions\ServiceModel.cs" />
-    <Compile Include="CurrentlyUnused\MyDataContractBehaviour.cs" />
-    <Compile Include="CurrentlyUnused\WCFDataSerializerSurrogate.cs" />
-    <Compile Include="CurrentlyUnused\WCFTypeResolver.cs" />
-    <Compile Include="RepositoryClientProxy.cs" />
-    <Compile Include="ArtefactRepository.cs" />
-    <Compile Include="Queryable.cs" />
-    <Compile Include="ClientQueryProvider.cs" />
-    <Compile Include="ClientQueryVisitor.cs" />
-    <Compile Include="ServerQueryVisitor.cs" />
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Content Include="hibernate_server.cfg.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Compile Include="ArtefactRepository.cs" />
+    <Compile Include="ArtefactServiceConfiguration.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="ClientQueryProvider.cs" />
+    <Compile Include="ClientQueryVisitor.cs" />
+    <Compile Include="ExpressionVisitor.cs" />
+    <Compile Include="IRepository.cs" />
+    <Compile Include="NhBootStrap.cs" />
+    <Compile Include="PagingOptions.cs" />
+    <Compile Include="Queryable.cs" />
+    <Compile Include="RepositoryClientProxy.cs" />
+    <Compile Include="ServerQueryVisitor.cs" />
+    <Compile Include="Extensions\Expression.cs" />
+    <Compile Include="Extensions\ServiceModel.cs" />
+    <Compile Include="MyDataContractBehaviour.cs" />
+    <Compile Include="WCFTypeResolver.cs" />
+    <Compile Include="WCFDataSerializerSurrogate.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Artefacts\Artefacts.csproj">
-      <Project>{FC41660D-8F54-437D-9AA7-87E460D73689}</Project>
-      <Name>Artefacts</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ArtefactService.config.exclude">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="hibernate_server.cfg.xml" />
     <None Include="TODO.txt" />
     <None Include="CurrentlyUnused\QuerySerializationBinder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Extensions\" />
-    <Folder Include="CurrentlyUnused\" />
+    <Reference Include="NHibernate">
+      <HintPath>..\bin\lib\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="Serialize.Linq">
+      <HintPath>..\bin\lib\Serialize.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="Artefacts">
+      <HintPath>..\bin\Debug\Artefacts.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
 </Project>

@@ -6,10 +6,10 @@ using System.ServiceModel;
 namespace Artefacts.FileSystem
 {
 	[DataContract]	//(IsReference = true)]
-	[ArtefactFormatString("[Directory: ]")]
+	[ArtefactFormat("[Directory: ]")]
 	public class Directory : FileSystemEntry
 	{
-		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+//		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
 		
 		public Directory(string path)
 		{
@@ -31,7 +31,7 @@ namespace Artefacts.FileSystem
 		public override Artefact Update()
 		{
 			base.Update();
-			Init(new DirectoryInfo(Path), Drive.GetDriveContainingPath(Path));		// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
+			Init(new DirectoryInfo(Path), Drive.GetDrive(Path));		// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
 			return this;
 		}
 	}

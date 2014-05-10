@@ -9,6 +9,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>ArtefactClientTest</RootNamespace>
     <AssemblyName>ArtefactClientTest</AssemblyName>
+    <StartupObject>ArtefactClientTest.ArtefactClientTest</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,8 +26,6 @@
         <Variable name="MONO_DEBUG" value="casts,gdb,gen-seq-points,handle-sigint,suspend-on-sigsegv" />
         <Variable name="MONO_WCF_TRACE" value="/home/jk/Code/ArtefactService/bin/Trace.WCF.xml" />
         <Variable name="MONO_TRACE_LISTENER" value="/home/jk/Code/ArtefactService/bin/Trace.txt" />
-        <Variable name="MONO_XMLSERIALIZER_DEBUG" value="1" />
-        <Variable name="MONO_TRACE" value="N:System.Runtime.Remoting.Activation.ActivationServices" />
       </EnvironmentVariables>
     </EnvironmentVariables>
   </PropertyGroup>
@@ -42,25 +41,27 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="Iesi.Collections">
-      <HintPath>..\..\Resources\CS\NHibernate\Required_Bins\Iesi.Collections.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="NHibernate">
-      <HintPath>..\bin\lib\NHibernate.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Serialize.Linq">
       <HintPath>..\bin\lib\Serialize.Linq.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MySql.Data">
-      <HintPath>..\bin\lib\MySql.Data.dll</HintPath>
+    <Reference Include="Artefacts">
+      <HintPath>..\bin\Debug\Artefacts.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="ArtefactService">
+      <HintPath>..\bin\Debug\ArtefactService.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ArtefactFileSystem">
+      <HintPath>..\bin\Debug\ArtefactFileSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ArtefactServiceHost">
+      <HintPath>..\bin\Debug\ArtefactServiceHost.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -89,27 +90,6 @@
     <None Include="Outputs\140201-0707-AllQueriesAppearToBeWorking-AllTestsEnabled %28copy%29.txt" />
     <None Include="Outputs\140202-0947-FileCreatorWorkingIthink.txt" />
     <None Include="Outputs\140202-1414-CreatorWorksButRecreatesAndThenUpdatesAllDrivesForEveryFileAndDir.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Artefacts\Artefacts.csproj">
-      <Project>{FC41660D-8F54-437D-9AA7-87E460D73689}</Project>
-      <Name>Artefacts</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\ArtefactService\ArtefactService.csproj">
-      <Project>{D76CD89A-4341-462E-BBB1-9D756368442C}</Project>
-      <Name>ArtefactService</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\ArtefactServiceHost\ArtefactServiceHost.csproj">
-      <Project>{2A68C8C7-F066-41EA-A476-F1F27EF77E52}</Project>
-      <Name>ArtefactServiceHost</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\ArtefactFileSystem\ArtefactFileSystem.csproj">
-      <Project>{5B486604-0B8B-4214-99DB-C36A69168F5B}</Project>
-      <Name>ArtefactFileSystem</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Outputs\" />

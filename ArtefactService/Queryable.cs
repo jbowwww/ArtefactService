@@ -101,7 +101,7 @@ namespace Artefacts.Services
 		
 		public Type ElementType { get { return typeof(TArtefact); } }
 
-		public object QueryId { get { return Expression.ToString(); } }
+		public object QueryId { get { return Expression.Id(); } }				//.ToString(); } }
 //			get { return _serverQueryId != null ? _serverQueryId : _serverQueryId = Provider.Execute(Expression); }
 		
 		public Expression Expression { get; private set; }

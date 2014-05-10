@@ -240,7 +240,7 @@ namespace Artefacts.Services
 				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
 				if (expression.Type.GetInterface("System.Collections.IEnumerable") == null)
 					throw new ArgumentOutOfRangeException("expression", expression, "Not IEnumerable");
-				object queryId = expression.ToString();
+				object queryId = expression.Id();				//.ToString();
 				if (!_queryCache.ContainsKey(queryId))
 				{
 					IQueryable<Artefact> q =

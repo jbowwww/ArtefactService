@@ -1,0 +1,15 @@
+#
+# Binary output files
+#
+*/[Bb]in
+*/[Oo]bj
+
+#
+# Not sure exactly what these are but not needed
+#
+*.pidb
+
+#
+# Files backed up when saving
+#
+*~

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Artefacts", "Artefacts\Artefacts.csproj", "{FC41660D-8F54-437D-9AA7-87E460D73689}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtefactService", "ArtefactService\ArtefactService.csproj", "{D76CD89A-4341-462E-BBB1-9D756368442C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtefactService", "ArtefactService\ArtefactService.csproj", "{3FD32DA5-7D90-48AB-AF70-C72FF209BF78}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtefactServiceHost", "ArtefactServiceHost\ArtefactServiceHost.csproj", "{2A68C8C7-F066-41EA-A476-F1F27EF77E52}"
 EndProject
@@ -41,14 +41,14 @@ Global
 		{2A68C8C7-F066-41EA-A476-F1F27EF77E52}.Debug|x86.Build.0 = Debug|x86
 		{2A68C8C7-F066-41EA-A476-F1F27EF77E52}.Release|x86.ActiveCfg = Release|x86
 		{2A68C8C7-F066-41EA-A476-F1F27EF77E52}.Release|x86.Build.0 = Release|x86
+		{3FD32DA5-7D90-48AB-AF70-C72FF209BF78}.Debug|x86.ActiveCfg = Debug|x86
+		{3FD32DA5-7D90-48AB-AF70-C72FF209BF78}.Debug|x86.Build.0 = Debug|x86
+		{3FD32DA5-7D90-48AB-AF70-C72FF209BF78}.Release|x86.ActiveCfg = Release|Any CPU
+		{3FD32DA5-7D90-48AB-AF70-C72FF209BF78}.Release|x86.Build.0 = Release|Any CPU
 		{5B486604-0B8B-4214-99DB-C36A69168F5B}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{5B486604-0B8B-4214-99DB-C36A69168F5B}.Debug|x86.Build.0 = Debug|Any CPU
 		{5B486604-0B8B-4214-99DB-C36A69168F5B}.Release|x86.ActiveCfg = Release|Any CPU
 		{5B486604-0B8B-4214-99DB-C36A69168F5B}.Release|x86.Build.0 = Release|Any CPU
-		{D76CD89A-4341-462E-BBB1-9D756368442C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D76CD89A-4341-462E-BBB1-9D756368442C}.Debug|x86.Build.0 = Debug|Any CPU
-		{D76CD89A-4341-462E-BBB1-9D756368442C}.Release|x86.ActiveCfg = Release|Any CPU
-		{D76CD89A-4341-462E-BBB1-9D756368442C}.Release|x86.Build.0 = Release|Any CPU
 		{DF2BDA77-4F99-4327-85CC-2C7F1A5C4645}.Debug|x86.ActiveCfg = Debug|x86
 		{DF2BDA77-4F99-4327-85CC-2C7F1A5C4645}.Debug|x86.Build.0 = Debug|x86
 		{DF2BDA77-4F99-4327-85CC-2C7F1A5C4645}.Release|x86.ActiveCfg = Release|x86
@@ -78,9 +78,6 @@ Global
 		$3.EventAddBraceStyle = NextLine
 		$3.EventRemoveBraceStyle = NextLine
 		$3.StatementBraceStyle = NextLine
-		$3.PlaceElseOnNewLine = True
-		$3.PlaceCatchOnNewLine = True
-		$3.PlaceFinallyOnNewLine = True
 		$3.BeforeMethodDeclarationParentheses = False
 		$3.BeforeMethodCallParentheses = False
 		$3.BeforeConstructorDeclarationParentheses = False
@@ -251,6 +248,13 @@ Global
 		$32.NamingStyle = PascalCase
 		$32.IncludeInstanceMembers = True
 		$32.IncludeStaticEntities = True
+		$0.VersionControlPolicy = $34
+		$34.inheritsSet = Mono
+		$0.ChangeLogPolicy = $35
+		$35.UpdateMode = None
+		$35.MessageStyle = $36
+		$36.LineAlign = 0
+		$35.inheritsSet = Mono
 		outputpath = bin
 	EndGlobalSection
 EndGlobal

@@ -19,18 +19,30 @@ namespace Artefacts.Services
 		IRepository<TArtefact>
 		where TArtefact : Artefact
 	{
-		#region Private fields
+		#region Fields & properties
+		#region Service channel
+		public Binding Binding { get; private set; }
+		public string Address { get; private set; }
 		private ChannelFactory<IRepository<TArtefact>> _channelFactory = null;
 		private IRepository<TArtefact> _channel = null;
-		private Dictionary<object, IQueryable<Artefact>> _queryCache;
 		#endregion
 		
-		#region Properties
-		public Binding Binding { get; private set; }
-		
-		public string Address { get; private set; }
-		
+		#region Queries
 		public IQueryProvider QueryProvider { get; private set; }
+		private Dictionary<object, IQueryable<Artefact>> _queryCache;
+		
+		/// <summary>
+		/// Gets or sets the queryables.
+		/// </summary>
+		/// <remarks>IRepository[TArtefact] implementation</remarks>
+		public IDictionary<Type, IQueryable> Queryables { get; protected set; }
+		
+		/// <summary>
+		/// Gets or sets the artefacts.
+		/// </summary>
+		/// <remarks>IRepository[TArtefact] implementation</remarks>
+		public IQueryable<Artefact> Artefacts { get; private set; }
+		#endregion
 		#endregion
 		
 		#region Constructors & initialisation methods
@@ -48,12 +60,11 @@ namespace Artefacts.Services
 			_channel = _channelFactory.CreateChannel();
 			
 			_queryCache = new Dictionary<object, IQueryable<Artefact>>();
-			
-			ClientQueryProvider<TArtefact> queryProvider = new ClientQueryProvider<TArtefact>(this);
+			QueryProvider = new ClientQueryProvider<TArtefact>(this);
 			Expression expression = 
 				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) },
 				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()));
-			Artefacts = (IQueryable<Artefact>)queryProvider.CreateQuery(expression);
+			Artefacts = (IQueryable<Artefact>)QueryProvider.CreateQuery(expression);
 				
 				// experimentation
 //				Expression.MakeMemberAccess(
@@ -63,6 +74,7 @@ namespace Artefacts.Services
 			
 			Queryables = new ConcurrentDictionary<Type, IQueryable>();
 			Queryables.Add(typeof(Artefact), Artefacts);
+	
 		}
 
 		private void ApplyChannelFactoryBehaviours(ChannelFactory<IRepository<TArtefact>> factory)
@@ -80,9 +92,7 @@ namespace Artefacts.Services
 		
 		#region IRepository[TArtefact] implementation	
 		#region Collections/Enumerables/Queryables
-		public IDictionary<Type, IQueryable> Queryables { get; protected set; }
-
-		public IQueryable<Artefact> Artefacts { get; private set; }
+		
 		#endregion
 		
 		#region Add/Get/Update/Remove singular artefact operations

@@ -18,9 +18,6 @@ using Artefacts;
 using Artefacts.Services;
 using Artefacts.FileSystem;
 
-using NHibernate.Criterion;
-using NHibernate.Linq;
-
 namespace ArtefactClientTest
 {
 	/// <summary>

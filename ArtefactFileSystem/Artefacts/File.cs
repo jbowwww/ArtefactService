@@ -9,10 +9,10 @@ using System.Runtime.Serialization;
 namespace Artefacts.FileSystem
 {
 	[DataContract]	//(IsReference = true)]
-	[ArtefactFormatString("[File: Size={Size}]")]
+	[ArtefactFormat("[File: Size={Size}]")]
 	public class File : FileSystemEntry
 	{
-		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+//		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
 
 		[DataMember]
 		public virtual long Size { get; set; }
@@ -31,7 +31,7 @@ namespace Artefacts.FileSystem
 		
 		public File(string path)
 		{
-			Init(new FileInfo(path), Drive.GetDriveContainingPath(path));	// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
+			Init(new FileInfo(path), Drive.GetDrive(path));	// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
 		}
 		
 		protected File (FileInfo fInfo, Drive drive)
@@ -50,7 +50,7 @@ namespace Artefacts.FileSystem
 		public override Artefact Update()
 		{
 			base.Update();
-			Init(new FileInfo(Path), Drive.GetDriveContainingPath(Path));	// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
+			Init(new FileInfo(Path), Drive.GetDrive(Path));	// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
 			return this;
 		}
 	}

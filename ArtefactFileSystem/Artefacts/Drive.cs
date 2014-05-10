@@ -12,11 +12,11 @@ using Artefacts.Services;
 namespace Artefacts.FileSystem
 {
 	[DataContract]	//(IsReference = true)]
-	[ArtefactFormatString("[Drive: Disk={Disk} Partition={Partition} Label={Label} Format={Format} Type={Type} Size={Size} FreeSpace={FreeSpace} AvailableFreeSpace={AvailableFreeSpace}]")]
+	[ArtefactFormat("[Drive: Disk={Disk} Partition={Partition} Label={Label} Format={Format} Type={Type} Size={Size} FreeSpace={FreeSpace} AvailableFreeSpace={AvailableFreeSpace}]")]
 	public class Drive : Artefact
 	{
 		#region Static members
-		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+//		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
 		private static IDictionary<string, string> _partitionMountPaths = null;
 		public static IDictionary<string, string> PartitionMountPaths {
 			get
@@ -53,32 +53,49 @@ namespace Artefacts.FileSystem
 			{
 //				IRepository<Artefact> repository = RepositoryClientProxy<Artefact>.Repository;
 				Drive drive = null;
-				if (Repository != null)
+				try
 				{
-					var q = from d in Repository.Artefacts.AsEnumerable().OfType<Drive>()
-						where d.Label == dInfo.VolumeLabel
-					 	select d;
-					drive = (Drive)q.SingleOrDefault();
-					if (drive == null)
-						Repository.Add(drive = new Drive(dInfo));
+					if (Repository != null)
+					{
+						var q = from d in Repository.Artefacts.AsEnumerable().OfType<Drive>()
+							where d.Label == dInfo.VolumeLabel
+						 	select d;
+						drive = (Drive)q.SingleOrDefault();
+						if (drive == null)
+							Repository.Add(drive = new Drive(dInfo));
+						else
+							Repository.Update(drive.Update(dInfo));
+					}
 					else
-						Repository.Update(drive.Update(dInfo));
+						drive = new Drive(dInfo);
+					if (drive == null)
+						throw new NullReferenceException("drive is null");
+					drives.Add(drive);
 				}
-				else
-					drive = new Drive(dInfo);
-				if (drive == null)
-					throw new NullReferenceException("drive is null");
-				drives.Add(drive);
+				catch (UnauthorizedAccessException ex)
+				{
+					// this is OK to continue from, just ignore & omit that drive - for now output for debug though
+					Console.WriteLine("\n{0}\n", ex.ToString());
+				}
 			}
 			return drives.AsQueryable();
 		}
 		
-		public static Drive GetDriveContainingPath(string path)
+		public static Drive GetDrive(string rootPath)
 		{
-			return (from dr in Drive.GetDrives().AsEnumerable()
-				orderby dr.Label.Length descending
-				where path.StartsWith(dr.Label)
-				select dr).FirstOrDefault();
+//			IQueryable<Drive> q =
+//				from dr in FileSystemArtefactCreator.Singleton.Drives
+//				orderby dr.Label.Length descending
+//				where path.StartsWith(dr.Label)
+//				select dr;
+//			Drive drive = q.FirstOrDefault() ?? 
+						throw new NotImplementedException();
+		}
+//			return (from dr in Drive.GetDrives().AsEnumerable()
+		
+		public static Drive GetOrCreate(string driveName)
+		{
+						throw new NotImplementedException();
 		}
 		#endregion
 		
@@ -175,6 +192,11 @@ namespace Artefacts.FileSystem
 //				&& Label == drive.Label && Format == drive.Format && Type == drive.Type && Size == drive.Size
 //				&& FreeSpace == drive.FreeSpace && AvailableFreeSpace == drive.AvailableFreeSpace;
 		
+				public override int GetHashCode()
+		{
+						return Convert.ToInt32(Name);
+		}
+
 		public override void CopyMembersFrom(Artefact source)
 		{
 			base.CopyMembersFrom(source);
