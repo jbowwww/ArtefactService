@@ -1,17 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/ArtefactRepository.cs">
-    <Files>
-      <File FileName="ArtefactService/ArtefactRepository.cs" Line="40" Column="2" />
-      <File FileName="ArtefactService/ArtefactServiceConfiguration.cs" Line="8" Column="2" />
-    </Files>
+  <MonoDevelop.Ide.Workbench>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
-          <Node name="ArtefactClientTest" expanded="True" />
+          <Node name="ArtefactFileSystem" expanded="True">
+            <Node name="Artefacts" expanded="True" />
+          </Node>
+          <Node name="Artefacts" expanded="True">
+            <Node name="Artefacts" expanded="True" />
+          </Node>
           <Node name="ArtefactService" expanded="True">
-            <Node name="Extensions" expanded="True" />
-            <Node name="ArtefactRepository.cs" selected="True" />
+            <Node name="Queryable.cs" selected="True" />
           </Node>
         </State>
       </Pad>

@@ -47,7 +47,6 @@ namespace Artefacts.Service
 		
 		#region Private fields
 		private Dictionary<int, Artefact> _artefactCache;
-		private Dictionary<object, IQueryable<Artefact>> _queryCache;
 		private Dictionary<object, int> _countCache;
 //		private Dictionary<object, QueryResult<Artefact>> _queryResultCache;
 		private ConcurrentQueue<object> _queryExecuteQueue;
@@ -64,7 +63,7 @@ namespace Artefacts.Service
 			Configuration = new ArtefactServiceConfiguration();
 
 			_artefactCache = new Dictionary<int, Artefact>();
-			_queryCache = new Dictionary<object, IQueryable<Artefact>>();
+			QueryCache = new Dictionary<object, IQueryable>();
 			_countCache = new Dictionary<object, int>();
 //			_queryResultCache = new Dictionary<object, QueryResult<Artefact>>();
 			_queryExecuteQueue = new ConcurrentQueue<object>();
@@ -237,13 +236,13 @@ namespace Artefacts.Service
 				if (expression.Type.GetInterface("System.Collections.IEnumerable") == null)
 					throw new ArgumentOutOfRangeException("expression", expression, "Not IEnumerable");
 				object queryId = expression.Id();				//.ToString();
-				if (!_queryCache.ContainsKey(queryId))
+				if (!QueryCache.ContainsKey(queryId))
 				{
 					IQueryable<Artefact> q =
 //						new NhQueryable<Artefact>(Artefacts.Provider, expression);
 //						Artefacts.Provider.Execute<IQueryable<Artefact>>(expression);
 					Artefacts.Provider.CreateQuery<Artefact>(expression);
-					_queryCache.Add(queryId, q);					//(Queryable<Artefact>)				// Session.Query<Artefact>().Provider.CreateQuery<Artefact>(en.ToExpression());
+					QueryCache.Add(queryId, q);					//(Queryable<Artefact>)				// Session.Query<Artefact>().Provider.CreateQuery<Artefact>(en.ToExpression());
 				}
 				return queryId;
 			}
@@ -253,42 +252,42 @@ namespace Artefacts.Service
 			}
 		}
 		
-		public int QueryCount(object queryId)
-		{
-			try
-			{
-				IQueryable<Artefact> query = _queryCache[queryId];
-				int count = _countCache.ContainsKey(queryId) ?
-					_countCache[queryId] :
-					_countCache[queryId] = query.Count();
-	//					_nhQueryProvider.Execute<int>(query.Expression);
-				return count;
-			}
-			catch (Exception ex)
-			{
-				throw Error(ex, queryId);
-			}
-		}
-		
-		public Artefact QueryResult(object queryId)
-		{
-			try
-			{
-				IQueryable<Artefact> query = _queryCache[queryId];
-				Artefact artefact = _nhQueryProvider.Execute<Artefact>(query.Expression);
-				return artefact;
-			}
-			catch (Exception ex)
-			{
-				throw Error(ex, queryId);
-			}
-		}
-		
+//		public int QueryCount(object queryId)
+//		{
+//			try
+//			{
+//				IQueryable<Artefact> query = QueryCache[queryId];
+//				int count = _countCache.ContainsKey(queryId) ?
+//					_countCache[queryId] :
+//					_countCache[queryId] = query.Count();
+//	//					_nhQueryProvider.Execute<int>(query.Expression);
+//				return count;
+//			}
+//			catch (Exception ex)
+//			{
+//				throw Error(ex, queryId);
+//			}
+//		}
+//		
+//		public Artefact QueryResult(object queryId)
+//		{
+//			try
+//			{
+//				IQueryable<Artefact> query = QueryCache[queryId];
+//				Artefact artefact = _nhQueryProvider.Execute<Artefact>(query.Expression);
+//				return artefact;
+//			}
+//			catch (Exception ex)
+//			{
+//				throw Error(ex, queryId);
+//			}
+//		}
+//		
 		public Artefact[] QueryResults(object queryId, int startIndex = 0, int count = -1)
 		{
 			try
 			{	
-				IQueryable<Artefact> query = _queryCache[queryId];
+				IQueryable<Artefact> query = (IQueryable<Artefact>)QueryCache[queryId];
 				Artefact[] results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
 					query.Skip(startIndex) : // with a new custom server-side query provider, and implement caching??
 					query.Skip(startIndex).Take(count)).ToArray();
@@ -310,29 +309,30 @@ namespace Artefacts.Service
 				throw Error(ex, queryId, startIndex, count);
 			}
 		}
-		
-		public object QueryMethodCall(object queryId, string methodName)//  MethodInfo method)
-		{
-			try
-			{
-				IQueryable<Artefact> query = _queryCache[queryId];
-				string[] methodFullName = methodName.Split(':');
-				MethodInfo method = typeof(System.Linq.Enumerable).GetMethod(methodFullName[1], new Type[] { typeof(IEnumerable<Artefact>) });
-					//Type.GetType(methodFullName[0]).GetMethod(methodFullName[1]);
-				object result = method.Invoke(query, new object[] { });		// currently can't use methods with parameters - need to serialize them
-				return result;
-			}
-			catch (Exception ex)
-			{
-				throw Error(ex, queryId);
-			}
-		}
+//		
+//		public object QueryMethodCall(object queryId, string methodName)//  MethodInfo method)
+//		{
+//			try
+//			{
+//				IQueryable<Artefact> query = QueryCache[queryId];
+//				string[] methodFullName = methodName.Split(':');
+//				MethodInfo method = typeof(System.Linq.Enumerable).GetMethod(methodFullName[1], new Type[] { typeof(IEnumerable<Artefact>) });
+//					//Type.GetType(methodFullName[0]).GetMethod(methodFullName[1]);
+//				object result = method.Invoke(query, new object[] { });		// currently can't use methods with parameters - need to serialize them
+//				return result;
+//			}
+//			catch (Exception ex)
+//			{
+//				throw Error(ex, queryId);
+//			}
+//		}
 		
 		public object QueryExecute(byte[] binary)
 		{
 			try
 			{
 				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
+
 				object result = Artefacts.Provider.Execute(expression);
 				return result;
 			}
@@ -347,6 +347,8 @@ namespace Artefacts.Service
 		public IQueryable<Artefact> Artefacts { get; private set; }
 		
 		public IDictionary<Type, IQueryable> Queryables { get; private set; }
+
+		public Dictionary<object, IQueryable> QueryCache { get; private set; }
 		#endregion
 		
 		#region Get/Set default paging options

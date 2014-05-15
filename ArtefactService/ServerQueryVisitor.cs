@@ -6,21 +6,24 @@ namespace Artefacts.Service
 {
 	public class ServerQueryVisitor : ExpressionVisitor
 	{
-		public IRepository<Artefact> Repository { get; private set; }
+		public ArtefactRepository Repository { get; private set; }
 			
-		public ServerQueryVisitor(IRepository<Artefact> repository)
+		public ServerQueryVisitor(ArtefactRepository repository)
 		{
 			Repository = repository;
 		}
-		
-//		protected override Expression VisitConstant(ConstantExpression c)
-//		{
-//			if (c.Type == typeof(IQueryable<Artefact>) && c.Value == null)
-//			{
-//				return Expression.Constant(Repository.Artefacts);				
-//			}
-//			return c;
-//		}
+
+
+		protected override Expression VisitConstant(ConstantExpression c)
+		{
+			if (c.Type.Equals(typeof(object)))			//typeof(IQueryable).IsAssignableFrom(c.Type))
+			{
+				if (c.Value == null)
+					return Expression.Constant(Repository.Artefacts);	
+				return Expression.Constant(Repository.QueryCache[c.Value]);
+			}
+			return c;
+		}
 	}
 }
 

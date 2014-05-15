@@ -47,11 +47,12 @@
     <Compile Include="MyDataContractBehaviour.cs" />
     <Compile Include="WCFTypeResolver.cs" />
     <Compile Include="WCFDataSerializerSurrogate.cs" />
+    <Compile Include="Extensions\Type.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="TODO.txt" />
     <None Include="CurrentlyUnused\QuerySerializationBinder.cs" />
     <None Include="Configuration\hibernate_server.cfg.xml" />
+    <None Include="Notes\TODO.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="NHibernate">

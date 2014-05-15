@@ -1,90 +1,128 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using Antlr.Runtime.Tree;
 using System.Reflection;
+using System.Globalization;
 
 namespace Artefacts.Service
 {
 	/// <summary>
 	/// Client query provider.
 	/// </summary>
-	/// <exception cref="ArgumentOutOfRangeException">
-	/// Is thrown when an argument passed to a method is invalid because it is outside the allowable range of values as
-	/// specified by the method.
-	/// </exception>
 	/// <remarks>
-	/// //	where TArtefact : Artefact
+	/// 
 	/// </remarks>
-	public class ClientQueryProvider<TArtefact> : IQueryProvider
+	public class ClientQueryProvider<TArtefact> : IQueryProvider where TArtefact : Artefact
 	{
-		public IRepository<TArtefact> Repository { get; private set; }
-		
-		public ExpressionVisitor QueryVisitor { get; private set; }
+		/// <summary>
+		/// An expression visitor used in constructor
+		/// </summary>
+		private readonly ExpressionVisitor _expressionVisitor;
 
-		public Dictionary<Expression, IQueryable> QueryCache { get; private set; }
-		
-		public BinaryFormatter BinaryFormatter { get; private set; }
-		
-		public ClientQueryProvider(IRepository<TArtefact> repository)
-		{
-			Repository = repository;
-			QueryVisitor = new ClientQueryVisitor((IRepository<Artefact>)Repository);
-			QueryCache = new Dictionary<Expression, IQueryable>();
-			BinaryFormatter = new BinaryFormatter();
+		/// <summary>
+		/// The repository.
+		/// </summary>
+		public IRepository<TArtefact> Repository {
+			get; private set;
 		}
 
-		#region IQueryProvider implementation
+		/// <summary>
+		/// Gets the query cache.
+		/// </summary>
+		/// <remarks>
+		/// If you have trouble converting items to IQueryable, try deriving Queryable`1[TArtefact] from a new base class Queryable
+		/// that has no type parameters and use that as the element type for this dictionary
+		/// </remarks>
+		protected IDictionary<object, IQueryable> _queryCache;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Artefacts.Service.ClientQueryProvider`1"/> class.
+		/// </summary>
+		/// <param name="repository">Repository.</param>
+		/// <param name="visitor">Visitor.</param>
+		public ClientQueryProvider(IRepository<TArtefact> repository, ExpressionVisitor visitor = null)
+		{
+			if (repository == null)
+				throw new ArgumentNullException("repository");
+			Repository = repository;
+			_queryCache = new ConcurrentDictionary<object, IQueryable>();
+			_expressionVisitor = visitor ?? new ClientQueryVisitor<TArtefact>(Repository, _queryCache);	// Activator.CreateInstance<TExpressionVisitor>();
+		}
+
+		/// <summary>
+		/// Creates the query.
+		/// </summary>
+		/// <param name="expression">Expression</param>
+		/// <returns>The query</returns>
+		/// <remarks>IQueryProvider implementation</remarks>
 		public IQueryable CreateQuery(Expression expression)
 		{
-			if (!expression.IsEnumerable())
-				throw new ArgumentOutOfRangeException("expression", expression, "IQueryable IQueryProvider.CreateQuery: Expression should be IEnumerable");
-			Expression newExpression = QueryVisitor.Visit(expression); 
-						Queryable<TArtefact> query = new Queryable<TArtefact>(this, (IRepository<Artefact>)Repository, newExpression);
-						object qId = Repository.CreateQuery(newExpression.ToBinary(BinaryFormatter));			// TODO: In future you may not want to wait for and return the queryId from server: it is only the expression as a string, and if you wait for it it will delay until the server has deserialized expression tree, which might be non-trivial if the expression is complex
-//			if (query.QueryId != qId)
-//				throw new InvalidOperationException("QueryId mismatch between client and server");
-			return (IQueryable)query;
+			return (IQueryable)(this as IQueryProvider).CreateQuery<TArtefact>(expression);
 		}
 
-				/// <summary>
-				/// Creates the query.
-				/// </summary>
-				/// <returns>The query.</returns>
-				/// <param name="expression">Expression.</param>
-				/// <typeparam name="TElement">The 1st type parameter.</typeparam>
-				/// <remarks>
-				/// TODO: Doesn't want to serialize lambda exp[ressions (I think) - try using ExpressionNode again??
-				/// </remarks>
+		/// <summary>
+		/// Creates the query.
+		/// </summary>
+		/// <param name="expression">Expression.</param>
+		/// <typeparam name="TElement">The 1st type parameter.</typeparam>
+		/// <returns>The query.</returns>
+		/// <remarks>IQueryProvider implementation</remarks>
 		IQueryable<TElement> IQueryProvider.CreateQuery<TElement>(Expression expression)
 		{
-						//return (IQueryable<TElement>)(CreateQuery(expression));
-						if (!expression.IsEnumerable())
-								throw new ArgumentOutOfRangeException("expression", expression, "IQueryable IQueryProvider.CreateQuery: Expression should be IEnumerable");
-						Expression newExpression = QueryVisitor.Visit(expression); 
-						Queryable<TElement> query = new Queryable<TElement>(this, (IRepository<Artefact>)Repository, newExpression);
-						//object qId = Repository.CreateQuery(newExpression.ToBinary(BinaryFormatter));			// TODO: In future you may not want to wait for and return the queryId from server: it is only the expression as a string, and if you wait for it it will delay until the server has deserialized expression tree, which might be non-trivial if the expression is complex
-//			if (query.QueryId != qId)
-//				throw new InvalidOperationException("QueryId mismatch between client and server");
-						return (System.Linq.IQueryable<TElement>) query;
+			if (expression == null)
+				throw new ArgumentNullException("expression");
+			if (!expression.IsEnumerable())
+				throw new ArgumentOutOfRangeException("expression", expression, "Should implement System.Collections.IEnumerable");
+			if (!typeof(Artefact).IsAssignableFrom(typeof(TElement)))
+				throw new ArgumentOutOfRangeException("TElement", typeof(TElement), "Should be subclass of Artefact");
+//			if (!typeof(TElement).IsAssignableFrom(expression.Type.GetElementType()))
+//				throw new ArgumentOutOfRangeException("expression", expression,
+//					string.Format("Should assignable to System.Linq.IQueryable<{0}>", typeof(TElement).FullName));
+			object expressionId = expression.Id();
+			if (_queryCache.ContainsKey(expressionId))
+				return (IQueryable<TElement>)_queryCache[expressionId];
+//			Expression newExpression = _expressionVisitor.Visit(expression);
+			IQueryable<TElement> queryable = (IQueryable<TElement>)Activator.CreateInstance(
+				typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, expression);
+//				BindingFlags.NonPublic, null,
+//				new object[] { this, expression },
+//				CultureInfo.CurrentCulture);
+			_queryCache[expressionId] = (IQueryable)queryable;
+			return queryable;
+			//return new Queryable<TArtefact>(this, expression);
 		}
 
+		/// <summary>
+		/// Execute the specified expression.
+		/// </summary>
+		/// <param name="expression">Expression.</param>
+		/// <returns>The query result</returns>
+		/// <remarks>IQueryProvider implementation</remarks>
 		public object Execute(Expression expression)
 		{
+//			if (expression.IsEnumerable() && typeof(TArtefact).IsAssignableFrom(expression.Type) && _queryCache.ContainsKey(expression))
+//				return _queryCache[expression];
 			if (expression.IsEnumerable())
-				throw new ArgumentOutOfRangeException("expression", expression, "IQueryable IQueryProvider.Execute: Expression should not be IEnumerable");
-			Expression newExpression = QueryVisitor.Visit(expression); 
-			return Repository.QueryExecute(newExpression.ToBinary(BinaryFormatter));	
+				throw new InvalidOperationException();
+//			Expression newExpression = _expressionVisitor.Visit(expression);
+//			Queryable.
+			return Repository.QueryExecute(expression.ToBinary());	
 		}
 
+		/// <summary>
+		/// Execute the specified expression.
+		/// </summary>
+		/// <param name="expression">Expression.</param>
+		/// <typeparam name="TResult">The 1st type parameter.</typeparam>
+		/// <returns>The query result</returns>
+		/// <remarks>IQueryProvider implementation</remarks>
 		TResult IQueryProvider.Execute<TResult>(Expression expression)
 		{
 			return (TResult)Execute(expression);
 		}
-		#endregion
 	}
 }
 

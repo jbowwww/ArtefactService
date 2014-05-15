@@ -128,25 +128,25 @@ namespace Artefacts.Service
 			return _channel.CreateQuery(binary);
 		}
 		
-		public int QueryCount(object queryId)
-		{
-			return _channel.QueryCount(queryId);
-		}
-
-		public TArtefact QueryResult(object queryId)
-		{
-			return _channel.QueryResult(queryId);
-		}
-
+//		public int QueryCount(object queryId)
+//		{
+//			return _channel.QueryCount(queryId);
+//		}
+//
+//		public TArtefact QueryResult(object queryId)
+//		{
+//			return _channel.QueryResult(queryId);
+//		}
+//
 		public TArtefact[] QueryResults(object queryId, int startIndex = 0, int count = -1)
 		{
 			return _channel.QueryResults(queryId, startIndex, count);
 		}
-
-		public object QueryMethodCall(object queryId, string methodName)//  MethodInfo method)
-		{
-			return _channel.QueryMethodCall(queryId, methodName);
-		}
+//
+//		public object QueryMethodCall(object queryId, string methodName)//  MethodInfo method)
+//		{
+//			return _channel.QueryMethodCall(queryId, methodName);
+//		}
 		
 		public object QueryExecute(byte[] binary)
 		{

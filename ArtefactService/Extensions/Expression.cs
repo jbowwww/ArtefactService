@@ -12,6 +12,8 @@ namespace Artefacts.Service
 {
 	public static class Expression_Extensions
 	{
+		private static readonly BinaryFormatter _bf = new BinaryFormatter();
+
 		public static bool IsEnumerable(this Expression e)
 		{
 			return typeof(IEnumerable).IsAssignableFrom(e.Type);
@@ -30,10 +32,15 @@ namespace Artefacts.Service
 		
 		public static object Id(this Expression e)
 		{
-						return e.ToString();//.ToJson();	//ToExpressionNode().GetHashCode();
+			return e.ToJson();		//.ToString();//.ToJson();	//ToExpressionNode().GetHashCode();
 				//e.ToString();		// TODO: Will have to implement your own Id builder I think, because generic method calls don't include generic arguments in the string
 		}
-		
+
+		public static byte[] ToBinary(this Expression e)
+		{
+			return ToBinary(e, _bf);
+		}
+
 		public static byte[] ToBinary(this Expression e, BinaryFormatter bf)
 		{
 			ExpressionNode en = e.ToExpressionNode();
@@ -42,7 +49,12 @@ namespace Artefacts.Service
 			byte[] binaryExpression = ms.GetBuffer();
 			return binaryExpression;
 		}
-		
+
+		public static Expression FromBinary(this byte[] eBinary)
+		{
+			return FromBinary(eBinary, _bf);
+		}
+
 		public static Expression FromBinary(this byte[] eBinary, BinaryFormatter bf)
 		{
 			ExpressionNode en = (ExpressionNode)bf.Deserialize(new System.IO.MemoryStream(eBinary));

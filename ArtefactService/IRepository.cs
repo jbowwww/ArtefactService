@@ -14,8 +14,7 @@ namespace Artefacts.Service
 {
 	[ServiceContract]
 	[ServiceKnownType(typeof(Queryable<Artefact>))]
-	public interface IRepository<TArtefact>
-//		where TArtefact : Artefact
+	public interface IRepository<TArtefact> where TArtefact : Artefact
 	{
 		#region Collections/Enumerables/Queryables
 		IQueryable<Artefact> Artefacts { get; }
@@ -44,17 +43,17 @@ namespace Artefacts.Service
 		[OperationContract]
 		object CreateQuery(byte[] binary);
 		
-		[OperationContract]
-		int QueryCount(object queryId);
-		
-		[OperationContract]
-		TArtefact QueryResult(object queryId);
-		
+//		[OperationContract]
+//		int QueryCount(object queryId);
+//		
+//		[OperationContract]
+//		TArtefact QueryResult(object queryId);
+//		
 		[OperationContract]
 		TArtefact[] QueryResults(object queryId, int startIndex = 0, int count = -1);
-		
-		[OperationContract]
-		object QueryMethodCall(object queryId, string methodName);// MethodInfo method);
+//		
+//		[OperationContract]
+//		object QueryMethodCall(object queryId, string methodName);// MethodInfo method);
 		
 		[OperationContract]
 		object QueryExecute(byte[] binary);
