@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	public class ServerQueryVisitor : ExpressionVisitor
 	{

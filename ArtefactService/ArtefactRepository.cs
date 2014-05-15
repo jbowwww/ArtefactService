@@ -1,26 +1,25 @@
 using System;
-using System.Text;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Runtime.Serialization;
+using System.Reflection;
+//using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.ServiceModel;
-using System.ServiceModel.Description;
-using System.ServiceModel.Dispatcher;
-//using WCFChannel = System.ServiceModel.Channels;
-using System.Reflection;
-using System.Diagnostics;
-
-using Serialize.Linq;
-using Serialize.Linq.Extensions;
-using Serialize.Linq.Nodes;
+//using System.ServiceModel.Description;
+//using System.ServiceModel.Dispatcher;
+using System.Text;
 
 using NHibernate;
 using NHibernate.Linq;
+//using Serialize.Linq;
 
-namespace Artefacts.Services
+//using Serialize.Linq.Extensions;
+using Serialize.Linq.Nodes;
+
+namespace Artefacts.Service
 {
 	/// <summary>
 	/// Artefact repository
@@ -30,13 +29,10 @@ namespace Artefacts.Services
 	///			MaxItemsInObjectGraph=100,
 	///			ReleaseServiceInstanceOnTransactionComplete=false)]
 	/// </remarks>
-//	[ServiceBehavior(
-//		IncludeExceptionDetailInFaults=true,
-//		InstanceContextMode=InstanceContextMode.Single,
-//		ConcurrencyMode=ConcurrencyMode.Single)]
-	[ServiceBehavior(IncludeExceptionDetailInFaults=true,
-		InstanceContextMode=InstanceContextMode.Single,
-		ConcurrencyMode=ConcurrencyMode.Single)]
+	[ServiceBehavior(
+				IncludeExceptionDetailInFaults=true,
+				InstanceContextMode=InstanceContextMode.Single,
+				ConcurrencyMode=ConcurrencyMode.Single)]
 	public class ArtefactRepository : IRepository<Artefact>
 	{		
 		#region Static members

@@ -8,7 +8,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 //using System.Xml.Serialization;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	/// <summary>
 	/// Queryable.
@@ -97,7 +97,7 @@ namespace Artefacts.Services
 		
 		public DateTime TimeRetrieved { get; private set; }
 		
-		public IRepository<TArtefact> Repository { get; protected set; }
+		public IRepository<Artefact> Repository { get; protected set; }
 		
 		public Type ElementType { get { return typeof(TArtefact); } }
 
@@ -139,13 +139,15 @@ namespace Artefacts.Services
 		}
 		#endregion
 		
-		internal Queryable(IQueryProvider provider, IRepository<TArtefact> repository, Expression expression)
+		internal Queryable(IQueryProvider provider, IRepository<Artefact> repository, Expression expression)
 		{
 			TimeCreated = DateTime.Now;
 			TimeRetrieved = DateTime.MinValue;
 			Provider = provider;
 			Repository = repository;
 			Expression = expression;
+
+						/*QueryId =*/ repository.CreateQuery(expression.ToBinary(new BinaryFormatter()));
 		}
 		
 		#region IEnumerable & IEnumerable[Artefact] implementation

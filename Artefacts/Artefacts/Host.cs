@@ -11,10 +11,10 @@ namespace Artefacts
 	[ArtefactFormat("[Host: HostId={HostId}]")]
 	public class Host : Artefact
 	{
-//		public static Type[] GetArtefactTypes()
-//		{
-//			return Artefact.GetArtefactTypes();
-//		}
+		public static Type[] GetArtefactTypes()
+		{
+			return Artefact.GetArtefactTypes();
+		}
 		
 		private static Host _current = null;
 		

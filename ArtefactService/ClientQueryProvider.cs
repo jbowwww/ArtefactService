@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Reflection;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	/// <summary>
 	/// Client query provider.
@@ -43,16 +43,33 @@ namespace Artefacts.Services
 			if (!expression.IsEnumerable())
 				throw new ArgumentOutOfRangeException("expression", expression, "IQueryable IQueryProvider.CreateQuery: Expression should be IEnumerable");
 			Expression newExpression = QueryVisitor.Visit(expression); 
-			Queryable<TArtefact> query = new Queryable<TArtefact>(this, Repository, newExpression);
-			object qId = Repository.CreateQuery(newExpression.ToBinary(BinaryFormatter));			// TODO: In future you may not want to wait for and return the queryId from server: it is only the expression as a string, and if you wait for it it will delay until the server has deserialized expression tree, which might be non-trivial if the expression is complex
+						Queryable<TArtefact> query = new Queryable<TArtefact>(this, (IRepository<Artefact>)Repository, newExpression);
+						object qId = Repository.CreateQuery(newExpression.ToBinary(BinaryFormatter));			// TODO: In future you may not want to wait for and return the queryId from server: it is only the expression as a string, and if you wait for it it will delay until the server has deserialized expression tree, which might be non-trivial if the expression is complex
 //			if (query.QueryId != qId)
 //				throw new InvalidOperationException("QueryId mismatch between client and server");
 			return (IQueryable)query;
 		}
 
+				/// <summary>
+				/// Creates the query.
+				/// </summary>
+				/// <returns>The query.</returns>
+				/// <param name="expression">Expression.</param>
+				/// <typeparam name="TElement">The 1st type parameter.</typeparam>
+				/// <remarks>
+				/// TODO: Doesn't want to serialize lambda exp[ressions (I think) - try using ExpressionNode again??
+				/// </remarks>
 		IQueryable<TElement> IQueryProvider.CreateQuery<TElement>(Expression expression)
 		{
-			return (IQueryable<TElement>)CreateQuery(expression);
+						//return (IQueryable<TElement>)(CreateQuery(expression));
+						if (!expression.IsEnumerable())
+								throw new ArgumentOutOfRangeException("expression", expression, "IQueryable IQueryProvider.CreateQuery: Expression should be IEnumerable");
+						Expression newExpression = QueryVisitor.Visit(expression); 
+						Queryable<TElement> query = new Queryable<TElement>(this, (IRepository<Artefact>)Repository, newExpression);
+						//object qId = Repository.CreateQuery(newExpression.ToBinary(BinaryFormatter));			// TODO: In future you may not want to wait for and return the queryId from server: it is only the expression as a string, and if you wait for it it will delay until the server has deserialized expression tree, which might be non-trivial if the expression is complex
+//			if (query.QueryId != qId)
+//				throw new InvalidOperationException("QueryId mismatch between client and server");
+						return (System.Linq.IQueryable<TElement>) query;
 		}
 
 		public object Execute(Expression expression)

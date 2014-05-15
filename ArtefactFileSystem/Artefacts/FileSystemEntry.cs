@@ -9,7 +9,7 @@ namespace Artefacts.FileSystem
 	[ArtefactFormat("[FileSystemEntry: Drive={Drive} Path={Path} Attributes={Attributes} CreationTime={CreationTime} AccessTime={AccessTime} ModifyTime={ModifyTime}]")]
 	public class FileSystemEntry : Artefact
 	{
-//		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
 
 //		public virtual int? DriveId { 
 //			get { return Drive == null ? -1 : Drive.Id; }

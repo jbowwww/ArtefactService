@@ -1,6 +1,6 @@
 using System;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	/// <summary>
 	/// Artefact service configuration options

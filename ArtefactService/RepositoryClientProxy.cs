@@ -13,7 +13,7 @@ using System.Diagnostics;
 
 using NHibernate.Linq;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	public class RepositoryClientProxy<TArtefact> :
 		IRepository<TArtefact>

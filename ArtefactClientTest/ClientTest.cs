@@ -15,7 +15,7 @@ using System.Diagnostics;
 //using Serialize.Linq.Nodes;
 
 using Artefacts;
-using Artefacts.Services;
+using Artefacts.Service;
 using Artefacts.FileSystem;
 
 namespace ArtefactClientTest
@@ -77,7 +77,7 @@ namespace ArtefactClientTest
 //		private static IArtefactService _proxy = null;
 //		private static IRepository<Artefact> _repoProxy = null;
 		private static RepositoryClientProxy<Artefact> _clientProxy = null;
-		private static ICreator _fsCreator = null;
+				private static FileSystemArtefactCreator/*ICreator*/ _fsCreator = null;
 		#endregion
 		
 		#region Debug Writer Constants
@@ -181,7 +181,7 @@ namespace ArtefactClientTest
 		#endregion
 		
 		#region Test methods executed by RunTest
-//		[ClientTestMethod(Order=5, Name="int RepositoryClientProxy<Artefact>.Artefacts.Count()")]
+		[ClientTestMethod(Order=5, Name="int RepositoryClientProxy<Artefact>.Artefacts.Count()")]
 		private static void TestQueryArtefactsCount()
 		{
 			Console.WriteLine("{0} artefacts currently in repository", _clientProxy.Artefacts.Count());
@@ -211,21 +211,35 @@ namespace ArtefactClientTest
 			foreach (Artefact artefact in q)
 				Console.WriteLine(artefact.ToString());
 		}
-		
+
+//				[ClientTestMethod(Order=35, Name="int RepositoryClientProxy<Artefact>.Artefacts.Count()")]
+				private static void TestQueryArtefactsDrivesCount()
+				{
+						Console.WriteLine("{0} artefacts currently in repository\n{1} drives", _clientProxy.Artefacts.Count(), _fsCreator.Drives.Count());
+
+				}
+					
 		[ClientTestMethod(Order=40, Name="FileSystemArtefactCreator")]
 		private static void TestFileSystemArtefactCreator()
 		{
 			_fsCreator = new FileSystemArtefactCreator(_clientProxy)
 			{
 				BasePath = "/media/Scarydoor/mystuff/moozik/samples/mycollections/"
-			};
+						};		//_clientProxy.Artefacts
+
+						Console.WriteLine("{0} artefacts currently in repository\n{1} drives", _clientProxy.Artefacts.Count(), _fsCreator.Drives.Count());
+
+						var q = _fsCreator.Drives.Where((a) => a.Id > 32799);
+						//a.GetType().FullName == typeof(Drive).FullName && 
+						foreach (Artefact artefact in q)
+								Console.WriteLine(artefact.ToString());
 			_fsCreator.Run(null);
 		}
 		#endregion
 		
 		protected static void Init()
 		{
-			Console.ReadKey();
+//			Console.ReadKey();
 
 			Artefact.ArtefactTypes.AddRange(artefactTypes);
 			
@@ -233,7 +247,9 @@ namespace ArtefactClientTest
 			_serviceHostThread = ArtefactServiceHost.GetOrCreateAsyncThread();		//artefactTypes);
 			_serviceHostThread.Start();
 			Thread.Sleep(ServiceHostStartDelay);
-			
+//						ArtefactServiceHost.Main(null);
+//						Thread.Sleep(ServiceHostStartDelay);
+
 			_clientProxy = new RepositoryClientProxy<Artefact>(new NetTcpBinding(SecurityMode.None), "net.tcp://localhost:3334/ArtefactRepository");
 			
 			Console.WriteLine("\nService Artefact Repository: {0}\n", _clientProxy.ToString());

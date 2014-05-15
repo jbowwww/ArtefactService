@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	/// <summary>
 	/// Paging options for <see cref="IRepository"/> query results

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 
-using Artefacts.Services;
+using Artefacts.Service;
 
 namespace Artefacts.FileSystem
 {

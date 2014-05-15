@@ -5,7 +5,7 @@ using System.ServiceModel.Dispatcher;
 using System.ServiceModel.Description;
 using System.ServiceModel.Channels;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	public static class ServiceModel_Extensions
 	{

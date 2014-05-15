@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 using System.Reflection;
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	public class QuerySerializationBinder :
 		SerializationBinder

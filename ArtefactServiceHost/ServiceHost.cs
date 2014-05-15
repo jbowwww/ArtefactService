@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Diagnostics;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	public class ArtefactServiceHost
 	{	
@@ -35,7 +35,7 @@ namespace Artefacts.Services
 		private static void ApplyServiceHostSettings(ServiceHost host)
 		{
 			host.OpenTimeout = host.CloseTimeout = Timeout;
-			
+					
 			ServiceDebugBehavior sdb = host.Description.Behaviors.Find<ServiceDebugBehavior>();
 			if (sdb == null)
 				host.Description.Behaviors.Add(sdb = new ServiceDebugBehavior());
@@ -44,10 +44,10 @@ namespace Artefacts.Services
 			host.AddServiceEndpoint(typeof(IRepository<Artefact>),
 				new NetTcpBinding(SecurityMode.None)
 				{
-					MaxBufferSize = 16384,
+										MaxBufferSize = 4096,
 					ReaderQuotas = new System.Xml.XmlDictionaryReaderQuotas()
 					{
-						MaxStringContentLength = 16384
+												MaxStringContentLength = 32768
 					}
 				},
 				new Uri("net.tcp://localhost:3334/ArtefactRepository"));

@@ -21,13 +21,6 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <Externalconsole>true</Externalconsole>
-    <EnvironmentVariables>
-      <EnvironmentVariables>
-        <Variable name="MONO_DEBUG" value="casts,gdb,gen-seq-points,handle-sigint,suspend-on-sigsegv" />
-        <Variable name="MONO_WCF_TRACE" value="/home/jk/Code/ArtefactService/bin/Trace.WCF.xml" />
-        <Variable name="MONO_TRACE_LISTENER" value="/home/jk/Code/ArtefactService/bin/Trace.txt" />
-      </EnvironmentVariables>
-    </EnvironmentVariables>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
@@ -48,14 +41,6 @@
     </Reference>
     <Reference Include="Artefacts">
       <HintPath>..\bin\Debug\Artefacts.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ArtefactService">
-      <HintPath>..\bin\Debug\ArtefactService.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ArtefactFileSystem">
-      <HintPath>..\bin\Debug\ArtefactFileSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ArtefactServiceHost">
@@ -93,5 +78,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Outputs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ArtefactFileSystem\ArtefactFileSystem.csproj">
+      <Project>{5B486604-0B8B-4214-99DB-C36A69168F5B}</Project>
+      <Name>ArtefactFileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ArtefactService\ArtefactService.csproj">
+      <Project>{3FD32DA5-7D90-48AB-AF70-C72FF209BF78}</Project>
+      <Name>ArtefactService</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

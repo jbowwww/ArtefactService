@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	public class WCFDataSerializerSurrogate :
 		IDataContractSurrogate

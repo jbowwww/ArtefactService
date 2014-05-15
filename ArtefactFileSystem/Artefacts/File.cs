@@ -12,7 +12,7 @@ namespace Artefacts.FileSystem
 	[ArtefactFormat("[File: Size={Size}]")]
 	public class File : FileSystemEntry
 	{
-//		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
 
 		[DataMember]
 		public virtual long Size { get; set; }

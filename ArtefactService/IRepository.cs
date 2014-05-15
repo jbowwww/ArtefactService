@@ -10,7 +10,7 @@ using NHibernate.Criterion;
 using Serialize.Linq.Extensions;
 using Serialize.Linq.Nodes;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	[ServiceContract]
 	[ServiceKnownType(typeof(Queryable<Artefact>))]

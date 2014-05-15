@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using Serialize.Linq.Extensions;
 using Serialize.Linq.Nodes;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	public static class Expression_Extensions
 	{
@@ -30,7 +30,7 @@ namespace Artefacts.Services
 		
 		public static object Id(this Expression e)
 		{
-			return e.ToJson();	//ToExpressionNode().GetHashCode();
+						return e.ToString();//.ToJson();	//ToExpressionNode().GetHashCode();
 				//e.ToString();		// TODO: Will have to implement your own Id builder I think, because generic method calls don't include generic arguments in the string
 		}
 		

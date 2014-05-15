@@ -9,7 +9,7 @@ namespace Artefacts.FileSystem
 	[ArtefactFormat("[Directory: ]")]
 	public class Directory : FileSystemEntry
 	{
-//		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
 		
 		public Directory(string path)
 		{

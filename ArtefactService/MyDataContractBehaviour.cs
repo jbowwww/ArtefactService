@@ -2,7 +2,7 @@ using System;
 using System.ServiceModel.Description;
 using System.Runtime.Serialization;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	public class MyDataContractBehaviour :
 		DataContractSerializerOperationBehavior

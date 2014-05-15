@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml;
 
-namespace Artefacts.Services
+namespace Artefacts.Service
 {
 	/// <summary>
 	/// This bloody thing doesn't even get CALLED!!! despite it being added to the operation behaviours (DataContractSerialzerOperationBehaviour)

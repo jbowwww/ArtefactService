@@ -1,20 +1,30 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/RepositoryClientProxy.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/ArtefactRepository.cs">
     <Files>
-      <File FileName="ArtefactClientTest/ClientTest.cs" Line="19" Column="17" />
-      <File FileName="ArtefactFileSystem/Client/FileSystemArtefactCreator.cs" Line="33" Column="1" />
-      <File FileName="ArtefactService/ArtefactRepository.cs" Line="246" Column="11" />
-      <File FileName="ArtefactService/RepositoryClientProxy.cs" Line="130" Column="3" />
-      <File FileName="ArtefactService/Queryable.cs" Line="149" Column="1" />
-      <File FileName="ArtefactService/ClientQueryProvider.cs" Line="30" Column="1" />
-      <File FileName="ArtefactService/Extensions/Expression.cs" Line="43" Column="1" />
+      <File FileName="ArtefactService/ArtefactRepository.cs" Line="40" Column="2" />
+      <File FileName="ArtefactService/ArtefactServiceConfiguration.cs" Line="8" Column="2" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="ArtefactClientTest" expanded="True" />
+          <Node name="ArtefactService" expanded="True">
+            <Node name="Extensions" expanded="True" />
+            <Node name="ArtefactRepository.cs" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True">
+          <Node name="Artefacts" expanded="True" />
+          <Node name="ArtefactService" expanded="True" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/home/jk/Code/ArtefactService/ArtefactFileSystem/Client/FileSystemArtefactCreator.cs" line="86" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

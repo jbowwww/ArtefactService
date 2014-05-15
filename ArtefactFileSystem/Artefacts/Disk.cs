@@ -11,10 +11,10 @@ namespace Artefacts.FileSystem
 	[ArtefactFormat("[Disk: Serial={Serial} MostRecentHost={MostRecentHostId}] DeviceName={DeviceName}")]
 	public class Disk : Artefact
 	{
-//		public static Type[] GetArtefactTypes()
-//		{
-//			return Artefact.GetArtefactTypes();
-//		}
+		public static Type[] GetArtefactTypes()
+		{
+			return Artefact.GetArtefactTypes();
+		}
 		
 				private static List<Disk> _disks;
 				public static List<Disk> Disks {

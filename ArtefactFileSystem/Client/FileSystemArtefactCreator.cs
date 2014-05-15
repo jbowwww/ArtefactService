@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.ServiceModel;
 using System.Reflection;
 
-using Artefacts.Services;
+using Artefacts.Service;
 
 namespace Artefacts.FileSystem
 {
@@ -32,24 +32,24 @@ namespace Artefacts.FileSystem
 		
 		public IRepository<Artefact> Repository { get; private set; }
 //		public IQueryable Artefacts { get; private set; }
-		public IQueryable FileEntries {
-			get { return Repository.Queryables[typeof(FileSystemEntry)]; }
+				public IQueryable<FileSystemEntry> FileEntries {
+						get { return (IQueryable<FileSystemEntry>)Repository.Queryables[typeof(FileSystemEntry)]; }
 			private set { Repository.Queryables[typeof(FileSystemEntry)] = value; }
 		}
-		public IQueryable Files {
-			get { return Repository.Queryables[typeof(File)]; }
+				public IQueryable<File> Files {
+						get { return (IQueryable<File>)Repository.Queryables[typeof(File)]; }
 			private set { Repository.Queryables[typeof(File)] = value; }
 		}
-		public IQueryable Directories {
-			get { return Repository.Queryables[typeof(Directory)]; }
+				public IQueryable<Directory> Directories {
+						get { return (IQueryable<Directory>)Repository.Queryables[typeof(Directory)]; }
 			private set { Repository.Queryables[typeof(Directory)] = value; }
 		}
-		public IQueryable Drives {
-			get { return Repository.Queryables[typeof(Drive)]; }
+				public IQueryable<Drive> Drives {
+						get { return (IQueryable<Drive>)Repository.Queryables[typeof(Drive)]; }
 			private set { Repository.Queryables[typeof(Drive)] = value; }
 		}
-		public IQueryable Disks {
-			get { return Repository.Queryables[typeof(Disk)]; }
+				public IQueryable<Disk> Disks {
+						get { return (IQueryable<Disk>)Repository.Queryables[typeof(Disk)]; }
 			private set { Repository.Queryables[typeof(Disk)] = value; }
 		}
 		public Host ThisHost = new Host(true);
@@ -69,7 +69,8 @@ namespace Artefacts.FileSystem
 			Repository = repository;
 			
 //			Artefacts = Repository.Artefacts.OfType
-			FileEntries = QueryBase<FileSystemEntry>();
+						var g6 = QueryBase<FileSystemEntry>();
+						FileEntries = g6;
 			Files = QueryBase<File>();
 			Directories = QueryBase<Directory>();
 			Drives = QueryBase<Drive>();
@@ -81,23 +82,25 @@ namespace Artefacts.FileSystem
 //			BuildTypedQueryable<Artefacts.FileSystem.Drive>();
 //			BuildTypedQueryable<Artefacts.FileSystem.Disk>();
 			                          
-		internal IQueryable QueryBase<TArtefact>()
+				internal IQueryable<TArtefact> QueryBase<TArtefact>() where TArtefact : Artefact
 		{
-			IQueryable q = Repository.Artefacts.OfType<TArtefact>().AsQueryable();
-			return q;
-		}
-//			const BindingFlags bf = BindingFlags.Public | BindingFlags.Static;
-//			Expression expression =
-//				Expression.Call(typeof(NHibernate.Linq.LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) },
-//				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", bf).GetGetMethod()));
-//			return Repository.Artefacts.Provider.CreateQuery(expression);				//			Repository.Queryables.Add(typeof(TArtefact),
-//		}
+//						var q = Repository.Artefacts.OfType<TArtefact>().Select((arg) => (TArtefact)arg);//Where((a) => a is TArtefact).Select((a) => (TArtefact)a);
+//						//;Where((arg) => arg.GetType().FullName == typeof(Artefact).FullName)//.AsQueryable();
+//						                                //.Where((arg) => arg.GetType().FullName == typeof(Artefact).FullName);
+//						                                //
+//			return q;
+						const BindingFlags bf = BindingFlags.Public | BindingFlags.Static;
+						Expression expression =
+								Expression.Call(typeof(NHibernate.Linq.LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) },
+										Expression.Call(typeof(ArtefactRepository).GetProperty("Session", bf).GetGetMethod()));
+						return Repository.Artefacts.Provider.CreateQuery<TArtefact>(expression);				//			Repository.Queryables.Add(typeof(TArtefact),
+						}
 		#endregion
 		
 		#region implemented abstract members of Artefacts.CreatorBase
 		public override void Run(object param)
 		{
-			// Initialise
+						// Initialise 
 			Drive.Repository = Repository;
 			int recursionDepth = -1;
 			Queue<Uri> subDirectories = new Queue<Uri>(new Uri[] { BaseUri });

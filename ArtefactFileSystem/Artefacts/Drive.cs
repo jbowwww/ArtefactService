@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Diagnostics;
 
-using Artefacts.Services;
+using Artefacts.Service;
 
 namespace Artefacts.FileSystem
 {
@@ -16,7 +16,7 @@ namespace Artefacts.FileSystem
 	public class Drive : Artefact
 	{
 		#region Static members
-//		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
 		private static IDictionary<string, string> _partitionMountPaths = null;
 		public static IDictionary<string, string> PartitionMountPaths {
 			get
@@ -83,13 +83,23 @@ namespace Artefacts.FileSystem
 		
 		public static Drive GetDrive(string rootPath)
 		{
-//			IQueryable<Drive> q =
-//				from dr in FileSystemArtefactCreator.Singleton.Drives
-//				orderby dr.Label.Length descending
-//				where path.StartsWith(dr.Label)
+//						var q =c
+//								from dr in FileSystemArtefactCreator.Singleton.Drives
+//									orderby dr.Label.Length descending
+//										where rootPath.StartsWith(dr.Label)
 //				select dr;
-//			Drive drive = q.FirstOrDefault() ?? 
-						throw new NotImplementedException();
+						IQueryable<Drive> q = Repository.Artefacts
+								.Where((arg) => arg.GetType().FullName == typeof(Drive).FullName)
+								.Select((arg) => (Drive)arg)
+								.OrderByDescending((d) => d.Label.Length);
+//								.Where((d) => rootPath.StartsWith(d.Label));
+//						FileSystemArtefactCreator.Singleton.Drives
+						Drive dr = q.FirstOrDefault();
+						return dr;
+//								orderby dr.Label.Length descending
+//										where rootPath.StartsWith(dr.Label)
+//								select dr;
+//						return q.FirstOrDefault();
 		}
 //			return (from dr in Drive.GetDrives().AsEnumerable()
 		
