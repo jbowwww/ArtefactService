@@ -225,14 +225,13 @@ namespace ArtefactClientTest
 			_fsCreator = new FileSystemArtefactCreator(_clientProxy)
 			{
 				BasePath = "/media/Scarydoor/mystuff/moozik/samples/mycollections/"
-						};		//_clientProxy.Artefacts
+			};		//_clientProxy.Artefacts
 
-						Console.WriteLine("{0} artefacts currently in repository\n{1} drives", _clientProxy.Artefacts.Count(), _fsCreator.Drives.Count());
-
-						var q = _fsCreator.Drives.Where((a) => a.Id > 32799);
-						//a.GetType().FullName == typeof(Drive).FullName && 
-						foreach (Artefact artefact in q)
-								Console.WriteLine(artefact.ToString());
+			Console.WriteLine("{0} artefacts currently in repository\n{1} drives", _clientProxy.Artefacts.Count(), _fsCreator.Drives.Count());
+//				var q = _fsCreator.Drives.Where((a) => a.Id > 32799);
+				//a.GetType().FullName == typeof(Drive).FullName && 
+			foreach (Artefact artefact in _fsCreator.Drives)
+				Console.WriteLine(artefact.ToString());
 			_fsCreator.Run(null);
 		}
 		#endregion

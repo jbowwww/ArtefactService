@@ -51,16 +51,12 @@ namespace Artefacts.FileSystem
 			List<Drive> drives = new List<Drive>();
 			foreach (DriveInfo dInfo in DriveInfo.GetDrives())
 			{
-//				IRepository<Artefact> repository = RepositoryClientProxy<Artefact>.Repository;
 				Drive drive = null;
 				try
 				{
 					if (Repository != null)
 					{
-						var q = from d in Repository.Artefacts.AsEnumerable().OfType<Drive>()
-							where d.Label == dInfo.VolumeLabel
-						 	select d;
-						drive = (Drive)q.SingleOrDefault();
+						drive = ((IQueryable<Drive>)Repository.Queryables[typeof(Drive)]).FirstOrDefault((d) => d.Label == dInfo.VolumeLabel);
 						if (drive == null)
 							Repository.Add(drive = new Drive(dInfo));
 						else

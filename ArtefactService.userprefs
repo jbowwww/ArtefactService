@@ -1,17 +1,24 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/ArtefactRepository.cs">
+    <Files>
+      <File FileName="ArtefactClientTest/ClientTest.cs" Line="235" Column="16" />
+      <File FileName="ArtefactFileSystem/Client/FileSystemArtefactCreator.cs" Line="66" Column="1" />
+      <File FileName="ArtefactFileSystem/Artefacts/Disk.cs" Line="63" Column="19" />
+      <File FileName="ArtefactFileSystem/Artefacts/Drive.cs" Line="59" Column="34" />
+      <File FileName="ArtefactService/ArtefactRepository.cs" Line="337" Column="1" />
+      <File FileName="ArtefactService/Queryable.cs" Line="263" Column="1" />
+      <File FileName="ArtefactService/ClientQueryProvider.cs" Line="89" Column="32" />
+    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State expanded="True">
+          <Node name="ArtefactClientTest" expanded="True" />
           <Node name="ArtefactFileSystem" expanded="True">
-            <Node name="Artefacts" expanded="True" />
-          </Node>
-          <Node name="Artefacts" expanded="True">
-            <Node name="Artefacts" expanded="True" />
+            <Node name="Client" expanded="True" />
           </Node>
           <Node name="ArtefactService" expanded="True">
-            <Node name="Queryable.cs" selected="True" />
+            <Node name="ArtefactRepository.cs" selected="True" />
           </Node>
         </State>
       </Pad>
@@ -24,7 +31,10 @@
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactFileSystem/Artefacts/Drive.cs" line="87" column="1" />
+      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactService/ArtefactRepository.cs" line="337" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
