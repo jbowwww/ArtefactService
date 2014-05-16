@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Diagnostics;
 
 using NHibernate.Linq;
+using Serialize.Linq.Nodes;
 
 namespace Artefacts.Service
 {
@@ -123,9 +124,9 @@ namespace Artefacts.Service
 		#endregion
 		
 		#region Query methods		
-		public object CreateQuery(byte[] binary)
+		public object CreateQuery(ExpressionNode expression)		//byte[] binary)
 		{
-			return _channel.CreateQuery(binary);
+			return _channel.CreateQuery(expression);
 		}
 		
 //		public int QueryCount(object queryId)

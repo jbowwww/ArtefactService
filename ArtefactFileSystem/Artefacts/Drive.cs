@@ -11,8 +11,8 @@ using Artefacts.Service;
 
 namespace Artefacts.FileSystem
 {
-	[DataContract]	//(IsReference = true)]
-	[ArtefactFormat("[Drive: Disk={Disk} Partition={Partition} Label={Label} Format={Format} Type={Type} Size={Size} FreeSpace={FreeSpace} AvailableFreeSpace={AvailableFreeSpace}]")]
+	[DataContract]	//(IsReference = true)] Disk={Disk}
+	[ArtefactFormat("[Drive: Partition={Partition} Label={Label} Format={Format} Type={Type} Size={Size} FreeSpace={FreeSpace} AvailableFreeSpace={AvailableFreeSpace}]")]
 	public class Drive : Artefact
 	{
 		#region Static members
@@ -215,6 +215,13 @@ namespace Artefacts.FileSystem
 			Size = srcDrive.Size;
 			FreeSpace = srcDrive.FreeSpace;
 			AvailableFreeSpace = srcDrive.AvailableFreeSpace;
+		}
+		
+		public override string ToString()
+		{
+			return string.Format("[Drive: Partition={0} Label={1} Format={2} Type={3} Size={4} FreeSpace={5} AvailableFreeSpace={6}]\n" +
+				"\t[Artefact: Id={7}, TimeCreated={8}, TimeChecked={9}, TimeUpdated={10}]",
+				Partition, Label, Format, Type, Size, FreeSpace, AvailableFreeSpace, Id, TimeCreated, TimeChecked, TimeUpdated);
 		}
 	}
 }

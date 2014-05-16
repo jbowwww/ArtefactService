@@ -14,15 +14,11 @@ namespace Artefacts.Service
 		}
 
 
-		protected override Expression VisitConstant(ConstantExpression c)
+		protected override Expression VisitParameter(ParameterExpression p)
 		{
-			if (c.Type.Equals(typeof(object)))			//typeof(IQueryable).IsAssignableFrom(c.Type))
-			{
-				if (c.Value == null)
-					return Expression.Constant(Repository.Artefacts);	
-				return Expression.Constant(Repository.QueryCache[c.Value]);
-			}
-			return c;
+			if (typeof(ArtefactRepository).IsAssignableFrom(p.Type) && p.Name.Equals("ArtefactRepository"))
+				return Expression.Constant(Repository, typeof(ArtefactRepository));
+			return p;
 		}
 	}
 }

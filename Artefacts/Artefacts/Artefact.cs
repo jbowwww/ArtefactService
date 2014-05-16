@@ -11,7 +11,7 @@ namespace Artefacts
 	/// The base abstract Artefact class
 	/// </summary>
 	[DataContract, KnownType("GetArtefactTypes")]
-	[ArtefactFormat("[Artefact: Id={Id} TimeCreated={TimeCreated} TimeUpdated={TimeUpdated} TimeChecked={TimeChecked}]")]
+	[ArtefactFormat("[Artefact: Id={Id}]")]	// TimeCreated={TimeCreated} TimeUpdated={TimeUpdated} TimeChecked={TimeChecked}]")]
 	public abstract class Artefact : IArtefact
 	{
 		#region Static members (store and return Type arrays for WCF service known types)

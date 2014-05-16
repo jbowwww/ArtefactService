@@ -18,6 +18,7 @@ using NHibernate.Linq;
 
 //using Serialize.Linq.Extensions;
 using Serialize.Linq.Nodes;
+using System.Net.Mime;
 
 namespace Artefacts.Service
 {
@@ -228,61 +229,47 @@ namespace Artefacts.Service
 		///							variable references, when I just wanted to use the string value
 		///							-	I think one way or another I will have to write code to traverse the expression trees, to prepare them when and as necessary
 		/// </remarks>
-		public object CreateQuery(byte[] binary)
+//		public object CreateQuery(byte[] binary)
+//		{
+//			try
+//			{
+//				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
+//				if (expression.Type.GetInterface("System.Collections.IEnumerable") == null)
+//					throw new ArgumentOutOfRangeException("expression", expression, "Not IEnumerable");
+//				object queryId = expression.Id();				//.ToString();
+//				if (!QueryCache.ContainsKey(queryId))
+//				{
+//					IQueryable<Artefact> q =
+////						new NhQueryable<Artefact>(Artefacts.Provider, expression);
+////						Artefacts.Provider.Execute<IQueryable<Artefact>>(expression);
+//					Artefacts.Provider.CreateQuery<Artefact>(expression);
+//					QueryCache.Add(queryId, q);					//(Queryable<Artefact>)				// Session.Query<Artefact>().Provider.CreateQuery<Artefact>(en.ToExpression());
+//				}
+//				return queryId;
+//			}
+//			catch (Exception ex)
+//			{
+//				throw Error(ex, binary);
+//			}
+//		}
+		
+		/// <summary>
+		/// Creates the query.
+		/// </summary>
+		/// <returns>The query identifier</returns>
+		/// <param name="expression">Expression.</param>
+		public object CreateQuery(ExpressionNode expression)
 		{
-			try
+			object queryId = expression.ToString();		//.GetHashCode();
+			if (!QueryCache.ContainsKey(queryId))
 			{
-				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
-				if (expression.Type.GetInterface("System.Collections.IEnumerable") == null)
-					throw new ArgumentOutOfRangeException("expression", expression, "Not IEnumerable");
-				object queryId = expression.Id();				//.ToString();
-				if (!QueryCache.ContainsKey(queryId))
-				{
-					IQueryable<Artefact> q =
-//						new NhQueryable<Artefact>(Artefacts.Provider, expression);
-//						Artefacts.Provider.Execute<IQueryable<Artefact>>(expression);
-					Artefacts.Provider.CreateQuery<Artefact>(expression);
-					QueryCache.Add(queryId, q);					//(Queryable<Artefact>)				// Session.Query<Artefact>().Provider.CreateQuery<Artefact>(en.ToExpression());
-				}
-				return queryId;
+				Expression serverSideExpression = QueryVisitor.Visit(expression.ToExpression());
+				IQueryable serverSideQuery = _nhQueryProvider.CreateQuery(serverSideExpression);
+				QueryCache[queryId] = serverSideQuery;
 			}
-			catch (Exception ex)
-			{
-				throw Error(ex, binary);
-			}
+			return queryId;
 		}
 		
-//		public int QueryCount(object queryId)
-//		{
-//			try
-//			{
-//				IQueryable<Artefact> query = QueryCache[queryId];
-//				int count = _countCache.ContainsKey(queryId) ?
-//					_countCache[queryId] :
-//					_countCache[queryId] = query.Count();
-//	//					_nhQueryProvider.Execute<int>(query.Expression);
-//				return count;
-//			}
-//			catch (Exception ex)
-//			{
-//				throw Error(ex, queryId);
-//			}
-//		}
-//		
-//		public Artefact QueryResult(object queryId)
-//		{
-//			try
-//			{
-//				IQueryable<Artefact> query = QueryCache[queryId];
-//				Artefact artefact = _nhQueryProvider.Execute<Artefact>(query.Expression);
-//				return artefact;
-//			}
-//			catch (Exception ex)
-//			{
-//				throw Error(ex, queryId);
-//			}
-//		}
-//		
 		public Artefact[] QueryResults(object queryId, int startIndex = 0, int count = -1)
 		{
 			try
@@ -309,23 +296,6 @@ namespace Artefacts.Service
 				throw Error(ex, queryId, startIndex, count);
 			}
 		}
-//		
-//		public object QueryMethodCall(object queryId, string methodName)//  MethodInfo method)
-//		{
-//			try
-//			{
-//				IQueryable<Artefact> query = QueryCache[queryId];
-//				string[] methodFullName = methodName.Split(':');
-//				MethodInfo method = typeof(System.Linq.Enumerable).GetMethod(methodFullName[1], new Type[] { typeof(IEnumerable<Artefact>) });
-//					//Type.GetType(methodFullName[0]).GetMethod(methodFullName[1]);
-//				object result = method.Invoke(query, new object[] { });		// currently can't use methods with parameters - need to serialize them
-//				return result;
-//			}
-//			catch (Exception ex)
-//			{
-//				throw Error(ex, queryId);
-//			}
-//		}
 		
 		public object QueryExecute(byte[] binary)
 		{
@@ -356,7 +326,6 @@ namespace Artefacts.Service
 		{
 			throw new NotImplementedException();
 		}
-
 		public void SetDefaultPagingOptions(PagingOptions pagingOptions)
 		{
 			throw new NotImplementedException();

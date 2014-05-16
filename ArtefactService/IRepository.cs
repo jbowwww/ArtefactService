@@ -41,7 +41,7 @@ namespace Artefacts.Service
 		
 		#region Query Methods
 		[OperationContract]
-		object CreateQuery(byte[] binary);
+		object CreateQuery(ExpressionNode expression);
 		
 //		[OperationContract]
 //		int QueryCount(object queryId);

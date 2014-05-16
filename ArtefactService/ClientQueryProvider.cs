@@ -6,6 +6,8 @@ using System.Collections.Concurrent;
 using Antlr.Runtime.Tree;
 using System.Reflection;
 using System.Globalization;
+using Serialize.Linq.Nodes;
+using Serialize.Linq.Extensions;
 
 namespace Artefacts.Service
 {
@@ -81,15 +83,26 @@ namespace Artefacts.Service
 //			if (!typeof(TElement).IsAssignableFrom(expression.Type.GetElementType()))
 //				throw new ArgumentOutOfRangeException("expression", expression,
 //					string.Format("Should assignable to System.Linq.IQueryable<{0}>", typeof(TElement).FullName));
-			object expressionId = expression.Id();
+			
+			object expressionId = Repository.CreateQuery(_expressionVisitor.Visit(expression).ToExpressionNode());
+			Expression expressionClientSide = //Expression.MakeIndex(
+				Expression.Property(
+					Expression.Property(
+						Expression.Variable(
+							typeof(ArtefactRepository),
+							"ArtefactRepository"),
+						typeof(ArtefactRepository).GetProperty(
+							"QueryCache",
+	//						BindingFlags.Public | BindingFlags.Instance,
+							typeof(IDictionary<object, IQueryable>))),
+					"Item",
+					Expression.Constant(expressionId));
+//				typeof(IDictionary<object, IQueryable>).GetProperty(), ,);
+			
 			if (_queryCache.ContainsKey(expressionId))
 				return (IQueryable<TElement>)_queryCache[expressionId];
-//			Expression newExpression = _expressionVisitor.Visit(expression);
 			IQueryable<TElement> queryable = (IQueryable<TElement>)Activator.CreateInstance(
-				typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, expression);
-//				BindingFlags.NonPublic, null,
-//				new object[] { this, expression },
-//				CultureInfo.CurrentCulture);
+				typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, expressionClientSide, expressionId);
 			_queryCache[expressionId] = (IQueryable)queryable;
 			return queryable;
 			//return new Queryable<TArtefact>(this, expression);

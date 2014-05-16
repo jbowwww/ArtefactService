@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System;
 
 namespace Artefacts.Service
 {
@@ -22,11 +23,16 @@ namespace Artefacts.Service
 			_queryCache = queryCache;
 		}
   
-		protected override Expression VisitUnary(UnaryExpression u)
+		protected override Expression VisitConstant(ConstantExpression c)
 		{
-			if (typeof(IQueryable).IsAssignableFrom(u.Type) && _queryCache.ContainsKey(u))
-				return Expression.Constant(_queryCache[u], u.Type);
-			return u;
+			if (c.Type.GetInterface("IIdentifiableQueryable") != null)		// is IIdentifiableQueryable)
+			{
+				object id = (c.Value as IIdentifiableQueryable).Id;
+				if (!_queryCache.ContainsKey(id))
+					throw new InvalidProgramException("IIdentifiableQueryable with Id=\"" + id + "\" should be in client side cache but it is not");
+				return _queryCache[id].Expression;
+			}
+			return c;
 		}
 	}
 }

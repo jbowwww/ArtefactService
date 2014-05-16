@@ -19,6 +19,11 @@ namespace Artefacts.Service
 			return typeof(IEnumerable).IsAssignableFrom(e.Type);
 		}
 		
+		public static Type GetElementType(this Expression e)
+		{
+			return e.GetType().GetElementType();
+		}
+		
 		public static bool IsMethodCallExpression(this Expression e)
 		{
 			return e.NodeType == ExpressionType.Call;
@@ -32,7 +37,8 @@ namespace Artefacts.Service
 		
 		public static object Id(this Expression e)
 		{
-			return e.ToJson();		//.ToString();//.ToJson();	//ToExpressionNode().GetHashCode();
+			return e.ToExpressionNode().ToString();
+//			return e.ToJson();		//.ToString();//.ToJson();	//ToExpressionNode().GetHashCode();
 				//e.ToString();		// TODO: Will have to implement your own Id builder I think, because generic method calls don't include generic arguments in the string
 		}
 
