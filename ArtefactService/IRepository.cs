@@ -40,15 +40,15 @@ namespace Artefacts.Service
 		#endregion
 		
 		#region Query Methods
-		[OperationContract]
-		object CreateQuery(byte[] binary);
-		
 //		[OperationContract]
-//		int QueryCount(object queryId);
+//		object CreateQuery(byte[] binary);
 //		
-//		[OperationContract]
-//		TArtefact QueryResult(object queryId);
-//		
+////		[OperationContract]
+////		int QueryCount(object queryId);
+////		
+////		[OperationContract]
+////		TArtefact QueryResult(object queryId);
+////		
 		[OperationContract]
 		TArtefact[] QueryResults(object queryId, int startIndex = 0, int count = -1);
 //		
@@ -56,7 +56,7 @@ namespace Artefacts.Service
 //		object QueryMethodCall(object queryId, string methodName);// MethodInfo method);
 		
 		[OperationContract]
-		object QueryExecute(byte[] binary);
+		object QueryExecute(object query);		//byte[] binary);
 		#endregion
 		
 		#region Get/Set default paging options

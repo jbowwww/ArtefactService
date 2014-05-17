@@ -14,10 +14,10 @@ using System.Text;
 
 using NHibernate;
 using NHibernate.Linq;
-//using Serialize.Linq;
-
-//using Serialize.Linq.Extensions;
+using Serialize.Linq;
+using Serialize.Linq.Extensions;
 using Serialize.Linq.Nodes;
+using Serialize.Linq.Serializers;
 
 namespace Artefacts.Service
 {
@@ -228,29 +228,29 @@ namespace Artefacts.Service
 		///							variable references, when I just wanted to use the string value
 		///							-	I think one way or another I will have to write code to traverse the expression trees, to prepare them when and as necessary
 		/// </remarks>
-		public object CreateQuery(byte[] binary)
-		{
-			try
-			{
-				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
-				if (expression.Type.GetInterface("System.Collections.IEnumerable") == null)
-					throw new ArgumentOutOfRangeException("expression", expression, "Not IEnumerable");
-				object queryId = expression.Id();				//.ToString();
-				if (!QueryCache.ContainsKey(queryId))
-				{
-					IQueryable<Artefact> q =
-//						new NhQueryable<Artefact>(Artefacts.Provider, expression);
-//						Artefacts.Provider.Execute<IQueryable<Artefact>>(expression);
-					Artefacts.Provider.CreateQuery<Artefact>(expression);
-					QueryCache.Add(queryId, q);					//(Queryable<Artefact>)				// Session.Query<Artefact>().Provider.CreateQuery<Artefact>(en.ToExpression());
-				}
-				return queryId;
-			}
-			catch (Exception ex)
-			{
-				throw Error(ex, binary);
-			}
-		}
+//		public object CreateQuery(byte[] binary)
+//		{
+//			try
+//			{
+//				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
+//				if (expression.Type.GetInterface("System.Collections.IEnumerable") == null)
+//					throw new ArgumentOutOfRangeException("expression", expression, "Not IEnumerable");
+//				object queryId = expression.Id();				//.ToString();
+//				if (!QueryCache.ContainsKey(queryId))
+//				{
+//					IQueryable<Artefact> q =
+////						new NhQueryable<Artefact>(Artefacts.Provider, expression);
+////						Artefacts.Provider.Execute<IQueryable<Artefact>>(expression);
+//					Artefacts.Provider.CreateQuery<Artefact>(expression);
+//					QueryCache.Add(queryId, q);					//(Queryable<Artefact>)				// Session.Query<Artefact>().Provider.CreateQuery<Artefact>(en.ToExpression());
+//				}
+//				return queryId;
+//			}
+//			catch (Exception ex)
+//			{
+//				throw Error(ex, binary);
+//			}
+//		}
 		
 //		public int QueryCount(object queryId)
 //		{
@@ -327,18 +327,24 @@ namespace Artefacts.Service
 //			}
 //		}
 		
-		public object QueryExecute(byte[] binary)
+		public object QueryExecute(object query)
 		{
 			try
 			{
-				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
+				if (!(query is ExpressionNode))		// string))
+					throw new ArgumentOutOfRangeException("query", query, "Should be an ExpressionNode");	// JSON string");
+//				ExpressionNode en = new JsonSerializer().Deserialize<ExpressionNode>((string)query);
+//				new Serialize.Linq.Serializers.ExpressionSerializer(new JsonSerializer()).DeserializeText((string)query);
+				Expression expression = ((ExpressionNode)query).ToExpression();
+					// new JsonSerializer().Deserialize<Expression>((string)query);
+//				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
 
 				object result = Artefacts.Provider.Execute(expression);
 				return result;
 			}
 			catch (Exception ex)
 			{
-				throw Error(ex, binary);
+				throw Error(ex, query);	// binary);
 			}			
 		}
 		#endregion

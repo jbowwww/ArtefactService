@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection.Emit;
 
 namespace Artefacts.Service
 {
@@ -20,14 +21,7 @@ namespace Artefacts.Service
 		{
 			Repository = repository;
 			_queryCache = queryCache;
-		}
-  
-		protected override Expression VisitUnary(UnaryExpression u)
-		{
-			if (typeof(IQueryable).IsAssignableFrom(u.Type) && _queryCache.ContainsKey(u))
-				return Expression.Constant(_queryCache[u], u.Type);
-			return u;
-		}
+		}		
 	}
 }
 

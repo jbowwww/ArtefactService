@@ -1,14 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/ArtefactRepository.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/ClientQueryVisitor.cs">
     <Files>
-      <File FileName="ArtefactClientTest/ClientTest.cs" Line="235" Column="16" />
-      <File FileName="ArtefactFileSystem/Client/FileSystemArtefactCreator.cs" Line="66" Column="1" />
-      <File FileName="ArtefactFileSystem/Artefacts/Disk.cs" Line="63" Column="19" />
-      <File FileName="ArtefactFileSystem/Artefacts/Drive.cs" Line="59" Column="34" />
-      <File FileName="ArtefactService/ArtefactRepository.cs" Line="337" Column="1" />
-      <File FileName="ArtefactService/Queryable.cs" Line="263" Column="1" />
-      <File FileName="ArtefactService/ClientQueryProvider.cs" Line="89" Column="32" />
+      <File FileName="ArtefactService/ClientQueryVisitor.cs" Line="43" Column="1" />
+      <File FileName="ArtefactService/ClientQueryProvider.cs" Line="53" Column="1" />
+      <File FileName="ArtefactService/RepositoryClientProxy.cs" Line="54" Column="1" />
+      <File FileName="ArtefactClientTest/ClientTest.cs" Line="262" Column="1" />
+      <File FileName="ArtefactFileSystem/Client/FileSystemArtefactCreator.cs" Line="114" Column="4" />
+      <File FileName="ArtefactService/ExpressionVisitor.cs" Line="19" Column="2" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -18,22 +17,33 @@
             <Node name="Client" expanded="True" />
           </Node>
           <Node name="ArtefactService" expanded="True">
-            <Node name="ArtefactRepository.cs" selected="True" />
+            <Node name="ClientQueryVisitor.cs" selected="True" />
           </Node>
         </State>
       </Pad>
       <Pad Id="ClassPad">
-        <State expanded="True">
-          <Node name="Artefacts" expanded="True" />
-          <Node name="ArtefactService" expanded="True" selected="True" />
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>typeof(ArtefactRepository).GetProperty(
+						"QueryCache",
+//						BindingFlags.Public | BindingFlags.Instance,
+						typeof(IQueryable),
+						new Type[] { typeof(object) })</Value>
+          <Value>Expression.Parameter(
+						typeof(ArtefactRepository),
+						"ArtefactRepository")</Value>
+          <Value>_expressionVisitor.Visit(expression).ToExpressionNode()</Value>
         </State>
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactFileSystem/Artefacts/Drive.cs" line="87" column="1" />
-      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactService/ArtefactRepository.cs" line="337" column="1" />
+      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactService/ClientQueryVisitor.cs" line="42" column="5" />
+      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactService/ClientQueryVisitor.cs" line="40" column="1" />
+      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactService/ClientQueryVisitor.cs" line="34" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

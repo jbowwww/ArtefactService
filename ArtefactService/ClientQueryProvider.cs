@@ -6,6 +6,9 @@ using System.Collections.Concurrent;
 using Antlr.Runtime.Tree;
 using System.Reflection;
 using System.Globalization;
+using Serialize.Linq.Extensions;
+using Serialize.Linq.Nodes;
+using Serialize.Linq.Serializers;
 
 namespace Artefacts.Service
 {
@@ -60,7 +63,7 @@ namespace Artefacts.Service
 		/// <remarks>IQueryProvider implementation</remarks>
 		public IQueryable CreateQuery(Expression expression)
 		{
-			return (IQueryable)(this as IQueryProvider).CreateQuery<TArtefact>(expression);
+			return (IQueryable)((IQueryProvider)this).CreateQuery<TArtefact>(expression);
 		}
 
 		/// <summary>
@@ -78,19 +81,15 @@ namespace Artefacts.Service
 				throw new ArgumentOutOfRangeException("expression", expression, "Should implement System.Collections.IEnumerable");
 			if (!typeof(Artefact).IsAssignableFrom(typeof(TElement)))
 				throw new ArgumentOutOfRangeException("TElement", typeof(TElement), "Should be subclass of Artefact");
-//			if (!typeof(TElement).IsAssignableFrom(expression.Type.GetElementType()))
-//				throw new ArgumentOutOfRangeException("expression", expression,
-//					string.Format("Should assignable to System.Linq.IQueryable<{0}>", typeof(TElement).FullName));
-			object expressionId = expression.Id();
-			if (_queryCache.ContainsKey(expressionId))
-				return (IQueryable<TElement>)_queryCache[expressionId];
+			if (_queryCache.ContainsKey(expression))
+				return (IQueryable<TElement>)_queryCache[expression];
 //			Expression newExpression = _expressionVisitor.Visit(expression);
 			IQueryable<TElement> queryable = (IQueryable<TElement>)Activator.CreateInstance(
-				typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, expression);
+				typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, _expressionVisitor.Visit(expression));
 //				BindingFlags.NonPublic, null,
 //				new object[] { this, expression },
 //				CultureInfo.CurrentCulture);
-			_queryCache[expressionId] = (IQueryable)queryable;
+			_queryCache[expression] = (IQueryable)queryable;
 			return queryable;
 			//return new Queryable<TArtefact>(this, expression);
 		}
@@ -107,9 +106,11 @@ namespace Artefacts.Service
 //				return _queryCache[expression];
 			if (expression.IsEnumerable())
 				throw new InvalidOperationException();
-//			Expression newExpression = _expressionVisitor.Visit(expression);
+			Expression newExpression = _expressionVisitor.Visit(expression);
+			ExpressionNode en = newExpression.ToExpressionNode();
 //			Queryable.
-			return Repository.QueryExecute(expression.ToBinary());	
+//			object query = new JsonSerializer().Serialize<ExpressionNode>(en);		//.ToJson();
+			return Repository.QueryExecute(en);			//query);			//_expressionVisitor.Visit(expression).ToJson());		//.ToBinary());	
 		}
 
 		/// <summary>

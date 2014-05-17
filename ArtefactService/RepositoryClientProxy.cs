@@ -123,21 +123,21 @@ namespace Artefacts.Service
 		#endregion
 		
 		#region Query methods		
-		public object CreateQuery(byte[] binary)
-		{
-			return _channel.CreateQuery(binary);
-		}
-		
-//		public int QueryCount(object queryId)
+//		public object CreateQuery(byte[] binary)
 //		{
-//			return _channel.QueryCount(queryId);
+//			return _channel.CreateQuery(binary);
 //		}
-//
-//		public TArtefact QueryResult(object queryId)
-//		{
-//			return _channel.QueryResult(queryId);
-//		}
-//
+//		
+////		public int QueryCount(object queryId)
+////		{
+////			return _channel.QueryCount(queryId);
+////		}
+////
+////		public TArtefact QueryResult(object queryId)
+////		{
+////			return _channel.QueryResult(queryId);
+////		}
+////
 		public TArtefact[] QueryResults(object queryId, int startIndex = 0, int count = -1)
 		{
 			return _channel.QueryResults(queryId, startIndex, count);
@@ -148,9 +148,9 @@ namespace Artefacts.Service
 //			return _channel.QueryMethodCall(queryId, methodName);
 //		}
 		
-		public object QueryExecute(byte[] binary)
+		public object QueryExecute(object query)
 		{
-			return _channel.QueryExecute(binary);
+			return _channel.QueryExecute(query);
 		}
 		#endregion
 		
