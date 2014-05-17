@@ -260,7 +260,7 @@ namespace Artefacts.Service
 		/// <param name="expression">Expression.</param>
 		public object CreateQuery(ExpressionNode expression)
 		{
-			object queryId = expression.ToString();		//.GetHashCode();
+			object queryId = expression.GetHashCode();//.ToString();		//.GetHashCode();
 			if (!QueryCache.ContainsKey(queryId))
 			{
 				Expression serverSideExpression = QueryVisitor.Visit(expression.ToExpression());

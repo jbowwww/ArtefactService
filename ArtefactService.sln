@@ -16,6 +16,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Design", "Design", "{AD5F93
 		Design\Solution Overview.txt = Design\Solution Overview.txt
 		Design\XML_Comments.cs = Design\XML_Comments.cs
 		Design\Removed_Code_Recycle_Bin.txt = Design\Removed_Code_Recycle_Bin.txt
+		Design\IArtefactService.cs = Design\IArtefactService.cs
+		Design\Queryable-nongeneric.cs = Design\Queryable-nongeneric.cs
+		Design\QueryResult.cs = Design\QueryResult.cs
+		Design\Screenshot from 2014-05-17 21:43:02.png = Design\Screenshot from 2014-05-17 21:43:02.png
+		Design\ServerQueryProvider.cs = Design\ServerQueryProvider.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Removed Code Files", "Removed Code Files", "{ABC7B4C9-272A-43E9-A015-9FFD54F140D0}"

@@ -45,6 +45,7 @@ namespace Artefacts.Service
 		public static byte[] ToBinary(this Expression e)
 		{
 			return ToBinary(e, _bf);
+
 		}
 
 		public static byte[] ToBinary(this Expression e, BinaryFormatter bf)

@@ -83,26 +83,28 @@ namespace Artefacts.Service
 //			if (!typeof(TElement).IsAssignableFrom(expression.Type.GetElementType()))
 //				throw new ArgumentOutOfRangeException("expression", expression,
 //					string.Format("Should assignable to System.Linq.IQueryable<{0}>", typeof(TElement).FullName));
-			
-			object expressionId = Repository.CreateQuery(_expressionVisitor.Visit(expression).ToExpressionNode());
-			Expression expressionClientSide = //Expression.MakeIndex(
-				Expression.Property(
-					Expression.Property(
-						Expression.Variable(
-							typeof(ArtefactRepository),
-							"ArtefactRepository"),
-						typeof(ArtefactRepository).GetProperty(
-							"QueryCache",
-	//						BindingFlags.Public | BindingFlags.Instance,
-							typeof(IDictionary<object, IQueryable>))),
-					"Item",
-					Expression.Constant(expressionId));
+
+			Expression newExpression = _expressionVisitor.Visit(expression);
+			object expressionId = Repository.CreateQuery(newExpression.ToExpressionNode());
+
+//			Expression expressionClientSide = //Expression.MakeIndex(
+//				Expression.Property(
+//					Expression.Property(
+//						Expression.Variable(
+//							typeof(ArtefactRepository),
+//							"ArtefactRepository"),
+//						typeof(ArtefactRepository).GetProperty(
+//							"QueryCache",
+//	//						BindingFlags.Public | BindingFlags.Instance,
+//							typeof(IDictionary<object, IQueryable>))),
+//					"Item",
+//					Expression.Constant(expressionId));
 //				typeof(IDictionary<object, IQueryable>).GetProperty(), ,);
 			
 			if (_queryCache.ContainsKey(expressionId))
 				return (IQueryable<TElement>)_queryCache[expressionId];
 			IQueryable<TElement> queryable = (IQueryable<TElement>)Activator.CreateInstance(
-				typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, expressionClientSide, expressionId);
+				typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, newExpression, expressionId);
 			_queryCache[expressionId] = (IQueryable)queryable;
 			return queryable;
 			//return new Queryable<TArtefact>(this, expression);

@@ -245,8 +245,8 @@ namespace Artefacts.Service
 				throw new ArgumentNullException("expression");
 			if (!expression.IsEnumerable())
 				throw new ArgumentOutOfRangeException("expression", expression, "Should implement System.Collections.IEnumerable");
-			if (!typeof(TArtefact).IsAssignableFrom(expression.GetElementType()))
-				throw new ArgumentOutOfRangeException("expression", expression, "Should have an element type assignable to " + typeof(TArtefact).FullName);
+//			if (!typeof(TArtefact).IsAssignableFrom(expression.Type.GetElementType()))
+//				throw new ArgumentOutOfRangeException("expression", expression, "Should have an element type assignable to " + typeof(TArtefact).FullName);
 			TimeCreated = DateTime.Now;
 			TimeRetrieved = DateTime.MinValue;
 			Provider = provider;
