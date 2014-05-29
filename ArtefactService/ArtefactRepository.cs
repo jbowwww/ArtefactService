@@ -73,10 +73,11 @@ namespace Artefacts.Service
 			_binaryFormatter = new BinaryFormatter();
 			QueryVisitor = new ServerQueryVisitor(this);
 			
-			Expression expression = 
-				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) },
-				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()));
-			Artefacts = new NhQueryable<Artefact>(_nhQueryProvider, expression);
+//			Expression expression = 
+//				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) },
+//				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()));
+//			Artefacts = new NhQueryable<Artefact>(_nhQueryProvider, expression);
+			Artefacts = new NhQueryable<Artefact>(_nhQueryProvider, Expression.Variable(typeof(IQueryable<Artefact>), "Artefacts"));
 //				_nhQueryProvider.CreateQuery<Artefact>(expression);
 //			Session.Query<Artefact>();
 //				new Queryable<Artefact>(this, _nhQueryProvider, expression);
@@ -260,7 +261,7 @@ namespace Artefacts.Service
 		/// <param name="expression">Expression.</param>
 		public object CreateQuery(ExpressionNode expression)
 		{
-			object queryId = expression.GetHashCode();//.ToString();		//.GetHashCode();
+			object queryId = expression.Id();
 			if (!QueryCache.ContainsKey(queryId))
 			{
 				Expression serverSideExpression = QueryVisitor.Visit(expression.ToExpression());
@@ -269,7 +270,14 @@ namespace Artefacts.Service
 			}
 			return queryId;
 		}
-		
+
+		/// <summary>
+		/// Queries the results.
+		/// </summary>
+		/// <returns>The results.</returns>
+		/// <param name="queryId">Query identifier.</param>
+		/// <param name="startIndex">Start index.</param>
+		/// <param name="count">Count.</param>
 		public Artefact[] QueryResults(object queryId, int startIndex = 0, int count = -1)
 		{
 			try
@@ -296,19 +304,24 @@ namespace Artefacts.Service
 				throw Error(ex, queryId, startIndex, count);
 			}
 		}
-		
-		public object QueryExecute(byte[] binary)
+
+		/// <summary>
+		/// Queries the execute.
+		/// </summary>
+		/// <returns>The execute.</returns>
+		/// <param name="binary">Binary.</param>
+		/// <param name="expression">Expression</param>
+		public object QueryExecute(ExpressionNode expression)		//byte[] binary)
 		{
 			try
 			{
-				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
-
-				object result = Artefacts.Provider.Execute(expression);
+				Expression serverSideExpression = QueryVisitor.Visit(expression.ToExpression());		// ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
+				object result = _nhQueryProvider.Execute(serverSideExpression);
 				return result;
 			}
 			catch (Exception ex)
 			{
-				throw Error(ex, binary);
+				throw Error(ex, expression);		// binary);
 			}			
 		}
 		#endregion

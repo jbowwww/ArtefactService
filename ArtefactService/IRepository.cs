@@ -55,8 +55,11 @@ namespace Artefacts.Service
 //		[OperationContract]
 //		object QueryMethodCall(object queryId, string methodName);// MethodInfo method);
 		
+//		[OperationContract]
+//		object QueryExecute(byte[] binary);
+
 		[OperationContract]
-		object QueryExecute(byte[] binary);
+		object QueryExecute(ExpressionNode expression);
 		#endregion
 		
 		#region Get/Set default paging options

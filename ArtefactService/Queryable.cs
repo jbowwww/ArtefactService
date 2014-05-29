@@ -160,9 +160,9 @@ namespace Artefacts.Service
 			{
 				_expression = value;			//.ReduceAndCheck();
 				Id = _expression.Id();
-				ExpressionAsString = _expression.ToString();
-				ExpressionAsNode = _expression.ToExpressionNode();
-				ExpressionAsBinary = _expression.ToBinary();
+//				ExpressionAsString = _expression.ToString();
+//				ExpressionAsNode = _expression.ToExpressionNode();
+//				ExpressionAsBinary = _expression.ToBinary();
 			}
 		}
 		private Expression _expression;
@@ -177,23 +177,23 @@ namespace Artefacts.Service
 		/// <summary>
 		/// Gets <see cref="Queryable`1[TArtefact].Expression"/> as string.
 		/// </summary>
-		public string ExpressionAsString {
-			get; private set;
-		}
+//		public string ExpressionAsString {
+//			get; private set;
+//		}
 
 		/// <summary>
 		/// Gets <see cref="Queryable`1[TArtefact].Expression"/> as <see cref="Serialize.Linq.ExpressionNode"/> .
 		/// </summary>
-		public ExpressionNode ExpressionAsNode {
-			get; private set;
-		}
+//		public ExpressionNode ExpressionAsNode {
+//			get; private set;
+//		}
 		
 		/// <summary>
 		/// Gets <see cref="Queryable`1[TArtefact].Expression"/> as binary.
 		/// </summary>
-		public byte[] ExpressionAsBinary {
-			get; private set;
-		}
+//		public byte[] ExpressionAsBinary {
+//			get; private set;
+//		}
 		
 		/// <summary>
 		/// Gets the count.
@@ -251,7 +251,6 @@ namespace Artefacts.Service
 			TimeRetrieved = DateTime.MinValue;
 			Provider = provider;
 			Expression = expression;
-			Id = id;
 		}
 
 		/// <summary>

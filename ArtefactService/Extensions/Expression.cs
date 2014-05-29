@@ -37,9 +37,16 @@ namespace Artefacts.Service
 		
 		public static object Id(this Expression e)
 		{
-			return e.ToExpressionNode().ToString();
+			return e.ToExpressionNode().Id();
+			//return e.ToExpressionNode().GetHashCode();
+				//.ToString();
 //			return e.ToJson();		//.ToString();//.ToJson();	//ToExpressionNode().GetHashCode();
 				//e.ToString();		// TODO: Will have to implement your own Id builder I think, because generic method calls don't include generic arguments in the string
+		}
+
+		public static object Id(this ExpressionNode en)
+		{
+			return en.GetHashCode();
 		}
 
 		public static byte[] ToBinary(this Expression e)
@@ -52,7 +59,7 @@ namespace Artefacts.Service
 		{
 			ExpressionNode en = e.ToExpressionNode();
 			MemoryStream ms = new MemoryStream();
-			bf.Serialize(ms, en);
+			bf.Serialize(ms, e);	//n);
 			byte[] binaryExpression = ms.GetBuffer();
 			return binaryExpression;
 		}

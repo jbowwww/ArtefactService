@@ -122,9 +122,8 @@ namespace Artefacts.Service
 //				return _queryCache[expression];
 			if (expression.IsEnumerable())
 				throw new InvalidOperationException();
-//			Expression newExpression = _expressionVisitor.Visit(expression);
-//			Queryable.
-			return Repository.QueryExecute(expression.ToBinary());	
+			Expression newExpression = _expressionVisitor.Visit(expression);
+			return Repository.QueryExecute(newExpression.ToExpressionNode());	
 		}
 
 		/// <summary>

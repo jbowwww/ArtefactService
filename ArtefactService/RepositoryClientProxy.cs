@@ -149,9 +149,9 @@ namespace Artefacts.Service
 //			return _channel.QueryMethodCall(queryId, methodName);
 //		}
 		
-		public object QueryExecute(byte[] binary)
+		public object QueryExecute(ExpressionNode expression)		// byte[] binary)
 		{
-			return _channel.QueryExecute(binary);
+			return _channel.QueryExecute(expression);		//binary);
 		}
 		#endregion
 		
