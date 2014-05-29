@@ -96,9 +96,12 @@ namespace Artefacts.FileSystem
 //						                                //
 //			return q;
 			const BindingFlags bf = BindingFlags.Public | BindingFlags.Static;
-			Expression expression =
-				Expression.Call(typeof(NHibernate.Linq.LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) },
-					Expression.Call(typeof(ArtefactRepository).GetProperty("Session", bf).GetGetMethod()));
+//			Expression expression =
+//				Expression.Call(typeof(NHibernate.Linq.LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) },
+//					Expression.Call(typeof(ArtefactRepository).GetProperty("Session", bf).GetGetMethod()));
+//			Expression expression = Expression.Parameter(typeof(IQueryable<TArtefact>), string.Concat("Artefacts:", typeof(TArtefact).FullName));
+			Expression expression = Expression.Call(typeof(System.Linq.Queryable), "OfType", new Type[] { typeof(TArtefact) },
+				Expression.Parameter(typeof(IQueryable<Artefact>), "Artefacts"));
 			return Repository.Artefacts.Provider.CreateQuery<TArtefact>(expression);				//			Repository.Queryables.Add(typeof(TArtefact),
 		}
 		#endregion

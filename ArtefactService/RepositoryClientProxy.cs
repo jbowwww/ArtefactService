@@ -62,11 +62,11 @@ namespace Artefacts.Service
 			
 			_queryCache = new Dictionary<object, IQueryable<Artefact>>();
 			QueryProvider = new ClientQueryProvider<TArtefact>(this);
-			Expression expression = 
-				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) },
-				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()));
-			Artefacts = (IQueryable<Artefact>)QueryProvider.CreateQuery(expression);
-				
+//			Expression expression = 
+//				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) },
+//				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()));
+//			Artefacts = (IQueryable<Artefact>)QueryProvider.CreateQuery(expression);
+			Artefacts = (IQueryable<Artefact>)QueryProvider.CreateQuery<Artefact>(Expression.Variable(typeof(IQueryable<Artefact>), "Artefacts"));
 				// experimentation
 //				Expression.MakeMemberAccess(
 //				Expression.Quote()

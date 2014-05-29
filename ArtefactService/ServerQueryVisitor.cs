@@ -24,6 +24,8 @@ namespace Artefacts.Service
 
 		protected override Expression VisitParameter(ParameterExpression p)
 		{
+			if (p.NodeType == ExpressionType.Parameter && p.Name.Equals("Artefacts"))
+				return Expression.Constant(Repository.Artefacts);
 			if (typeof(ArtefactRepository).IsAssignableFrom(p.Type) && p.Name.Equals("ArtefactRepository"))
 				return Expression.Constant(Repository, typeof(ArtefactRepository));
 			return p;

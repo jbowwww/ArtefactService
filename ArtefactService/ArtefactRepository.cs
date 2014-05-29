@@ -77,7 +77,9 @@ namespace Artefacts.Service
 //				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) },
 //				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()));
 //			Artefacts = new NhQueryable<Artefact>(_nhQueryProvider, expression);
-			Artefacts = new NhQueryable<Artefact>(_nhQueryProvider, Expression.Variable(typeof(IQueryable<Artefact>), "Artefacts"));
+
+			Artefacts = Session.Query<Artefact>();
+//			new NhQueryable<Artefact>(_nhQueryProvider, Expression.Variable(typeof(IQueryable<Artefact>), "Artefacts"));
 //				_nhQueryProvider.CreateQuery<Artefact>(expression);
 //			Session.Query<Artefact>();
 //				new Queryable<Artefact>(this, _nhQueryProvider, expression);
