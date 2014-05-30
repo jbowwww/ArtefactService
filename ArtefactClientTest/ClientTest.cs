@@ -45,7 +45,7 @@ namespace ArtefactClientTest
 
 			public void OnNext(Artefact value)
 			{
-				_clientProxy.Add(value);
+//				_clientProxy.Add(value);
 //				_repoProxy.Add(value);
 //				value.Id = _repoProxy.Add(value);
 //				_repoProxy.Update(value);

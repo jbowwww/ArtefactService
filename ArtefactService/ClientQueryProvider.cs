@@ -17,7 +17,12 @@ namespace Artefacts.Service
 	/// Client query provider.
 	/// </summary>
 	/// <remarks>
-	/// 
+	/// TODO: This is so tightly coupled with RepositoryClientProxy, and they are logically very closley
+	/// related, so I'm thinking that class should implement IQueryProvider and provide the implementations
+	/// currently in this class. In this particular case I think rationalizing/condesnsing the two into
+	/// one makes sense, as they have a fairly "mutual" (can't think of a better word") relationship and
+	/// logically speaking, the "RepositoryClientProxy" class does kind of exist to "provide" the "client"
+	/// with the ability to run "queries"
 	/// </remarks>
 	public class ClientQueryProvider<TArtefact> : IQueryProvider where TArtefact : Artefact
 	{
@@ -81,7 +86,7 @@ namespace Artefacts.Service
 		/// <typeparam name="TElement">The 1st type parameter.</typeparam>
 		/// <returns>The query.</returns>
 		/// <remarks>IQueryProvider implementation</remarks>
-		IQueryable<TElement> IQueryProvider.CreateQuery<TElement>(Expression expression) where TElement : Artefact
+		IQueryable<TElement> IQueryProvider.CreateQuery<TElement>(Expression expression)// where TElement : Artefact
 		{
 			if (expression == null)
 				throw new ArgumentNullException("expression");
@@ -110,13 +115,13 @@ namespace Artefacts.Service
 //					Expression.Constant(expressionId));
 //				typeof(IDictionary<object, IQueryable>).GetProperty(), ,);
 
-			IQueryable<TElement> query;
-			if (_queryCache.TryGetValue(expression, out (IQueryable)query))
+			IQueryable/*<TElement>*/ query;
+			if (_queryCache.TryGetValue(expression, out query))
 				return (IQueryable<TElement>)_queryCache[expression];
-			query = new Queryable<TElement>(this, expression);
-			//(IQueryable<TElement>)Activator.CreateInstance(typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, expression);
+			query = //new Queryable<TElement>(this, expression);
+			(IQueryable<TElement>)Activator.CreateInstance(typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, expression);
 			_queryCache.Add(expression, (IQueryable)query);
-			return query;
+			return (IQueryable<TElement>)query;
 			//return new Queryable<TArtefact>(this, expression);
 		}
 
@@ -133,7 +138,7 @@ namespace Artefacts.Service
 			if (expression.IsEnumerable())
 				throw new InvalidOperationException();
 //			Expression newExpression = _expressionVisitor.Visit(expression);
-			return Repository.QueryExecute(newExpression.ToExpressionNode());	
+			return Repository.QueryExecute(expression.ToExpressionNode());	
 		}
 
 		/// <summary>

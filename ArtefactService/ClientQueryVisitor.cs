@@ -13,7 +13,7 @@ namespace Artefacts.Service
 
 	public class ClientQueryVisitor<TArtefact> : ExpressionVisitor where TArtefact : Artefact
 	{
-		private IDictionary<object, IQueryable> _queryCache;
+		private IDictionary<Expression, IQueryable> _queryCache;
 
 		public IRepository<TArtefact> Repository { get; private set; }
 		
@@ -27,10 +27,10 @@ namespace Artefacts.Service
 		{
 			if (c.Type.GetInterface("IIdentifiableQueryable") != null)		// is IIdentifiableQueryable)
 			{
-				object id = (c.Value as IIdentifiableQueryable).Id;
-				if (!_queryCache.ContainsKey(id))
-					throw new InvalidProgramException("IIdentifiableQueryable with Id=\"" + id + "\" should be in client side cache but it is not");
-				return _queryCache[id].Expression;
+//				Expression exp = (c.Value as IIdentifiableQueryable);//.Id;
+				if (!_queryCache.ContainsKey(c))
+					throw new InvalidProgramException("IIdentifiableQueryable with expression=\"" + c + "\" should be in client side cache but it is not");
+				return _queryCache[c].Expression;
 			}
 			return c;
 		}
