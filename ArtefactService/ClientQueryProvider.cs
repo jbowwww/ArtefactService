@@ -8,6 +8,8 @@ using System.Reflection;
 using System.Globalization;
 using Serialize.Linq.Nodes;
 using Serialize.Linq.Extensions;
+using NHibernate.Mapping;
+using System.ServiceModel;
 
 namespace Artefacts.Service
 {
@@ -19,6 +21,7 @@ namespace Artefacts.Service
 	/// </remarks>
 	public class ClientQueryProvider<TArtefact> : IQueryProvider where TArtefact : Artefact
 	{
+		private static RepositoryClientProxy<Artefact> _clientProxy = null;
 		/// <summary>
 		/// An expression visitor used in constructor
 		/// </summary>
@@ -31,6 +34,11 @@ namespace Artefacts.Service
 			get; private set;
 		}
 
+//		protected int Query [ int Index ] {
+//			get { }
+//			set { }
+//		}
+
 		/// <summary>
 		/// Gets the query cache.
 		/// </summary>
@@ -38,8 +46,7 @@ namespace Artefacts.Service
 		/// If you have trouble converting items to IQueryable, try deriving Queryable`1[TArtefact] from a new base class Queryable
 		/// that has no type parameters and use that as the element type for this dictionary
 		/// </remarks>
-		protected IDictionary<object, IQueryable> _queryCache;
-
+		protected IDictionary<Expression, IQueryable> _queryCache;
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Artefacts.Service.ClientQueryProvider`1"/> class.
 		/// </summary>
@@ -49,8 +56,10 @@ namespace Artefacts.Service
 		{
 			if (repository == null)
 				throw new ArgumentNullException("repository");
+			_clientProxy = new RepositoryClientProxy<Artefact>(new NetTcpBinding(SecurityMode.None), "net.tcp://localhost:3334/ArtefactRepository");
+
 			Repository = repository;
-			_queryCache = new ConcurrentDictionary<object, IQueryable>();
+			_queryCache = new ConcurrentDictionary<Expression, IQueryable>();
 			_expressionVisitor = visitor ?? new ClientQueryVisitor<TArtefact>(Repository, _queryCache);	// Activator.CreateInstance<TExpressionVisitor>();
 		}
 
@@ -72,7 +81,7 @@ namespace Artefacts.Service
 		/// <typeparam name="TElement">The 1st type parameter.</typeparam>
 		/// <returns>The query.</returns>
 		/// <remarks>IQueryProvider implementation</remarks>
-		IQueryable<TElement> IQueryProvider.CreateQuery<TElement>(Expression expression)
+		IQueryable<TElement> IQueryProvider.CreateQuery<TElement>(Expression expression) where TElement : Artefact
 		{
 			if (expression == null)
 				throw new ArgumentNullException("expression");
@@ -84,8 +93,8 @@ namespace Artefacts.Service
 //				throw new ArgumentOutOfRangeException("expression", expression,
 //					string.Format("Should assignable to System.Linq.IQueryable<{0}>", typeof(TElement).FullName));
 
-			Expression newExpression = _expressionVisitor.Visit(expression);
-			object expressionId = Repository.CreateQuery(newExpression.ToExpressionNode());
+//			Expression newExpression = _expressionVisitor.Visit(expression);
+//			object expressionId = Repository.CreateQuery(newExpression.ToExpressionNode());
 
 //			Expression expressionClientSide = //Expression.MakeIndex(
 //				Expression.Property(
@@ -100,13 +109,14 @@ namespace Artefacts.Service
 //					"Item",
 //					Expression.Constant(expressionId));
 //				typeof(IDictionary<object, IQueryable>).GetProperty(), ,);
-			
-			if (_queryCache.ContainsKey(expressionId))
-				return (IQueryable<TElement>)_queryCache[expressionId];
-			IQueryable<TElement> queryable = (IQueryable<TElement>)Activator.CreateInstance(
-				typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, newExpression, expressionId);
-			_queryCache[expressionId] = (IQueryable)queryable;
-			return queryable;
+
+			IQueryable<TElement> query;
+			if (_queryCache.TryGetValue(expression, out (IQueryable)query))
+				return (IQueryable<TElement>)_queryCache[expression];
+			query = new Queryable<TElement>(this, expression);
+			//(IQueryable<TElement>)Activator.CreateInstance(typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, expression);
+			_queryCache.Add(expression, (IQueryable)query);
+			return query;
 			//return new Queryable<TArtefact>(this, expression);
 		}
 
@@ -122,7 +132,7 @@ namespace Artefacts.Service
 //				return _queryCache[expression];
 			if (expression.IsEnumerable())
 				throw new InvalidOperationException();
-			Expression newExpression = _expressionVisitor.Visit(expression);
+//			Expression newExpression = _expressionVisitor.Visit(expression);
 			return Repository.QueryExecute(newExpression.ToExpressionNode());	
 		}
 

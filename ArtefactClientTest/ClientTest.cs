@@ -76,7 +76,7 @@ namespace ArtefactClientTest
 //		private static ChannelFactory<IRepository<Artefact>> _repoProxyFactory = null;
 //		private static IArtefactService _proxy = null;
 //		private static IRepository<Artefact> _repoProxy = null;
-		private static RepositoryClientProxy<Artefact> _clientProxy = null;
+//		private static RepositoryClientProxy<Artefact> _clientProxy = null;
 				private static FileSystemArtefactCreator/*ICreator*/ _fsCreator = null;
 		#endregion
 		
@@ -249,8 +249,7 @@ namespace ArtefactClientTest
 //						ArtefactServiceHost.Main(null);
 //						Thread.Sleep(ServiceHostStartDelay);
 
-			_clientProxy = new RepositoryClientProxy<Artefact>(new NetTcpBinding(SecurityMode.None), "net.tcp://localhost:3334/ArtefactRepository");
-			
+
 			Console.WriteLine("\nService Artefact Repository: {0}\n", _clientProxy.ToString());
 		}
 		

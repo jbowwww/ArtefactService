@@ -7,7 +7,7 @@ namespace Artefacts.Service
 {
 	public class ClientQueryVisitor : ClientQueryVisitor<Artefact>
 	{
-		public ClientQueryVisitor(IRepository<Artefact> repository, IDictionary<object, IQueryable> queryCache)
+		public ClientQueryVisitor(IRepository<Artefact> repository, IDictionary<Expression, IQueryable> queryCache)
 			: base(repository, queryCache) { }
 	}
 
@@ -17,7 +17,7 @@ namespace Artefacts.Service
 
 		public IRepository<TArtefact> Repository { get; private set; }
 		
-		public ClientQueryVisitor(IRepository<TArtefact> repository, IDictionary<object, IQueryable> queryCache)
+		public ClientQueryVisitor(IRepository<TArtefact> repository, IDictionary<Expression, IQueryable> queryCache)
 		{
 			Repository = repository;
 			_queryCache = queryCache;

@@ -237,7 +237,7 @@ namespace Artefacts.Service
 		/// </summary>
 		/// <param name="provider">Provider.</param>
 		/// <param name="expression">Expression.</param>
-		public Queryable(ClientQueryProvider<Artefact> provider, Expression expression, object id)
+		public Queryable(ClientQueryProvider<Artefact> provider, Expression expression)
 		{
 			if (provider == null)
 				throw new ArgumentNullException("provider");
@@ -251,6 +251,18 @@ namespace Artefacts.Service
 			TimeRetrieved = DateTime.MinValue;
 			Provider = provider;
 			Expression = expression;
+			object serverId = provider.Repository.CreateQuery(Expression.ToExpressionNode());
+			if (serverId != Id)
+				throw new Exception(string.Format("serverId != Id ({0} != {1})", serverId, Id));
+		}
+
+		/// <summary>
+		/// Serves as a hash function for a <see cref="Artefacts.Service.Queryable`1"/> object.
+		/// </summary>
+		/// <returns>A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a hash table.</returns>
+		public override int GetHashCode()
+		{
+			return Id;
 		}
 
 		/// <summary>
