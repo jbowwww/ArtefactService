@@ -1,0 +1,89 @@
+﻿ServiceHost: Opening
+ServiceHost: Opened
+System.ServiceModel.ServiceHost
+
+Service Artefact Repository: Artefacts.Service.RepositoryClientProxy`1[Artefacts.Artefact]
+
+
+########
+# RunTest: Start: int RepositoryClientProxy<Artefact>.Artefacts.Count()
+########
+
+
+########
+# RunTest: Failed: int RepositoryClientProxy<Artefact>.Artefacts.Count()
+########
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00069] in /home/jk/Code/Resources/CS/mono/mcs/class/corlib/System.Reflection/MonoMethod.cs:238 
+  at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in /home/jk/Code/Resources/CS/mono/mcs/class/corlib/System.Reflection/MethodBase.cs:114 
+  at ArtefactClientTest.ArtefactClientTest+<RunTests>c__AnonStorey0.<>m__0 () [0x0000d] in /home/jk/Code/Projects/NET/ArtefactService/ArtefactClientTest/ClientTest.cs:103 
+  at ArtefactClientTest.ArtefactClientTest.RunTest (System.String name, System.Action testMethod, System.IO.TextWriter output) [0x00023] in /home/jk/Code/Projects/NET/ArtefactService/ArtefactClientTest/ClientTest.cs:113 
+
+   ------ Inner Exception ------
+  System.Runtime.Serialization.SerializationException: Type 'Serialize.Linq.Nodes.MethodCallExpressionNode' is unexpected. The type should either be registered as a known type, or DataContractResolver should be used.
+    at System.Runtime.Serialization.DataContractSerializer.WriteStartObject (System.Xml.XmlDictionaryWriter writer, System.Object graph) [0x0013e] in /home/jk/Code/Resources/CS/mono/mcs/class/System.Runtime.Serialization/System.Runtime.Serialization/DataContractSerializer.cs:481 
+    at System.Runtime.Serialization.XmlObjectSerializer.WriteObject (System.Xml.XmlDictionaryWriter writer, System.Object graph) [0x00000] in /home/jk/Code/Resources/CS/mono/mcs/class/System.Runtime.Serialization/System.Runtime.Serialization/XmlObjectSerializer.cs:113 
+    at System.ServiceModel.Dispatcher.DataContractMessagesFormatter+DataContractBodyWriter.WriteMessagePart (System.Xml.XmlDictionaryWriter writer, System.ServiceModel.Description.MessageBodyDescription desc, System.ServiceModel.Description.MessagePartDescription partDesc, System.Object obj) [0x00049] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Dispatcher/BaseMessagesFormatter.cs:503 
+    at System.ServiceModel.Dispatcher.DataContractMessagesFormatter+DataContractBodyWriter.OnWriteBodyContents (System.Xml.XmlDictionaryWriter writer) [0x00091] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Dispatcher/BaseMessagesFormatter.cs:488 
+    at System.ServiceModel.Channels.BodyWriter.WriteBodyContents (System.Xml.XmlDictionaryWriter writer) [0x00000] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/BodyWriter.cs:57 
+    at System.ServiceModel.Channels.SimpleMessage.OnWriteBodyContents (System.Xml.XmlDictionaryWriter writer) [0x00000] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/MessageImpl.cs:331 
+    at System.ServiceModel.Channels.Message.WriteBodyContents (System.Xml.XmlDictionaryWriter writer) [0x00022] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/Message.cs:183 
+    at System.ServiceModel.Channels.Message.WriteBody (System.Xml.XmlDictionaryWriter writer) [0x0001c] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/Message.cs:168 
+    at System.ServiceModel.Channels.Message.OnWriteMessage (System.Xml.XmlDictionaryWriter writer) [0x00065] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/Message.cs:293 
+    at System.ServiceModel.Channels.Message.WriteMessage (System.Xml.XmlDictionaryWriter writer) [0x00026] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/Message.cs:195 
+    at System.ServiceModel.Channels.BinaryMessageEncoder.WriteMessage (System.ServiceModel.Channels.Message message, System.IO.Stream stream) [0x0002a] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/BinaryMessageEncoder.cs:124 
+    at System.ServiceModel.Channels.NetTcp.TcpBinaryFrameManager.WriteSizedMessage (System.ServiceModel.Channels.Message message) [0x0006c] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels.NetTcp/TcpBinaryFrameManager.cs:440 
+    at System.ServiceModel.Channels.NetTcp.TcpDuplexSessionChannel.Send (System.ServiceModel.Channels.Message message, TimeSpan timeout) [0x0008e] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels.NetTcp/TcpDuplexSessionChannel.cs:153 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.RequestCorrelated (System.ServiceModel.Channels.Message msg, TimeSpan timeout, IOutputChannel channel) [0x00006] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel/ClientRuntimeChannel.cs:585 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.Request (System.ServiceModel.Channels.Message msg, TimeSpan timeout) [0x00019] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel/ClientRuntimeChannel.cs:576 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.Request (System.ServiceModel.Description.OperationDescription od, System.Object[] parameters) [0x00066] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel/ClientRuntimeChannel.cs:531 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.DoProcess (System.Reflection.MethodBase method, System.String operationName, System.Object[] parameters) [0x00038] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel/ClientRuntimeChannel.cs:496 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.Process (System.Reflection.MethodBase method, System.String operationName, System.Object[] parameters) [0x0001c] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel/ClientRuntimeChannel.cs:477 
+  
+
+########
+# RunTest: Start: FileSystemArtefactCreator
+########
+
+
+########
+# RunTest: Failed: FileSystemArtefactCreator
+########
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00069] in /home/jk/Code/Resources/CS/mono/mcs/class/corlib/System.Reflection/MonoMethod.cs:238 
+  at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in /home/jk/Code/Resources/CS/mono/mcs/class/corlib/System.Reflection/MethodBase.cs:114 
+  at ArtefactClientTest.ArtefactClientTest+<RunTests>c__AnonStorey0.<>m__0 () [0x0000d] in /home/jk/Code/Projects/NET/ArtefactService/ArtefactClientTest/ClientTest.cs:103 
+  at ArtefactClientTest.ArtefactClientTest.RunTest (System.String name, System.Action testMethod, System.IO.TextWriter output) [0x00023] in /home/jk/Code/Projects/NET/ArtefactService/ArtefactClientTest/ClientTest.cs:113 
+
+   ------ Inner Exception ------
+  System.Runtime.Serialization.SerializationException: Type 'Serialize.Linq.Nodes.MethodCallExpressionNode' is unexpected. The type should either be registered as a known type, or DataContractResolver should be used.
+    at System.Runtime.Serialization.DataContractSerializer.WriteStartObject (System.Xml.XmlDictionaryWriter writer, System.Object graph) [0x0013e] in /home/jk/Code/Resources/CS/mono/mcs/class/System.Runtime.Serialization/System.Runtime.Serialization/DataContractSerializer.cs:481 
+    at System.Runtime.Serialization.XmlObjectSerializer.WriteObject (System.Xml.XmlDictionaryWriter writer, System.Object graph) [0x00000] in /home/jk/Code/Resources/CS/mono/mcs/class/System.Runtime.Serialization/System.Runtime.Serialization/XmlObjectSerializer.cs:113 
+    at System.ServiceModel.Dispatcher.DataContractMessagesFormatter+DataContractBodyWriter.WriteMessagePart (System.Xml.XmlDictionaryWriter writer, System.ServiceModel.Description.MessageBodyDescription desc, System.ServiceModel.Description.MessagePartDescription partDesc, System.Object obj) [0x00049] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Dispatcher/BaseMessagesFormatter.cs:503 
+    at System.ServiceModel.Dispatcher.DataContractMessagesFormatter+DataContractBodyWriter.OnWriteBodyContents (System.Xml.XmlDictionaryWriter writer) [0x00091] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Dispatcher/BaseMessagesFormatter.cs:488 
+    at System.ServiceModel.Channels.BodyWriter.WriteBodyContents (System.Xml.XmlDictionaryWriter writer) [0x00000] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/BodyWriter.cs:57 
+    at System.ServiceModel.Channels.SimpleMessage.OnWriteBodyContents (System.Xml.XmlDictionaryWriter writer) [0x00000] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/MessageImpl.cs:331 
+    at System.ServiceModel.Channels.Message.WriteBodyContents (System.Xml.XmlDictionaryWriter writer) [0x00022] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/Message.cs:183 
+    at System.ServiceModel.Channels.Message.WriteBody (System.Xml.XmlDictionaryWriter writer) [0x0001c] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/Message.cs:168 
+    at System.ServiceModel.Channels.Message.OnWriteMessage (System.Xml.XmlDictionaryWriter writer) [0x00065] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/Message.cs:293 
+    at System.ServiceModel.Channels.Message.WriteMessage (System.Xml.XmlDictionaryWriter writer) [0x00026] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/Message.cs:195 
+    at System.ServiceModel.Channels.BinaryMessageEncoder.WriteMessage (System.ServiceModel.Channels.Message message, System.IO.Stream stream) [0x0002a] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels/BinaryMessageEncoder.cs:124 
+    at System.ServiceModel.Channels.NetTcp.TcpBinaryFrameManager.WriteSizedMessage (System.ServiceModel.Channels.Message message) [0x0006c] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels.NetTcp/TcpBinaryFrameManager.cs:440 
+    at System.ServiceModel.Channels.NetTcp.TcpDuplexSessionChannel.Send (System.ServiceModel.Channels.Message message, TimeSpan timeout) [0x0008e] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel.Channels.NetTcp/TcpDuplexSessionChannel.cs:153 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.RequestCorrelated (System.ServiceModel.Channels.Message msg, TimeSpan timeout, IOutputChannel channel) [0x00006] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel/ClientRuntimeChannel.cs:585 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.Request (System.ServiceModel.Channels.Message msg, TimeSpan timeout) [0x00019] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel/ClientRuntimeChannel.cs:576 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.Request (System.ServiceModel.Description.OperationDescription od, System.Object[] parameters) [0x00066] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel/ClientRuntimeChannel.cs:531 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.DoProcess (System.Reflection.MethodBase method, System.String operationName, System.Object[] parameters) [0x00038] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel/ClientRuntimeChannel.cs:496 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.Process (System.Reflection.MethodBase method, System.String operationName, System.Object[] parameters) [0x0001c] in /home/jk/Code/Resources/CS/mono/mcs/class/System.ServiceModel/System.ServiceModel/ClientRuntimeChannel.cs:477 
+  
+
+Exiting...
+Stopping service host thread... 
+ServiceHost: Closing
+ServiceHost: Closed
+done.
+
+Press any key to continue...
+

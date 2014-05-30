@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3FD32DA5-7D90-48AB-AF70-C72FF209BF78}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -53,6 +53,7 @@
     <None Include="CurrentlyUnused\QuerySerializationBinder.cs" />
     <None Include="Configuration\hibernate_server.cfg.xml" />
     <None Include="Notes\TODO.txt" />
+    <None Include="140530-1246-Output-ExceptionWhileSerializingMethodCallExpressionNode.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="NHibernate">
