@@ -3,6 +3,8 @@
 #
 */[Bb]in
 */[Oo]bj
+*.dll
+*.dll.mdb
 
 #
 # Not sure exactly what these are but not needed

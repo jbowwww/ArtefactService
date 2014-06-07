@@ -7,9 +7,9 @@ namespace Artefacts.Service
 {
 	public class ServerQueryVisitor : ExpressionVisitor
 	{
-		public ArtefactRepository Repository { get; private set; }
+		public Repository Repository { get; private set; }
 			
-		public ServerQueryVisitor(ArtefactRepository repository)
+		public ServerQueryVisitor(Repository repository)
 		{
 			Repository = repository;
 		}
@@ -24,11 +24,38 @@ namespace Artefacts.Service
 
 		protected override Expression VisitParameter(ParameterExpression p)
 		{
-			if (p.NodeType == ExpressionType.Parameter && p.Name.Equals("Artefacts"))
-				return Expression.Constant(Repository.Artefacts);
-			if (typeof(ArtefactRepository).IsAssignableFrom(p.Type) && p.Name.Equals("ArtefactRepository"))
-				return Expression.Constant(Repository, typeof(ArtefactRepository));
-			return p;
+			if (typeof(IRepository).IsAssignableFrom(p.Type) && p.Name.Equals("Repository"))
+//			{
+//				if ()
+				return Expression.Constant(Repository, typeof(Repository));
+//			}
+//			if (p.NodeType == ExpressionType.Parameter && p.Name.Equals("Artefacts"))
+//				return Expression.Constant(Repository.Artefacts);
+
+			else
+				return p;
+		}
+
+		protected override Expression VisitMemberAccess(MemberExpression m)
+		{
+//			if (m.Expression.NodeType == ExpressionType.Constant && m.Type.Equals(typeof(Repository)))
+//			{
+				if (m.Member.MemberType == System.Reflection.MemberTypes.Property && m.Member.Name.Equals("Session"))
+					return Expression.Constant(Repository.Session);
+//			}
+			return base.VisitMemberAccess(m);
+		}
+		protected override Expression VisitMethodCall(MethodCallExpression m)
+		{
+//			return (m.Type.IsGenericType && m.Method.Name.CompareTo("OfType")
+//				&& m.Object.Type.IsEnum && m.Object.Type.GetElementType().Equals(typeof(Artefact) && m.NodeType == ))
+				return base.VisitMethodCall(m);
+		}
+		protected override Expression VisitTypeIs(TypeBinaryExpression b)
+		{
+
+			return base.VisitTypeIs(b);
+
 		}
 	}
 }

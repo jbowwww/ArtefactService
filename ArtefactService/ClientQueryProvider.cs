@@ -23,19 +23,35 @@ namespace Artefacts.Service
 	/// one makes sense, as they have a fairly "mutual" (can't think of a better word") relationship and
 	/// logically speaking, the "RepositoryClientProxy" class does kind of exist to "provide" the "client"
 	/// with the ability to run "queries"
+	/// 
+	/// Removed code from somewhere c'tor I think
+	/// 
+	/// //			if (!typeof(TElement).IsAssignableFrom(expression.Type.GetElementType()))
+	///				throw new ArgumentOutOfRangeException("expression", expression,
+	///					string.Format("Should assignable to System.Linq.IQueryable<{0}>", typeof(TElement).FullName));
+	///			Expression newExpression = _expressionVisitor.Visit(expression);//			object expressionId = Repository.CreateQuery(newExpression.ToExpressionNode());
+	///			Expression expressionClientSide = //Expression.MakeIndex(
+	///				Expression.Property(
+	///					Expression.Property(
+	///						Expression.Variable(
+	///							typeof(ArtefactRepository),
+	///							"ArtefactRepository"),
+	///						typeof(ArtefactRepository).GetProperty(
+	///							"QueryCache",
+	///							BindingFlags.Public | BindingFlags.Instance,
+	///							typeof(IDictionary<object, IQueryable>))),
+	///					"Item",
+	///					Expression.Constant(expressionId));
+	///				typeof(IDictionary<object, IQueryable>).GetProperty(), ,);
 	/// </remarks>
-	public class ClientQueryProvider<TArtefact> : IQueryProvider where TArtefact : Artefact
+	internal abstract class ClientQueryProvider : IQueryProvider
 	{
-		private static RepositoryClientProxy<Artefact> _clientProxy = null;
-		/// <summary>
-		/// An expression visitor used in constructor
-		/// </summary>
-		private readonly ExpressionVisitor _expressionVisitor;
+		private static RepositoryClientProxy _clientProxy = null;
 
 		/// <summary>
 		/// The repository.
 		/// </summary>
-		public IRepository<TArtefact> Repository {
+		public IRepository Repository {
 			get; private set;
 		}
 
@@ -57,101 +73,16 @@ namespace Artefacts.Service
 		/// </summary>
 		/// <param name="repository">Repository.</param>
 		/// <param name="visitor">Visitor.</param>
-		public ClientQueryProvider(IRepository<TArtefact> repository, ExpressionVisitor visitor = null)
+		public ClientQueryProvider(IRepository repository, ExpressionVisitor visitor = null)
 		{
 			if (repository == null)
 				throw new ArgumentNullException("repository");
-			_clientProxy = new RepositoryClientProxy<Artefact>(new NetTcpBinding(SecurityMode.None), "net.tcp://localhost:3334/ArtefactRepository");
-
 			Repository = repository;
-			_queryCache = new ConcurrentDictionary<Expression, IQueryable>();
-			_expressionVisitor = visitor ?? new ClientQueryVisitor<TArtefact>(Repository, _queryCache);	// Activator.CreateInstance<TExpressionVisitor>();
+			_clientProxy = new RepositoryClientProxy(new NetTcpBinding(SecurityMode.None), "net.tcp://localhost:3334/ArtefactRepository");
+
 		}
 
-		/// <summary>
-		/// Creates the query.
-		/// </summary>
-		/// <param name="expression">Expression</param>
-		/// <returns>The query</returns>
-		/// <remarks>IQueryProvider implementation</remarks>
-		public IQueryable CreateQuery(Expression expression)
-		{
-			return (IQueryable)(this as IQueryProvider).CreateQuery<TArtefact>(expression);
-		}
 
-		/// <summary>
-		/// Creates the query.
-		/// </summary>
-		/// <param name="expression">Expression.</param>
-		/// <typeparam name="TElement">The 1st type parameter.</typeparam>
-		/// <returns>The query.</returns>
-		/// <remarks>IQueryProvider implementation</remarks>
-		IQueryable<TElement> IQueryProvider.CreateQuery<TElement>(Expression expression)// where TElement : Artefact
-		{
-			if (expression == null)
-				throw new ArgumentNullException("expression");
-			if (!expression.IsEnumerable())
-				throw new ArgumentOutOfRangeException("expression", expression, "Should implement System.Collections.IEnumerable");
-			if (!typeof(Artefact).IsAssignableFrom(typeof(TElement)))
-				throw new ArgumentOutOfRangeException("TElement", typeof(TElement), "Should be subclass of Artefact");
-//			if (!typeof(TElement).IsAssignableFrom(expression.Type.GetElementType()))
-//				throw new ArgumentOutOfRangeException("expression", expression,
-//					string.Format("Should assignable to System.Linq.IQueryable<{0}>", typeof(TElement).FullName));
-
-//			Expression newExpression = _expressionVisitor.Visit(expression);
-//			object expressionId = Repository.CreateQuery(newExpression.ToExpressionNode());
-
-//			Expression expressionClientSide = //Expression.MakeIndex(
-//				Expression.Property(
-//					Expression.Property(
-//						Expression.Variable(
-//							typeof(ArtefactRepository),
-//							"ArtefactRepository"),
-//						typeof(ArtefactRepository).GetProperty(
-//							"QueryCache",
-//	//						BindingFlags.Public | BindingFlags.Instance,
-//							typeof(IDictionary<object, IQueryable>))),
-//					"Item",
-//					Expression.Constant(expressionId));
-//				typeof(IDictionary<object, IQueryable>).GetProperty(), ,);
-
-			IQueryable/*<TElement>*/ query;
-			if (_queryCache.TryGetValue(expression, out query))
-				return (IQueryable<TElement>)_queryCache[expression];
-			query = //new Queryable<TElement>(this, expression);
-			(IQueryable<TElement>)Activator.CreateInstance(typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, expression);
-			_queryCache.Add(expression, (IQueryable)query);
-			return (IQueryable<TElement>)query;
-			//return new Queryable<TArtefact>(this, expression);
-		}
-
-		/// <summary>
-		/// Execute the specified expression.
-		/// </summary>
-		/// <param name="expression">Expression.</param>
-		/// <returns>The query result</returns>
-		/// <remarks>IQueryProvider implementation</remarks>
-		public object Execute(Expression expression)
-		{
-//			if (expression.IsEnumerable() && typeof(TArtefact).IsAssignableFrom(expression.Type) && _queryCache.ContainsKey(expression))
-//				return _queryCache[expression];
-			if (expression.IsEnumerable())
-				throw new InvalidOperationException();
-//			Expression newExpression = _expressionVisitor.Visit(expression);
-			return Repository.QueryExecute(expression.ToExpressionNode());	
-		}
-
-		/// <summary>
-		/// Execute the specified expression.
-		/// </summary>
-		/// <param name="expression">Expression.</param>
-		/// <typeparam name="TResult">The 1st type parameter.</typeparam>
-		/// <returns>The query result</returns>
-		/// <remarks>IQueryProvider implementation</remarks>
-		TResult IQueryProvider.Execute<TResult>(Expression expression)
-		{
-			return (TResult)Execute(expression);
-		}
 	}
 }
 

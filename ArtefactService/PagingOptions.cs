@@ -12,11 +12,6 @@ namespace Artefacts.Service
 		/// <summary>
 		/// Page size
 		/// </summary>
-		public int PageSize;
-		
-		/// <summary>
-		/// Start index.
-		/// </summary>
-//		public int StartIndex;
+		public int PageSize = 5;
 	}
 }

@@ -70,13 +70,14 @@ namespace ArtefactClientTest
 			#endregion
 		#endregion
 		
-		#region Private static fields
+			#region Private static fields
 		private static Thread _serviceHostThread = null;
 //		private static ChannelFactory<IArtefactService> _proxyFactory = null;
 //		private static ChannelFactory<IRepository<Artefact>> _repoProxyFactory = null;
 //		private static IArtefactService _proxy = null;
 //		private static IRepository<Artefact> _repoProxy = null;
 //		private static RepositoryClientProxy<Artefact> _clientProxy = null;
+		private static RepositoryClientProxy _clientProxy = null;
 				private static FileSystemArtefactCreator/*ICreator*/ _fsCreator = null;
 		#endregion
 		
@@ -180,21 +181,16 @@ namespace ArtefactClientTest
 		}
 		#endregion
 		
-		#region Test methods executed by RunTest
-		[ClientTestMethod(Order=5, Name="int RepositoryClientProxy<Artefact>.Artefacts.Count()")]
-		private static void TestQueryArtefactsCount()
-		{
-			Console.WriteLine("{0} artefacts currently in repository", _clientProxy.Artefacts.Count());
-		}
-		
-//		[ClientTestMethod(Order=10, Name="IQueryable<Artefact> RepositoryClientProxy<Artefact>.Artefacts")]
+		#region Test methods executed by RunTest		
+		[ClientTestMethod(Order=10, Name="IQueryable<Artefact> _clientProxy.Artefacts")]
 		private static void TestQueryAllArtefacts()
 		{
+			Console.WriteLine("{0} artefacts currently in repository", _clientProxy.Artefacts.Count());
 			foreach (Artefact artefact in _clientProxy.Artefacts)
 				Console.WriteLine(artefact.ToString());
 		}
 
-//		[ClientTestMethod(Order=20, Name="IEnumerator<Artefact> RepositoryClientProxy<Artefact>.Artefacts using LINQ statement")]
+		[ClientTestMethod(Order=20, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ statement")]
 		private static void TestQueryArtefacts_Linq_Statement()
 		{
 			var q = from a in _clientProxy.Artefacts
@@ -204,7 +200,7 @@ namespace ArtefactClientTest
 				Console.WriteLine(artefact.ToString());
 		}
 		
-//		[ClientTestMethod(Order=30, Name="IEnumerator<Aertefact> RepositoryClientProxy<Artefact>.Artefacts using LINQ method syntax")]
+		[ClientTestMethod(Order=30, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ method syntax")]
 		private static void TestQueryArtefacts_Linq_Method()
 		{
 			var q = _clientProxy.Artefacts.Where((a) => a.Id > 32799);
@@ -212,14 +208,14 @@ namespace ArtefactClientTest
 				Console.WriteLine(artefact.ToString());
 		}
 
-//				[ClientTestMethod(Order=35, Name="int RepositoryClientProxy<Artefact>.Artefacts.Count()")]
-				private static void TestQueryArtefactsDrivesCount()
-				{
-						Console.WriteLine("{0} artefacts currently in repository\n{1} drives", _clientProxy.Artefacts.Count(), _fsCreator.Drives.Count());
+		[ClientTestMethod(Order=5, Name="int _clientProxy.Artefacts.Count()")]
+		private static void TestQueryArtefactsDrivesCount()
+		{
+			Console.WriteLine("{0} artefacts currently in repository\n{1} drives", _clientProxy.Artefacts.Count(), _fsCreator.Drives.Count());
 
-				}
+		}
 					
-		[ClientTestMethod(Order=40, Name="FileSystemArtefactCreator")]
+		[ClientTestMethod(Order=7, Name="FileSystemArtefactCreator")]
 		private static void TestFileSystemArtefactCreator()
 		{
 			_fsCreator = new FileSystemArtefactCreator(_clientProxy)
@@ -241,7 +237,6 @@ namespace ArtefactClientTest
 //			Console.ReadKey();
 
 			Artefact.ArtefactTypes.AddRange(artefactTypes);
-			
 			// Start service host thread and pause for a few seconds to ensure it has started
 			_serviceHostThread = ArtefactServiceHost.GetOrCreateAsyncThread();		//artefactTypes);
 			_serviceHostThread.Start();
@@ -249,7 +244,7 @@ namespace ArtefactClientTest
 //						ArtefactServiceHost.Main(null);
 //						Thread.Sleep(ServiceHostStartDelay);
 
-
+			_clientProxy = new RepositoryClientProxy(new NetTcpBinding(), "net.tcp://localhost:3334/ArtefactRepository");
 			Console.WriteLine("\nService Artefact Repository: {0}\n", _clientProxy.ToString());
 		}
 		

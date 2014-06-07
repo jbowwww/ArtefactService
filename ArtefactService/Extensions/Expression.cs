@@ -5,8 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 
+using Serialize.Linq;
 using Serialize.Linq.Extensions;
 using Serialize.Linq.Nodes;
+using Serialize.Linq.Serializers;
 
 namespace Artefacts.Service
 {
@@ -37,7 +39,7 @@ namespace Artefacts.Service
 		
 		public static object Id(this Expression e)
 		{
-			return e.ToExpressionNode().Id();
+			return string.Concat(e.Type.FullName, ":", e.ToString()).GetHashCode();//.ToExpressionNode().Id();
 			//return e.ToExpressionNode().GetHashCode();
 				//.ToString();
 //			return e.ToJson();		//.ToString();//.ToJson();	//ToExpressionNode().GetHashCode();
@@ -46,7 +48,7 @@ namespace Artefacts.Service
 
 		public static object Id(this ExpressionNode en)
 		{
-			return en.GetHashCode();
+			return en.ToExpression().Id();
 		}
 
 		public static byte[] ToBinary(this Expression e)
@@ -59,7 +61,7 @@ namespace Artefacts.Service
 		{
 			ExpressionNode en = e.ToExpressionNode();
 			MemoryStream ms = new MemoryStream();
-			bf.Serialize(ms, e);	//n);
+			bf.Serialize(ms, en);	//n);
 			byte[] binaryExpression = ms.GetBuffer();
 			return binaryExpression;
 		}

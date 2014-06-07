@@ -32,38 +32,44 @@ namespace Artefacts.FileSystem
 			set { BaseUri = new UriBuilder(BaseUri.Scheme, BaseUri.Host, BaseUri.Port, BaseUri.LocalPath, value).Uri; }
 		}
 
-		public IRepository<Artefact> Repository { get; private set; }
+		public RepositoryClientProxy Repository { get; private set; }
+//		public SynchronizedReadOnlyCollection<FileSystemEntry> files = new SynchronizedReadOnlyCollection<FileSystemEntry>(this, )
 		//		public IQueryable Artefacts { get; private set; }
-		public IQueryable<FileSystemEntry> FileEntries {
-			get { return (IQueryable<FileSystemEntry>)Repository.Queryables[typeof(FileSystemEntry)]; }
-			private set { Repository.Queryables[typeof(FileSystemEntry)] = value; }
-		}
+		public IQueryable<FileSystemEntry> FileEntries;
+//		 {
+//			get { return (IQueryable<FileSystemEntry>)Repository.Queryables[typeof(FileSystemEntry)]; }
+//			private set { Repository.Queryables[typeof(FileSystemEntry)] = value; }
+//		}
 
-		public IQueryable<File> Files {
-			get { return (IQueryable<File>)Repository.Queryables[typeof(File)]; }
-			private set { Repository.Queryables[typeof(File)] = value; }
-		}
+		public IQueryable<File> Files;
+		// {
+//			get { return (IQueryable<File>)Repository.Queryables[typeof(File)]; }
+//			private set { Repository.Queryables[typeof(File)] = value; }
+//		}
 
-		public IQueryable<Directory> Directories {
-			get { return (IQueryable<Directory>)Repository.Queryables[typeof(Directory)]; }
-			private set { Repository.Queryables[typeof(Directory)] = value; }
-		}
+		public IQueryable<Directory> Directories;
+		//  {
+//			get { return (IQueryable<Directory>)Repository.Queryables[typeof(Directory)]; }
+//			private set { Repository.Queryables[typeof(Directory)] = value; }
+//		}
 
-		public IQueryable<Drive> Drives {
-			get { return (IQueryable<Drive>)Repository.Queryables[typeof(Drive)]; }
-			private set { Repository.Queryables[typeof(Drive)] = value; }
-		}
+		public IQueryable<Drive> Drives;
+		// {
+//			get { return (IQueryable<Drive>)Repository.Queryables[typeof(Drive)]; }
+//			private set { Repository.Queryables[typeof(Drive)] = value; }
+//		}
 
-		public IQueryable<Disk> Disks {
-			get { return (IQueryable<Disk>)Repository.Queryables[typeof(Disk)]; }
-			private set { Repository.Queryables[typeof(Disk)] = value; }
-		}
+		public IQueryable<Disk> Disks;
+		//  {
+//			get { return (IQueryable<Disk>)Repository.Queryables[typeof(Disk)]; }
+//			private set { Repository.Queryables[typeof(Disk)] = value; }
+//		}
 
 		public Host ThisHost = new Host(true);
 		#endregion
 
 		#region Constructors & Initialization
-		public FileSystemArtefactCreator(IRepository<Artefact> repository)
+		public FileSystemArtefactCreator(RepositoryClientProxy repository)
 		{
 			if (Singleton != null)
 				throw new InvalidOperationException("FileSystemArtefactCreator.c'tor: Singleton is not null");
@@ -74,22 +80,21 @@ namespace Artefacts.FileSystem
 			if (repository == null)
 				throw new ArgumentNullException("repository");
 			Repository = repository;
-			
-//			Artefacts = Repository.Artefacts.OfType
-			var g6 = QueryBase<FileSystemEntry>();
-			FileEntries = g6;
-			Files = QueryBase<File>();
-			Directories = QueryBase<Directory>();
-			Drives = QueryBase<Drive>();
-			Disks = QueryBase<Disk>();			
+
+			FileEntries = Repository.BuildBaseQuery<FileSystemEntry>();
+
+			Files = Repository.BuildBaseQuery<File>();
+			Directories = Repository.BuildBaseQuery<Directory>();
+			Drives = Repository.BuildBaseQuery<Drive>();
+			Disks = Repository.BuildBaseQuery<Disk>();
 		}
 		//			BuildTypedQueryable<Artefacts.FileSystem.FileSystemEntry>();
 		//			BuildTypedQueryable<Artefacts.FileSystem.File>();
 		//			BuildTypedQueryable<Artefacts.FileSystem.Directory>();
 		//			BuildTypedQueryable<Artefacts.FileSystem.Drive>();
 		//			BuildTypedQueryable<Artefacts.FileSystem.Disk>();
-		internal IQueryable<TArtefact> QueryBase<TArtefact>() where TArtefact : Artefact
-		{
+//		internal IQueryable<TArtefact> QueryBase<TArtefact>() where TArtefact : Artefact
+//		{
 //						var q = Repository.Artefacts.OfType<TArtefact>().Select((arg) => (TArtefact)arg);//Where((a) => a is TArtefact).Select((a) => (TArtefact)a);
 //						//;Where((arg) => arg.GetType().FullName == typeof(Artefact).FullName)//.AsQueryable();
 //						                                //.Where((arg) => arg.GetType().FullName == typeof(Artefact).FullName);
@@ -100,10 +105,11 @@ namespace Artefacts.FileSystem
 //				Expression.Call(typeof(NHibernate.Linq.LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) },
 //					Expression.Call(typeof(ArtefactRepository).GetProperty("Session", bf).GetGetMethod()));
 //			Expression expression = Expression.Parameter(typeof(IQueryable<TArtefact>), string.Concat("Artefacts:", typeof(TArtefact).FullName));
-			Expression expression = Expression.Call(typeof(System.Linq.Queryable), "OfType", new Type[] { typeof(TArtefact) },
-				Expression.Parameter(typeof(IQueryable<Artefact>), "Artefacts"));
-			return Repository.Artefacts.Provider.CreateQuery<TArtefact>(expression);				//			Repository.Queryables.Add(typeof(TArtefact),
-		}
+//			Expression expression = Expression.Call(typeof(System.Linq.Queryable), "OfType", new Type[] { typeof(TArtefact) },
+//				Expression.Parameter(typeof(IQueryable<Artefact>), "Artefacts"));
+//			return Repository.Artefacts.Provider.CreateQuery<TArtefact>(expression);				//			Repository.Queryables.Add(typeof(TArtefact),
+//			return Repository.Artefacts.OfType<TArtefact>();
+//		}
 		#endregion
 
 		#region implemented abstract members of Artefacts.CreatorBase
@@ -119,7 +125,12 @@ namespace Artefacts.FileSystem
 			while (subDirectories.Count > 0)
 			{
 				Uri currentUri = subDirectories.Dequeue();
-				Drive drive = Drives.FirstOrDefault((d) => currentUri.LocalPath.StartsWith(d.Label));
+//				Drive drive = Drives.FirstOrDefault((d) => currentUri.LocalPath.StartsWith(d.Label));
+				var q = from dr in Drives
+				where currentUri.LocalPath.StartsWith(dr.Label)
+				select dr;
+				Drive drive = q.First();
+
 				foreach (string relPath in EnumerateFiles(currentUri))
 				{
 					string absPath = Path.Combine(currentUri.LocalPath, relPath);

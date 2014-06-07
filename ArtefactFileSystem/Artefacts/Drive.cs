@@ -44,7 +44,7 @@ namespace Artefacts.FileSystem
 				return _partitionMountPaths;				
 			}
 		}
-		public static IRepository<Artefact> Repository { get; set; }
+		public static IRepository Repository { get; set; }
 		
 		public static IQueryable<Drive> GetDrives()
 		{

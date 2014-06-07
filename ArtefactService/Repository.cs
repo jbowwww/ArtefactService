@@ -5,20 +5,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-//using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.ServiceModel;
-//using System.ServiceModel.Description;
-//using System.ServiceModel.Dispatcher;
 using System.Text;
-
+using Serialize.Linq;
+using Serialize.Linq.Nodes;
 using NHibernate;
 using NHibernate.Linq;
-//using Serialize.Linq;
-
-//using Serialize.Linq.Extensions;
-using Serialize.Linq.Nodes;
-using System.Net.Mime;
 
 namespace Artefacts.Service
 {
@@ -26,15 +19,60 @@ namespace Artefacts.Service
 	/// Artefact repository
 	/// </summary>
 	/// <remarks>
+	/// 	- Should the root IQueryable ("Artefacts") (or any other near-root queryables) on the client side
+	/// 		be constructed using MemberExpressions referring to <see cref="IRepository"/>  ??
+	/// 
 	///	-	Removed parameters of <see cref="ServiceBehaviourAttribute"/>:
 	///			MaxItemsInObjectGraph=100,
 	///			ReleaseServiceInstanceOnTransactionComplete=false)]
+	/// 
+	/// 	- Removed experimental member method operation definitions:
+	/// 		/// <summary>
+	/// Create a query (serialized using binary formatter)
+	/// </summary>
+	/// <returns>The query identifier</returns>
+	/// <param name="binary">Binary</param>
+	/// <remarks>
+	/// 
 	/// </remarks>
-	[ServiceBehavior(
-				IncludeExceptionDetailInFaults=true,
-				InstanceContextMode=InstanceContextMode.Single,
-				ConcurrencyMode=ConcurrencyMode.Single)]
-	public class ArtefactRepository : IRepository<Artefact>
+	///		public object CreateQuery(byte[] binary)
+	///		{
+	///			try
+	///			{
+	///				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
+	///				if (expression.Type.GetInterface("System.Collections.IEnumerable") == null)
+	///					throw new ArgumentOutOfRangeException("expression", expression, "Not IEnumerable");
+	///				object queryId = expression.Id();				//.ToString();
+	///				if (!QueryCache.ContainsKey(queryId))
+	///				{
+	///					IQueryable<Artefact> q =
+	///						new NhQueryable<Artefact>(Artefacts.Provider, expression);
+	///					Artefacts.Provider.Execute<IQueryable<Artefact>>(expression);
+	///					Artefacts.Provider.CreateQuery<Artefact>(expression);/
+	///					QueryCache.Add(queryId, q);					//(Querya/ble<Artefact>)				// Session.Query<Artefact>().Provider.CreateQuery<Artefact>(en.ToExpression());
+	///				/}
+	///				return queryId;
+	///			}
+	///			catch (Exception ex)
+	///			{
+	///				throw Error(ex, binary);
+	///			}
+	///		}
+	/// 
+	/// //			Expression expression = 
+	///				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) },
+	///				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()));
+	///			Artefacts = new NhQueryable<Artefact>(_nhQueryProvider, expression);
+	///			new NhQueryable<Artefact>(_nhQueryProvider, Expression.Variable(typeof(IQueryable<Artefact>), "Artefacts"));
+	///				_nhQueryProvider.CreateQuery<Artefact>(expression);
+	///			Session.Query<Artefact>();
+	///				new Queryable<Artefact>(this, _nhQueryProvider, expression);
+	///				new QueryableNhProxy<Artefact>(new NhQueryable<Artefact>(_nhQueryProvider, Expression.Empty));			//				(NhQueryable<Artefact>)_nhQueryProvider.CreateQuery<Artefact>(Expression.Empty));
+	/// </remarks>
+	[ServiceBehavior(IncludeExceptionDetailInFaults=true,
+		InstanceContextMode=InstanceContextMode.Single,
+		ConcurrencyMode=ConcurrencyMode.Single)]
+	public class Repository : IRepository
 	{		
 		#region Static members
 		/// <summary>
@@ -42,54 +80,98 @@ namespace Artefacts.Service
 		/// </summary>
 		/// <remarks>May not remain constant - make configurable by clients</remarks>
 		public static TimeSpan ArtefactUpdateAgeLimit = new TimeSpan(0, 1, 0);
+
+		/// <summary>
+		/// Gets the transaction.
+		/// </summary>
+		/// <value>The transaction.</value>
 		public static ITransaction Transaction { get { return Session.Transaction; } }
+
+		/// <summary>
+		/// Gets the session.
+		/// </summary>
+		/// <value>The session.</value>
 		public static ISession Session { get { return NhBootStrap.Session; } }
 		#endregion
 		
-		#region Private fields
+		#region Private/protected fields & properties
 		private Dictionary<int, Artefact> _artefactCache;
 		private Dictionary<object, int> _countCache;
 //		private Dictionary<object, QueryResult<Artefact>> _queryResultCache;
 		private ConcurrentQueue<object> _queryExecuteQueue;
 		private INhQueryProvider _nhQueryProvider;
 		private BinaryFormatter _binaryFormatter;
+
+		/// <summary>
+		/// Gets the configuration.
+		/// </summary>
+		protected ArtefactServiceConfiguration Configuration { get; private set; }
+
+		/// <summary>
+		/// Gets or sets the query visitor.
+		/// </summary>
+		protected ExpressionVisitor QueryVisitor { get; set; }
+
+		/// <summary>
+		/// Gets or sets the query context.
+		/// </summary>
+		protected ExpressionContext QueryContext { get; set; }
+
+		/// <summary>
+		/// Gets the query next identifier.
+		/// </summary>
+		public int QueryNextId {
+			get
+			{
+				lock (_queryNextIdLock)
+				{
+					int id = _queryNextId;
+					_queryNextId++;
+					return id;
+				}
+			}
+		}
+		private int _queryNextId = 0;
+		private readonly object _queryNextIdLock = new object();
 		#endregion
 
-		public ArtefactServiceConfiguration Configuration { get; private set; }
-		
-		public ExpressionVisitor QueryVisitor { get; protected set; }
-		
-		public ArtefactRepository()
+		/// <summary>
+		/// Gets the query cache.
+		/// </summary>
+		/// <value>The query cache.</value>
+		public Dictionary<object, IQueryable> QueryCache { get; private set; }
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Artefacts.Service.ArtefactRepository"/> class.
+		/// </summary>
+		public Repository()
 		{
 			Configuration = new ArtefactServiceConfiguration();
 
 			_artefactCache = new Dictionary<int, Artefact>();
-			QueryCache = new Dictionary<object, IQueryable>();
 			_countCache = new Dictionary<object, int>();
-//			_queryResultCache = new Dictionary<object, QueryResult<Artefact>>();
+			//_queryResultCache = new Dictionary<object, QueryResult<Artefact>>();
 			_queryExecuteQueue = new ConcurrentQueue<object>();
-
 			_nhQueryProvider = new DefaultQueryProvider(Session.GetSessionImplementation());
 			_binaryFormatter = new BinaryFormatter();
-			QueryVisitor = new ServerQueryVisitor(this);
+
+			QueryContext = new ExpressionContext();
 			
-//			Expression expression = 
-//				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(Artefact) },
-//				Expression.Call(typeof(ArtefactRepository).GetProperty("Session", BindingFlags.Public | BindingFlags.Static).GetGetMethod()));
-//			Artefacts = new NhQueryable<Artefact>(_nhQueryProvider, expression);
+
+			QueryVisitor = new ServerQueryVisitor(this);
+			QueryCache = new Dictionary<object, IQueryable>();
 
 			Artefacts = Session.Query<Artefact>();
-//			new NhQueryable<Artefact>(_nhQueryProvider, Expression.Variable(typeof(IQueryable<Artefact>), "Artefacts"));
-//				_nhQueryProvider.CreateQuery<Artefact>(expression);
-//			Session.Query<Artefact>();
-//				new Queryable<Artefact>(this, _nhQueryProvider, expression);
-//				new QueryableNhProxy<Artefact>(new NhQueryable<Artefact>(_nhQueryProvider, Expression.Empty));			//				(NhQueryable<Artefact>)_nhQueryProvider.CreateQuery<Artefact>(Expression.Empty));
 			Queryables = new ConcurrentDictionary<Type, IQueryable>();
 			Queryables.Add(typeof(Artefact), Artefacts);
 		}
 
 		#region IRepository[Artefact] implementation		
 		#region Add/Get/Update/Remove singular artefact operations
+		/// <summary>
+		/// Add the specified artefact.
+		/// </summary>
+		/// <param name="artefact">Artefact.</param>
 		public int Add(Artefact artefact)
 		{
 			ITransaction transaction = null;
@@ -124,6 +206,11 @@ namespace Artefacts.Service
 			}
 		}
 
+		/// <summary>
+		/// Gets the identifier.
+		/// </summary>
+		/// <returns>The identifier.</returns>
+		/// <param name="artefact">Artefact.</param>
 		public int GetId(Artefact artefact)
 		{
 			try
@@ -136,6 +223,11 @@ namespace Artefacts.Service
 			}
 		}
 
+		/// <summary>
+		/// Gets the by identifier.
+		/// </summary>
+		/// <returns>The by identifier.</returns>
+		/// <param name="id">Identifier.</param>
 		public Artefact GetById(int id)
 		{
 			try
@@ -149,6 +241,10 @@ namespace Artefacts.Service
 			}
 		}
 
+		/// <summary>
+		/// Update the specified artefact.
+		/// </summary>
+		/// <param name="artefact">Artefact.</param>
 		public void Update(Artefact artefact)
 		{
 			ITransaction transaction = null;
@@ -179,6 +275,10 @@ namespace Artefacts.Service
 			}
 		}
 
+		/// <summary>
+		/// Remove the specified artefact.
+		/// </summary>
+		/// <param name="artefact">Artefact.</param>
 		public void Remove(Artefact artefact)
 		{
 			ITransaction transaction = null;
@@ -213,64 +313,24 @@ namespace Artefacts.Service
 		}
 		#endregion
 		
-		#region Query methods		
-		/// <summary>
-		/// Create a query (serialized using binary formatter)
-		/// </summary>
-		/// <returns>The query identifier</returns>
-		/// <param name="binary">Binary</param>
-		/// <remarks>
-		/// // TODO: I think I just need to traverse the expression tree from en.ToExpression(),
-		/// find the expression node representing the root query from the client side (RepositoryClientProxy.Artefacts)
-		/// The expression corresponding to that node is (currently, see source in mentioned class)  method call expression
-		/// to ISession.Query<>(). As a 1st parameter (maybe.. I think..?) this will take the ISession paramter. From client side
-		/// this is probably null, initialise it to this.Session before creating the query
-		/// Do this and this shit might even work?!
-		/// 16/1/14: ^^ It appears that this may well be false - may be almost working
-		/// 17/1/14: ^^ Not quite, still have trouble with certain things, e.g. using a string variable to compare with
-		///							an artefact's member value - tries to serialize the object containing the string instance the
-		///							variable references, when I just wanted to use the string value
-		///							-	I think one way or another I will have to write code to traverse the expression trees, to prepare them when and as necessary
-		/// </remarks>
-//		public object CreateQuery(byte[] binary)
-//		{
-//			try
-//			{
-//				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
-//				if (expression.Type.GetInterface("System.Collections.IEnumerable") == null)
-//					throw new ArgumentOutOfRangeException("expression", expression, "Not IEnumerable");
-//				object queryId = expression.Id();				//.ToString();
-//				if (!QueryCache.ContainsKey(queryId))
-//				{
-//					IQueryable<Artefact> q =
-////						new NhQueryable<Artefact>(Artefacts.Provider, expression);
-////						Artefacts.Provider.Execute<IQueryable<Artefact>>(expression);
-//					Artefacts.Provider.CreateQuery<Artefact>(expression);
-//					QueryCache.Add(queryId, q);					//(Queryable<Artefact>)				// Session.Query<Artefact>().Provider.CreateQuery<Artefact>(en.ToExpression());
-//				}
-//				return queryId;
-//			}
-//			catch (Exception ex)
-//			{
-//				throw Error(ex, binary);
-//			}
-//		}
-		
+		#region Query methods
 		/// <summary>
 		/// Creates the query.
 		/// </summary>
 		/// <returns>The query identifier</returns>
 		/// <param name="expression">Expression.</param>
-		public object CreateQuery(ExpressionNode expression)
+		public object QueryPreload(byte[] expression)	//ExpressionNode expression)
 		{
-			object queryId = expression.Id();
-			if (!QueryCache.ContainsKey(queryId))
+			Expression e = expression.FromBinary();
+			object serverId = e.Id(); //QueryNextId;
+			if (!QueryCache.ContainsKey(serverId))
 			{
-				Expression serverSideExpression = QueryVisitor.Visit(expression.ToExpression());
+				Expression serverSideExpression = QueryVisitor.Visit(e);
 				IQueryable serverSideQuery = _nhQueryProvider.CreateQuery(serverSideExpression);
-				QueryCache[queryId] = serverSideQuery;
+				
+				QueryCache[serverId] = serverSideQuery;
 			}
-			return queryId;
+			return serverId;
 		}
 
 		/// <summary>
@@ -280,24 +340,25 @@ namespace Artefacts.Service
 		/// <param name="queryId">Query identifier.</param>
 		/// <param name="startIndex">Start index.</param>
 		/// <param name="count">Count.</param>
-		public Artefact[] QueryResults(object queryId, int startIndex = 0, int count = -1)
+		public int[] QueryResults(object queryId, int startIndex = 0, int count = -1)
 		{
 			try
 			{	
+//				Debug.Assert(QueryCache.ContainsKey(queryId))
 				IQueryable<Artefact> query = (IQueryable<Artefact>)QueryCache[queryId];
-				Artefact[] results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
+				int[] results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
 					query.Skip(startIndex) : // with a new custom server-side query provider, and implement caching??
-					query.Skip(startIndex).Take(count)).ToArray();
-				foreach (Artefact artefact in results)
+					query.Skip(startIndex).Take(count)).Select((a) => a.Id.Value).ToArray();
+				foreach (int artefactId in results)
 				{
-					int id = artefact.Id.Value;
-					if (_artefactCache.ContainsKey(id))
+					Artefact artefact = GetById(artefactId);
+					if (_artefactCache.ContainsKey(artefactId))
 					{
-						if (_artefactCache[id] != artefact)
-							_artefactCache[id].CopyMembersFrom(artefact);
+						if (_artefactCache[artefactId] != artefact)
+							_artefactCache[artefactId].CopyMembersFrom(artefact);
 					}
 					else
-						_artefactCache[id] = artefact;
+						_artefactCache[artefactId] = artefact;
 				}
 				return results;
 			}
@@ -313,11 +374,11 @@ namespace Artefacts.Service
 		/// <returns>The execute.</returns>
 		/// <param name="binary">Binary.</param>
 		/// <param name="expression">Expression</param>
-		public object QueryExecute(ExpressionNode expression)		//byte[] binary)
+		public object QueryExecute(byte[] expression)		//ExpressionNode expression)		//byte[] binary)
 		{
 			try
 			{
-				Expression serverSideExpression = QueryVisitor.Visit(expression.ToExpression());		// ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
+				Expression serverSideExpression = QueryVisitor.Visit(expression.FromBinary());		// ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
 				object result = _nhQueryProvider.Execute(serverSideExpression);
 				return result;
 			}
@@ -329,23 +390,17 @@ namespace Artefacts.Service
 		#endregion
 		
 		#region Collections/Enumerables/Queryables
+		/// <summary>
+		/// Root artefact collection
+		/// </summary>
 		public IQueryable<Artefact> Artefacts { get; private set; }
-		
-		public IDictionary<Type, IQueryable> Queryables { get; private set; }
 
-		public Dictionary<object, IQueryable> QueryCache { get; private set; }
+		/// <summary>
+		/// IQueryable root for each Type
+		/// </summary>
+		public IDictionary<Type, IQueryable> Queryables { get; private set; }
 		#endregion
-		
-		#region Get/Set default paging options
-		public PagingOptions GetDefaultPagingOptions()
-		{
-			throw new NotImplementedException();
-		}
-		public void SetDefaultPagingOptions(PagingOptions pagingOptions)
-		{
-			throw new NotImplementedException();
-		}
-		#endregion
+
 		#endregion
 		
 		/// <summary>

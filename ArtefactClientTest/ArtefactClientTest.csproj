@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{DF2BDA77-4F99-4327-85CC-2C7F1A5C4645}</ProjectGuid>
@@ -11,25 +11,21 @@
     <AssemblyName>ArtefactClientTest</AssemblyName>
     <StartupObject>ArtefactClientTest.ArtefactClientTest</StartupObject>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <PlatformTarget>x64</PlatformTarget>
     <Externalconsole>true</Externalconsole>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>none</DebugType>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <Externalconsole>true</Externalconsole>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -45,6 +41,18 @@
     </Reference>
     <Reference Include="ArtefactServiceHost">
       <HintPath>..\bin\Debug\ArtefactServiceHost.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ArtefactFileSystem">
+      <HintPath>..\bin\Debug\ArtefactFileSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ArtefactService">
+      <HintPath>..\bin\Debug\ArtefactService.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>..\bin\lib\NHibernate.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -78,15 +86,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Outputs\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ArtefactFileSystem\ArtefactFileSystem.csproj">
-      <Project>{5B486604-0B8B-4214-99DB-C36A69168F5B}</Project>
-      <Name>ArtefactFileSystem</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ArtefactService\ArtefactService.csproj">
-      <Project>{3FD32DA5-7D90-48AB-AF70-C72FF209BF78}</Project>
-      <Name>ArtefactService</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>

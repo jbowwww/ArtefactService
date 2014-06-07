@@ -1,37 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/ClientQueryProvider.cs">
-    <Files>
-      <File FileName="ArtefactService/ArtefactRepository.cs" Line="1" Column="1" />
-      <File FileName="ArtefactService/IRepository.cs" Line="1" Column="1" />
-      <File FileName="ArtefactService/RepositoryClientProxy.cs" Line="63" Column="65" />
-      <File FileName="ArtefactService/ClientQueryProvider.cs" Line="25" Column="39" />
-      <File FileName="ArtefactClientTest/ClientTest.cs" Line="187" Column="63" />
-      <File FileName="ArtefactService/Extensions/Expression.cs" Line="1" Column="1" />
-      <File FileName="ArtefactService/ClientQueryVisitor.cs" Line="32" Column="87" />
-      <File FileName="ArtefactService/Queryable.cs" Line="265" Column="16" />
-    </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="Design" expanded="True" />
-          <Node name="ArtefactClientTest" expanded="True" />
-          <Node name="ArtefactService" expanded="True">
-            <Node name="Notes" expanded="True" />
-            <Node name="ClientQueryProvider.cs" selected="True" />
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
-  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactFileSystem/Artefacts/Drive.cs" line="87" column="1" />
-      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactService/ArtefactRepository.cs" line="310" column="1" />
-      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactService/ArtefactRepository.cs" line="266" column="1" />
-      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactService/RepositoryClientProxy.cs" line="144" column="1" />
-      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactService/RepositoryClientProxy.cs" line="154" column="1" />
-      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactClientTest/ClientTest.cs" line="48" column="22" />
+      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactFileSystem/Client/FileSystemArtefactCreator.cs" line="132" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

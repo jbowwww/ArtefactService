@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2A68C8C7-F066-41EA-A476-F1F27EF77E52}</ProjectGuid>
@@ -10,25 +10,20 @@
     <RootNamespace>ArtefactServiceHost</RootNamespace>
     <AssemblyName>ArtefactServiceHost</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <Externalconsole>true</Externalconsole>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <PlatformTarget>x64</PlatformTarget>
+    <DefineConstants>DEBUG;</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>none</DebugType>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
-    <Externalconsole>true</Externalconsole>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -39,11 +34,12 @@
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Remoting" />
-    <Reference Include="ArtefactService">
-      <HintPath>..\bin\Debug\ArtefactService.dll</HintPath>
-    </Reference>
     <Reference Include="Artefacts">
       <HintPath>..\bin\Debug\Artefacts.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ArtefactService">
+      <HintPath>..\bin\Debug\ArtefactService.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
