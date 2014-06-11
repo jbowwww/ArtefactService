@@ -53,7 +53,6 @@ namespace Artefacts.Service
 					if (index < 0)
 						throw new InvalidOperationException("Enumerator does not have a current item");
 					return (TArtefact)_queryable[index];
-//					return null;
 				}
 			}
 
@@ -81,12 +80,21 @@ namespace Artefacts.Service
 			/// </summary>
 			/// <remarks>IEnumerator implementation</remarks>
 			object IEnumerator.Current {
-				get { return (object)((this as IEnumerator<TArtefact>).Current); }
+				get { return Current; }
 			}
 
 			/// <summary>
 			/// Releases all resource used by the <see cref="Artefacts.Service.Queryable`1+QueryableEnumerator"/> object.
 			/// </summary>
+<<<<<<< HEAD
+=======
+			/// <remarks>Call <see cref="Dispose"/> when you are finished using the
+			/// <see cref="Artefacts.Service.Queryable`1+QueryableEnumerator"/>. The <see cref="Dispose"/> method leaves the
+			/// <see cref="Artefacts.Service.Queryable`1+QueryableEnumerator"/> in an unusable state. After calling
+			/// <see cref="Dispose"/>, you must release all references to the
+			/// <see cref="Artefacts.Service.Queryable`1+QueryableEnumerator"/> so the garbage collector can reclaim the memory
+			/// that the <see cref="Artefacts.Service.Queryable`1+QueryableEnumerator"/> was occupying.</remarks>
+>>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 			public void Dispose()
 			{
 
@@ -219,6 +227,7 @@ namespace Artefacts.Service
 		/// <summary>
 		/// Gets the <see cref="Artefacts.Service.Queryable`1[TArtefact]"/> at the specified index.
 		/// </summary>
+<<<<<<< HEAD
 		/// <param name="index">Index.</param>
 		public Artefact this[int index] {
 			get
@@ -236,6 +245,29 @@ namespace Artefacts.Service
 				}
 				return _results[index];
 			}
+=======
+		public bool IsUpToDate {
+			get
+			{
+				return TimeRetrieved != DateTime.MinValue &&
+					DateTime.Now.Subtract(TimeRetrieved) < ArtefactRepository.ArtefactUpdateAgeLimit;
+			}
+		}
+
+		public TArtefact this[int index] {
+			get
+			{
+				return this.Skip(index).Single();				//_queryProvider.Repository.QueryExecute(_expressionJSON);
+			}
+//				if (_results == null)
+//				{
+//					//	_results = new TArtefact[Count];
+//					_results = _queryProvider.Repository.QueryResults(_expressionId);
+//				}
+//				return _results[index];
+//			}
+
+>>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 		}
 		private Artefact[] _results;
 		private int[] _resultIds;
@@ -268,6 +300,7 @@ namespace Artefacts.Service
 				throw new ArgumentNullException("expression");
 			if (!expression.IsEnumerable())
 				throw new ArgumentOutOfRangeException("expression", expression, "Should implement System.Collections.IEnumerable");
+<<<<<<< HEAD
 //			if (!typeof(TArtefact).IsAssignableFrom(expression.Type.GetElementType()))
 //				throw new ArgumentOutOfRangeException("expression", expression, "Should have an element type assignable to " + typeof(TArtefact).FullName);
 			TimeCreated = DateTime.Now;
@@ -290,6 +323,19 @@ namespace Artefacts.Service
 		public override int GetHashCode()
 		{
 			return (int)Id;
+=======
+//			if (!typeof(Artefact).IsAssignableFrom(expression.Type.GetElementType()))
+//				throw new ArgumentOutOfRangeException("expression", expression, "Should have an element type assignable to Artefact");
+			TimeCreated = DateTime.Now;
+			TimeRetrieved = DateTime.MinValue;
+			_queryProvider = provider;
+			_expression = expression;
+			_expressionNode = _expression.ToExpressionNode();
+			_expressionBinary = _expression.ToBinary();
+			_expressionString = _expression.ToString();		//_expressionNode.ToString();
+			_expressionJSON = _expression.ToJson();
+//			_expressionId = _queryProvider.Repository.CreateQuery(_expressionBinary);
+>>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 		}
 
 		/// <summary>

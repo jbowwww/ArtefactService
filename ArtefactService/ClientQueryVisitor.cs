@@ -1,8 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+<<<<<<< HEAD
 using System;
 using System.Reflection;
+=======
+using System.Reflection.Emit;
+>>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 
 namespace Artefacts.Service
 {
@@ -22,6 +26,7 @@ namespace Artefacts.Service
 		{
 			Repository = repository;
 			_queryCache = queryCache;
+<<<<<<< HEAD
 		}
   
 		private static Expression StripQuotes(Expression e)
@@ -63,6 +68,9 @@ namespace Artefacts.Service
 			}
 			return base.VisitMemberAccess(m);
 		}
+=======
+		}		
+>>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 	}
 }
 

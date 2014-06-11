@@ -87,6 +87,7 @@ namespace Artefacts.Service
 		#endregion
 		
 		#region Query Methods
+<<<<<<< HEAD
 		/// <summary>
 		/// Creates the query.
 		/// </summary>
@@ -102,6 +103,28 @@ namespace Artefacts.Service
 		/// <param name="queryId">Query identifier.</param>
 		/// <param name="startIndex">Start index.</param>
 		/// <param name="count">Count.</param>
+=======
+//		[OperationContract]
+//		object CreateQuery(byte[] binary);
+//		
+////		[OperationContract]
+////		int QueryCount(object queryId);
+////		
+////		[OperationContract]
+////		TArtefact QueryResult(object queryId);
+////		
+		[OperationContract]
+		TArtefact[] QueryResults(object queryId, int startIndex = 0, int count = -1);
+//		
+//		[OperationContract]
+//		object QueryMethodCall(object queryId, string methodName);// MethodInfo method);
+		
+		[OperationContract]
+		object QueryExecute(object query);		//byte[] binary);
+		#endregion
+		
+		#region Get/Set default paging options
+>>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 		[OperationContract]
 		int[] QueryResults(object queryId, int startIndex = 0, int count = -1);
 

@@ -76,6 +76,20 @@ namespace Artefacts
 		#endregion
 		
 		#region Properties
+		#region IArtefact implementation
+		[DataMember]
+		public virtual int? Id { get; set; }
+
+		[DataMember]
+		public virtual DateTime TimeCreated { get; set; }
+
+		[DataMember]
+		public virtual DateTime TimeUpdated { get; set; }
+
+		[DataMember]
+		public virtual DateTime TimeChecked { get; set; }
+		#endregion
+		
 		public virtual bool IsTransient {
 			get { return !this.Id.HasValue; }
 		}
@@ -91,6 +105,7 @@ namespace Artefacts
 		public virtual TimeSpan CheckedAge {
 			get { return DateTime.Now - TimeChecked; }
 		}
+<<<<<<< HEAD
 		
 		#region IArtefact implementation
 		[DataMember]
@@ -106,6 +121,8 @@ namespace Artefacts
 		public virtual DateTime TimeChecked { get; set; }
 
 		#endregion
+=======
+>>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 		#endregion
 		
 		public Artefact()
@@ -146,6 +163,7 @@ namespace Artefacts
 //				&& TimeUpdated == artefact.TimeUpdated
 //				&& TimeChecked == artefact.TimeChecked;
 		
+<<<<<<< HEAD
 		public override string ToString()
 		{
 //			return ArtefactFormatAttribute.GetString(this);
@@ -153,6 +171,12 @@ namespace Artefacts
 				"[Artefact: Id={0} TimeCreated={1} TimeChecked={2} TimeUpdated={3}]",
 				Id, TimeCreated, TimeChecked, TimeUpdated);
 		}
+=======
+//		public override string ToString()
+//		{
+//			return ArtefactFormatAttribute.GetString(this);
+//		}
+>>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 	}
 }
 

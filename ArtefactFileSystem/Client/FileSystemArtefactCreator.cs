@@ -148,7 +148,7 @@ namespace Artefacts.FileSystem
 					foreach (string relPath in EnumerateDirectories(currentUri))
 					{
 						string absPath = Path.Combine(currentUri.LocalPath, relPath);
-						Directory dir = Directories.FirstOrDefault((d) => d.Path == absPath);
+						Directory dir = Directories.FirstOrDefault((Expression<Func<Directory, bool>>)((d) => d.Path == absPath));
 						if (dir == null)
 							Repository.Add(new Directory(new System.IO.DirectoryInfo(absPath), drive));
 						else if (dir.UpdateAge > TimeSpan.FromMinutes(1))

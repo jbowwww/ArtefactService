@@ -58,7 +58,7 @@ namespace Artefacts.Service
 		}
 
 		public static byte[] ToBinary(this Expression e, BinaryFormatter bf)
-		{
+			{
 			ExpressionNode en = e.ToExpressionNode();
 			MemoryStream ms = new MemoryStream();
 			bf.Serialize(ms, en);	//n);
