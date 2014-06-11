@@ -131,7 +131,11 @@ namespace Artefacts.FileSystem
 				select dr;
 				Drive drive;
 //				drive = q.FirstOrDefault();
-				drive = q.Take(1).ToArray().FirstOrDefault();
+				drive = q.FirstOrDefault();		// This only doesn't work because my queyr provider executes it using a repository query method (QueryExecute)
+				// that has return type of object, and should only be used for scalar results. (It does not have any artefact KnownType's)
+				// for method calls like FirstOrDefault() that produce an Artefact, you
+				// will need to find some way of detecting that return value, and running the method call expression's argument[0] expression as a query, to
+				// get artefact id, then retrieve artefact using repository getbyid() ??
 
 				foreach (string relPath in EnumerateFiles(currentUri))
 				{

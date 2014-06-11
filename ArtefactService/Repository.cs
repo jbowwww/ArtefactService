@@ -352,7 +352,8 @@ namespace Artefacts.Service
 					transaction.Dispose();
 			}
 		}
-		
+		#endregion
+
 		#region Query methods
 		/// <summary>
 		/// Creates the query.
@@ -428,9 +429,6 @@ namespace Artefacts.Service
 			}			
 		}
 		#endregion
-		#endregion
-
-
 
 		/// <summary>
 		/// Construct a <see cref="FaultException"/> describing the server side exception <paramref name="ex"/> for

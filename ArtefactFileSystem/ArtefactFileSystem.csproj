@@ -36,13 +36,11 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
-    <Reference Include="Artefacts">
-      <HintPath>..\bin\Debug\Artefacts.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="ArtefactService">
       <HintPath>..\bin\Debug\ArtefactService.dll</HintPath>
-      <Private>False</Private>
+    </Reference>
+    <Reference Include="Artefacts">
+      <HintPath>..\bin\Debug\Artefacts.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

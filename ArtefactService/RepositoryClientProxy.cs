@@ -299,7 +299,15 @@ namespace Artefacts.Service
 		/// </summary>
 		/// <param name="expression">Expression.</param>
 		/// <returns>The query result</returns>
-		/// <remarks>IQueryProvider implementation</remarks>
+		/// <remarks>
+		/// IQueryProvider implementation
+		/// - Trying to handle FirstOrDefault etc methods here
+		/// // This only doesn't work because my queyr provider executes it using a repository query method (QueryExecute)
+		/// that has return type of object, and should only be used for scalar results. (It does not have any artefact KnownType's)
+		/// for method calls like FirstOrDefault() that produce an Artefact, you
+		/// will need to find some way of detecting that return value, and running the method call expression's argument[0] expression as a query, to
+		/// get artefact id, then retrieve artefact using repository getbyid() ??
+		/// </remarks>
 		public object Execute(Expression expression)
 		{
 //			if (expression.IsEnumerable() && typeof(TArtefact).IsAssignableFrom(expression.Type) && _queryCache.ContainsKey(expression))
@@ -307,7 +315,10 @@ namespace Artefacts.Service
 			if (expression.IsEnumerable())
 				throw new InvalidOperationException();
 			Expression parsedExpression = ExpressionVisitor.Visit(expression);
-			return Channel.QueryExecute(parsedExpression.ToBinary());		//.ToExpressionNode());	
+			return !typeof(Artefact).IsAssignableFrom(parsedExpression.Type) ||
+				parsedExpression.NodeType != ExpressionType.Constant ?
+					Channel.QueryExecute(parsedExpression.ToBinary())
+					: ((ConstantExpression)parsedExpression).Value;		//.ToExpressionNode());	
 		}
 
 		/// <summary>

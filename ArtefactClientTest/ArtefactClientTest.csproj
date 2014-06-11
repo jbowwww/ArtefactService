@@ -38,19 +38,15 @@
     </Reference>
     <Reference Include="Artefacts">
       <HintPath>..\bin\Debug\Artefacts.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ArtefactServiceHost">
-      <HintPath>..\bin\Debug\ArtefactServiceHost.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="ArtefactFileSystem">
-      <HintPath>..\bin\Debug\ArtefactFileSystem.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="ArtefactService">
       <HintPath>..\bin\Debug\ArtefactService.dll</HintPath>
-      <Private>False</Private>
+    </Reference>
+    <Reference Include="ArtefactServiceHost">
+      <HintPath>..\bin\Debug\ArtefactServiceHost.dll</HintPath>
+    </Reference>
+    <Reference Include="ArtefactFileSystem">
+      <HintPath>..\bin\Debug\ArtefactFileSystem.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

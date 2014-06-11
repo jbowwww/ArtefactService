@@ -59,14 +59,14 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="Artefacts">
-      <HintPath>..\bin\Debug\Artefacts.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
     <Reference Include="NHibernate">
       <HintPath>..\bin\lib\NHibernate.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Artefacts">
+      <HintPath>..\bin\Debug\Artefacts.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

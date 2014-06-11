@@ -17,20 +17,20 @@ namespace Artefacts.Service
 		public static TextWriter Output;
 		public static TextWriter Error;
 		
-		private void ApplyServiceHostBehaviours(ServiceHost host)
-		{
-			foreach (ServiceEndpoint endpoint in host.Description.Endpoints)
-			{
-				foreach (OperationDescription operation in endpoint.Contract.Operations)
-				{
-					DataContractSerializerOperationBehavior dcsb = operation.Behaviors.Find<DataContractSerializerOperationBehavior>();
-					if (dcsb == null)
-						operation.Behaviors.Add(dcsb = new MyDataContractBehaviour(operation));
-					dcsb.DataContractResolver = new WCFTypeResolver();
-					dcsb.DataContractSurrogate = new WCFDataSerializerSurrogate();
-				}
-			}
-		}
+//		private void ApplyServiceHostBehaviours(ServiceHost host)
+//		{
+//			foreach (ServiceEndpoint endpoint in host.Description.Endpoints)
+//			{
+//				foreach (OperationDescription operation in endpoint.Contract.Operations)
+//				{
+//					DataContractSerializerOperationBehavior dcsb = operation.Behaviors.Find<DataContractSerializerOperationBehavior>();
+//					if (dcsb == null)
+//						operation.Behaviors.Add(dcsb = new MyDataContractBehaviour(operation));
+//					dcsb.DataContractResolver = new WCFTypeResolver();
+//					dcsb.DataContractSurrogate = new WCFDataSerializerSurrogate();
+//				}
+//			}
+//		}
 		
 		private static void ApplyServiceHostSettings(ServiceHost host)
 		{
