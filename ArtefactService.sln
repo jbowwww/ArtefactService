@@ -265,13 +265,6 @@ Global
 		$35.MessageStyle = $36
 		$36.LineAlign = 0
 		$35.inheritsSet = Mono
-		$0.TextStylePolicy = $37
-		$37.inheritsSet = null
-		$37.scope = application/xml
-		$0.XmlFormattingPolicy = $38
-		$38.inheritsSet = Mono
-		$38.inheritsScope = application/xml
-		$38.scope = application/xml
 		outputpath = bin
 	EndGlobalSection
 EndGlobal

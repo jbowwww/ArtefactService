@@ -12,13 +12,6 @@ using Serialize.Linq;
 using Serialize.Linq.Nodes;
 using NHibernate;
 using NHibernate.Linq;
-<<<<<<< HEAD:ArtefactService/Repository.cs
-=======
-using Serialize.Linq;
-using Serialize.Linq.Extensions;
-using Serialize.Linq.Nodes;
-using Serialize.Linq.Serializers;
->>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69:ArtefactService/ArtefactRepository.cs
 
 namespace Artefacts.Service
 {
@@ -365,7 +358,6 @@ namespace Artefacts.Service
 		/// Creates the query.
 		/// </summary>
 		/// <returns>The query identifier</returns>
-<<<<<<< HEAD:ArtefactService/Repository.cs
 		/// <param name="expression">Expression.</param>
 		public object QueryPreload(byte[] expression)	//ExpressionNode expression)
 		{
@@ -389,78 +381,6 @@ namespace Artefacts.Service
 		/// <param name="startIndex">Start index.</param>
 		/// <param name="count">Count.</param>
 		public int[] QueryResults(object queryId, int startIndex = 0, int count = -1)
-=======
-		/// <param name="binary">Binary</param>
-		/// <remarks>
-		/// // TODO: I think I just need to traverse the expression tree from en.ToExpression(),
-		/// find the expression node representing the root query from the client side (RepositoryClientProxy.Artefacts)
-		/// The expression corresponding to that node is (currently, see source in mentioned class)  method call expression
-		/// to ISession.Query<>(). As a 1st parameter (maybe.. I think..?) this will take the ISession paramter. From client side
-		/// this is probably null, initialise it to this.Session before creating the query
-		/// Do this and this shit might even work?!
-		/// 16/1/14: ^^ It appears that this may well be false - may be almost working
-		/// 17/1/14: ^^ Not quite, still have trouble with certain things, e.g. using a string variable to compare with
-		///							an artefact's member value - tries to serialize the object containing the string instance the
-		///							variable references, when I just wanted to use the string value
-		///							-	I think one way or another I will have to write code to traverse the expression trees, to prepare them when and as necessary
-		/// </remarks>
-//		public object CreateQuery(byte[] binary)
-//		{
-//			try
-//			{
-//				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
-//				if (expression.Type.GetInterface("System.Collections.IEnumerable") == null)
-//					throw new ArgumentOutOfRangeException("expression", expression, "Not IEnumerable");
-//				object queryId = expression.Id();				//.ToString();
-//				if (!QueryCache.ContainsKey(queryId))
-//				{
-//					IQueryable<Artefact> q =
-////						new NhQueryable<Artefact>(Artefacts.Provider, expression);
-////						Artefacts.Provider.Execute<IQueryable<Artefact>>(expression);
-//					Artefacts.Provider.CreateQuery<Artefact>(expression);
-//					QueryCache.Add(queryId, q);					//(Queryable<Artefact>)				// Session.Query<Artefact>().Provider.CreateQuery<Artefact>(en.ToExpression());
-//				}
-//				return queryId;
-//			}
-//			catch (Exception ex)
-//			{
-//				throw Error(ex, binary);
-//			}
-//		}
-		
-//		public int QueryCount(object queryId)
-//		{
-//			try
-//			{
-//				IQueryable<Artefact> query = QueryCache[queryId];
-//				int count = _countCache.ContainsKey(queryId) ?
-//					_countCache[queryId] :
-//					_countCache[queryId] = query.Count();
-//	//					_nhQueryProvider.Execute<int>(query.Expression);
-//				return count;
-//			}
-//			catch (Exception ex)
-//			{
-//				throw Error(ex, queryId);
-//			}
-//		}
-//		
-//		public Artefact QueryResult(object queryId)
-//		{
-//			try
-//			{
-//				IQueryable<Artefact> query = QueryCache[queryId];
-//				Artefact artefact = _nhQueryProvider.Execute<Artefact>(query.Expression);
-//				return artefact;
-//			}
-//			catch (Exception ex)
-//			{
-//				throw Error(ex, queryId);
-//			}
-//		}
-//		
-		public Artefact[] QueryResults(object queryId, int startIndex = 0, int count = -1)
->>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69:ArtefactService/ArtefactRepository.cs
 		{
 			try
 			{	
@@ -487,7 +407,6 @@ namespace Artefacts.Service
 				throw Error(ex, queryId, startIndex, count);
 			}
 		}
-<<<<<<< HEAD:ArtefactService/Repository.cs
 
 		/// <summary>
 		/// Queries the execute.
@@ -501,48 +420,11 @@ namespace Artefacts.Service
 			{
 				Expression serverSideExpression = QueryVisitor.Visit(expression.FromBinary());		// ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
 				object result = _nhQueryProvider.Execute(serverSideExpression);
-=======
-//		
-//		public object QueryMethodCall(object queryId, string methodName)//  MethodInfo method)
-//		{
-//			try
-//			{
-//				IQueryable<Artefact> query = QueryCache[queryId];
-//				string[] methodFullName = methodName.Split(':');
-//				MethodInfo method = typeof(System.Linq.Enumerable).GetMethod(methodFullName[1], new Type[] { typeof(IEnumerable<Artefact>) });
-//					//Type.GetType(methodFullName[0]).GetMethod(methodFullName[1]);
-//				object result = method.Invoke(query, new object[] { });		// currently can't use methods with parameters - need to serialize them
-//				return result;
-//			}
-//			catch (Exception ex)
-//			{
-//				throw Error(ex, queryId);
-//			}
-//		}
-		
-		public object QueryExecute(object query)
-		{
-			try
-			{
-				if (!(query is ExpressionNode))		// string))
-					throw new ArgumentOutOfRangeException("query", query, "Should be an ExpressionNode");	// JSON string");
-//				ExpressionNode en = new JsonSerializer().Deserialize<ExpressionNode>((string)query);
-//				new Serialize.Linq.Serializers.ExpressionSerializer(new JsonSerializer()).DeserializeText((string)query);
-				Expression expression = ((ExpressionNode)query).ToExpression();
-					// new JsonSerializer().Deserialize<Expression>((string)query);
-//				Expression expression = ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
-
-				object result = Artefacts.Provider.Execute(expression);
->>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69:ArtefactService/ArtefactRepository.cs
 				return result;
 			}
 			catch (Exception ex)
 			{
-<<<<<<< HEAD:ArtefactService/Repository.cs
 				throw Error(ex, expression);		// binary);
-=======
-				throw Error(ex, query);	// binary);
->>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69:ArtefactService/ArtefactRepository.cs
 			}			
 		}
 		#endregion

@@ -205,7 +205,6 @@ namespace Artefacts.Service
 		}
 		#endregion
 		
-<<<<<<< HEAD
 		#region Query methods
 		/// <summary>
 		/// Creates the query.
@@ -226,29 +225,9 @@ namespace Artefacts.Service
 		/// <param name="startIndex">Start index.</param>
 		/// <param name="count">Count.</param>
 		public int[] QueryResults(object queryId, int startIndex = 0, int count = -1)
-=======
-		#region Query methods		
-//		public object CreateQuery(byte[] binary)
-//		{
-//			return _channel.CreateQuery(binary);
-//		}
-//		
-////		public int QueryCount(object queryId)
-////		{
-////			return _channel.QueryCount(queryId);
-////		}
-////
-////		public TArtefact QueryResult(object queryId)
-////		{
-////			return _channel.QueryResult(queryId);
-////		}
-////
-		public TArtefact[] QueryResults(object queryId, int startIndex = 0, int count = -1)
->>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 		{
 			return Channel.QueryResults(queryId, startIndex, count);
 		}
-<<<<<<< HEAD
 
 		/// <summary>
 		/// Queries the execute.
@@ -258,17 +237,6 @@ namespace Artefacts.Service
 		public object QueryExecute(byte[] expression)		// ExpressionNode expression)
 		{
 			return Channel.QueryExecute(expression);		//binary);
-=======
-//
-//		public object QueryMethodCall(object queryId, string methodName)//  MethodInfo method)
-//		{
-//			return _channel.QueryMethodCall(queryId, methodName);
-//		}
-		
-		public object QueryExecute(object query)
-		{
-			return _channel.QueryExecute(query);
->>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 		}
 		#endregion
 

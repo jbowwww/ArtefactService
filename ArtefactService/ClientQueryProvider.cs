@@ -6,16 +6,10 @@ using System.Collections.Concurrent;
 using Antlr.Runtime.Tree;
 using System.Reflection;
 using System.Globalization;
-<<<<<<< HEAD
 using Serialize.Linq.Nodes;
 using Serialize.Linq.Extensions;
 using NHibernate.Mapping;
 using System.ServiceModel;
-=======
-using Serialize.Linq.Extensions;
-using Serialize.Linq.Nodes;
-using Serialize.Linq.Serializers;
->>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 
 namespace Artefacts.Service
 {
@@ -84,74 +78,10 @@ namespace Artefacts.Service
 			if (repository == null)
 				throw new ArgumentNullException("repository");
 			Repository = repository;
-<<<<<<< HEAD
 			_clientProxy = new RepositoryClientProxy(new NetTcpBinding(SecurityMode.None), "net.tcp://localhost:3334/ArtefactRepository");
 
 		}
 
-=======
-			_queryCache = new ConcurrentDictionary<object, IQueryable>();
-			_expressionVisitor = visitor ?? new ClientQueryVisitor<TArtefact>(Repository, _queryCache);	// Activator.CreateInstance<TExpressionVisitor>();
-		}
-
-		/// <summary>
-		/// Creates the query.
-		/// </summary>
-		/// <param name="expression">Expression</param>
-		/// <returns>The query</returns>
-		/// <remarks>IQueryProvider implementation</remarks>
-		public IQueryable CreateQuery(Expression expression)
-		{
-			return (IQueryable)((IQueryProvider)this).CreateQuery<TArtefact>(expression);
-		}
-
-		/// <summary>
-		/// Creates the query.
-		/// </summary>
-		/// <param name="expression">Expression.</param>
-		/// <typeparam name="TElement">The 1st type parameter.</typeparam>
-		/// <returns>The query.</returns>
-		/// <remarks>IQueryProvider implementation</remarks>
-		IQueryable<TElement> IQueryProvider.CreateQuery<TElement>(Expression expression)
-		{
-			if (expression == null)
-				throw new ArgumentNullException("expression");
-			if (!expression.IsEnumerable())
-				throw new ArgumentOutOfRangeException("expression", expression, "Should implement System.Collections.IEnumerable");
-			if (!typeof(Artefact).IsAssignableFrom(typeof(TElement)))
-				throw new ArgumentOutOfRangeException("TElement", typeof(TElement), "Should be subclass of Artefact");
-			if (_queryCache.ContainsKey(expression))
-				return (IQueryable<TElement>)_queryCache[expression];
-//			Expression newExpression = _expressionVisitor.Visit(expression);
-			IQueryable<TElement> queryable = (IQueryable<TElement>)Activator.CreateInstance(
-				typeof(Queryable<>).MakeGenericType(typeof(TElement)), this, _expressionVisitor.Visit(expression));
-//				BindingFlags.NonPublic, null,
-//				new object[] { this, expression },
-//				CultureInfo.CurrentCulture);
-			_queryCache[expression] = (IQueryable)queryable;
-			return queryable;
-			//return new Queryable<TArtefact>(this, expression);
-		}
-
-		/// <summary>
-		/// Execute the specified expression.
-		/// </summary>
-		/// <param name="expression">Expression.</param>
-		/// <returns>The query result</returns>
-		/// <remarks>IQueryProvider implementation</remarks>
-		public object Execute(Expression expression)
-		{
-//			if (expression.IsEnumerable() && typeof(TArtefact).IsAssignableFrom(expression.Type) && _queryCache.ContainsKey(expression))
-//				return _queryCache[expression];
-			if (expression.IsEnumerable())
-				throw new InvalidOperationException();
-			Expression newExpression = _expressionVisitor.Visit(expression);
-			ExpressionNode en = newExpression.ToExpressionNode();
-//			Queryable.
-//			object query = new JsonSerializer().Serialize<ExpressionNode>(en);		//.ToJson();
-			return Repository.QueryExecute(en);			//query);			//_expressionVisitor.Visit(expression).ToJson());		//.ToBinary());	
-		}
->>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
 
 	}
 }

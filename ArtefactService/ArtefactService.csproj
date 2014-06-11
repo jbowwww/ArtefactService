@@ -2,13 +2,8 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-<<<<<<< HEAD
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
-=======
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
->>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3FD32DA5-7D90-48AB-AF70-C72FF209BF78}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -55,12 +50,8 @@
     <None Include="CurrentlyUnused\QuerySerializationBinder.cs" />
     <None Include="Configuration\hibernate_server.cfg.xml" />
     <None Include="Notes\TODO.txt" />
-<<<<<<< HEAD
     <None Include="Queryable %28copy%29 - pre directly s%27able.cs" />
     <None Include="ClientQueryProvider.cs" />
-=======
-    <None Include="140530-1246-Output-ExceptionWhileSerializingMethodCallExpressionNode.txt" />
->>>>>>> d0ea7f9df1d004165eac58d862a95acb7d0dbd69
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Serialize.Linq">
