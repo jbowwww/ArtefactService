@@ -197,7 +197,7 @@ namespace Artefacts.Service
 		{
 //			using (IDisposable vmsu = new VisitationMethodStackUpdater(VisitStack, m))
 //			{
-				Expression obj = this.Visit(m.Object);
+			Expression obj = m.Object != null ? this.Visit(m.Object) : null;
 				IEnumerable<Expression> args = this.VisitExpressionList(m.Arguments);
 				if (obj != m.Object || args != m.Arguments)
 					return Expression.Call(obj, m.Method, args);

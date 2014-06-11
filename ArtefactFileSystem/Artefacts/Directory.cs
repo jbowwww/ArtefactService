@@ -34,6 +34,11 @@ namespace Artefacts.FileSystem
 			Init(new DirectoryInfo(Path), Drive.GetDrive(Path));		// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
 			return this;
 		}
+
+		public override string ToString()
+		{
+			return string.Format("[Directory: ]\n" + base.ToString().Indent());
+		}
 	}
 }
 

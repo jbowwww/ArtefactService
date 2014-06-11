@@ -18,7 +18,12 @@ namespace Artefacts
 				sb.AppendLine(so);
 			return sb.ToString();
 		}
-		
+
+		public static string Indent(this string s, string indent = "  ")
+		{
+			return string.Concat(indent, s.Replace("\n", string.Concat("\n", indent)));
+		}
+
 //		public static IDictionary<TKey, TValue> CreateDictionary<TKey, TValue>(KeyValuePair<TKey, TValue>[] initialPairs)
 //		{
 //			IDictionary<TKey, TValue> r = new Dictionary<TKey, TValue>();

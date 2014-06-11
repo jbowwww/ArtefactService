@@ -26,9 +26,26 @@ namespace Artefacts.Service
   
 		private static Expression StripQuotes(Expression e)
 		{
-			while (e.NodeType == ExpressionType.Quote)
+			while (e != null && e.NodeType == ExpressionType.Quote)
 				e = ((UnaryExpression)e).Operand;
 			return e;
+		}
+
+		public override Expression Visit(Expression exp)
+		{
+//			return exp != null ? base.Visit(StripQuotes(exp)) : null;
+			return base.Visit(StripQuotes(exp));
+		}
+		
+		protected override Expression VisitUnary(UnaryExpression u)
+		{
+
+			return base.VisitUnary((UnaryExpression)StripQuotes(u));
+		}
+
+		protected override Expression VisitConstant(ConstantExpression c)
+		{
+			return base.VisitConstant(c);
 		}
 
 		protected override Expression VisitMemberAccess(MemberExpression m)
@@ -44,7 +61,7 @@ namespace Artefacts.Service
 					(m.Expression as ConstantExpression).Value,
 					new object[] {}), m.Type);
 			}
-			return m;
+			return base.VisitMemberAccess(m);
 		}
 	}
 }

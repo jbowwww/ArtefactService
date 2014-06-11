@@ -10,6 +10,7 @@
     <RootNamespace>ArtefactClientTest</RootNamespace>
     <AssemblyName>ArtefactClientTest</AssemblyName>
     <StartupObject>ArtefactClientTest.ArtefactClientTest</StartupObject>
+    <ApplicationIcon>ArtefactClientTest</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,10 +52,6 @@
       <HintPath>..\bin\Debug\ArtefactService.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="NHibernate">
-      <HintPath>..\bin\lib\NHibernate.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -83,8 +80,13 @@
     <None Include="Outputs\140201-0707-AllQueriesAppearToBeWorking-AllTestsEnabled %28copy%29.txt" />
     <None Include="Outputs\140202-0947-FileCreatorWorkingIthink.txt" />
     <None Include="Outputs\140202-1414-CreatorWorksButRecreatesAndThenUpdatesAllDrivesForEveryFileAndDir.txt" />
+    <None Include="Resources\ArtefactClientTest.xcf" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Outputs\" />
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ArtefactClientTest.ico" />
   </ItemGroup>
 </Project>

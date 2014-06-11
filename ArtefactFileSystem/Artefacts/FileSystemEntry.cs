@@ -15,7 +15,9 @@ namespace Artefacts.FileSystem
 //			get { return Drive == null ? -1 : Drive.Id; }
 //		}
 		
-		[DataMember]
+//		[DataMember]
+//		public virtual ArtefactProxy<Drive> _Drive { get; set; }
+
 		public virtual Drive Drive { get; set; }
 
 		[DataMember]
@@ -65,6 +67,13 @@ namespace Artefacts.FileSystem
 				public override int GetHashCode()
 		{
 						return Convert.ToInt32(Path);
+		}
+
+		public override string ToString()
+		{
+			return string.Concat(string.Format(string.Concat(
+				"[FileSystemEntry: Drive=#{0} Path={1} Attributes={2} CreationTime={3} AccessTime={4} ModifyTime={5}]\n"),
+				Drive != null ? Drive.Id.HasValue ? Drive.Id.Value.ToString() : "int?" : "(null)", Path, Attributes, CreationTime, AccessTime, ModifyTime), base.ToString().Indent());
 		}
 	}
 }

@@ -104,6 +104,7 @@ namespace Artefacts
 
 		[DataMember]
 		public virtual DateTime TimeChecked { get; set; }
+
 		#endregion
 		#endregion
 		
@@ -147,7 +148,10 @@ namespace Artefacts
 		
 		public override string ToString()
 		{
-			return ArtefactFormatAttribute.GetString(this);
+//			return ArtefactFormatAttribute.GetString(this);
+			return string.Format(
+				"[Artefact: Id={0} TimeCreated={1} TimeChecked={2} TimeUpdated={3}]",
+				Id, TimeCreated, TimeChecked, TimeUpdated);
 		}
 	}
 }

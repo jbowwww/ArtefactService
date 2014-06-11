@@ -62,10 +62,13 @@ namespace ArtefactClientTest
 //				typeof(NHibernate.Linq.NhQueryable<Artefact>),
 	// shouldn't be in Artefact types, just temporary to pass it to known types in data contract serializer c'tor
 				typeof(Artefact),
-				typeof(Drive),
+			typeof(Host),
+			typeof(Directory),
+			typeof(Disk),
+			typeof(Drive),
 				typeof(FileSystemEntry),
 				typeof(File),
-				typeof(Directory)
+				
 			};
 			#endregion
 		#endregion
@@ -188,6 +191,8 @@ namespace ArtefactClientTest
 			Console.WriteLine("{0} artefacts currently in repository", _clientProxy.Artefacts.Count());
 			foreach (Artefact artefact in _clientProxy.Artefacts)
 				Console.WriteLine(artefact.ToString());
+//					string.Format("{0}: Id={1} TimeCreated={2} TimeUpdated={3} TimeChecked={4}",
+//					artefact.GetType().Name, artefact.Id, artefact.TimeCreated, artefact.TimeUpdated, artefact.TimeChecked));
 		}
 
 		[ClientTestMethod(Order=20, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ statement")]
@@ -208,14 +213,14 @@ namespace ArtefactClientTest
 				Console.WriteLine(artefact.ToString());
 		}
 
-		[ClientTestMethod(Order=5, Name="int _clientProxy.Artefacts.Count()")]
+		[ClientTestMethod(Order=50, Name="int _clientProxy.Artefacts.Count()")]
 		private static void TestQueryArtefactsDrivesCount()
 		{
 			Console.WriteLine("{0} artefacts currently in repository\n{1} drives", _clientProxy.Artefacts.Count(), _fsCreator.Drives.Count());
 
 		}
 					
-		[ClientTestMethod(Order=7, Name="FileSystemArtefactCreator")]
+		[ClientTestMethod(Order=40, Name="FileSystemArtefactCreator")]
 		private static void TestFileSystemArtefactCreator()
 		{
 			_fsCreator = new FileSystemArtefactCreator(_clientProxy)
@@ -231,11 +236,12 @@ namespace ArtefactClientTest
 			_fsCreator.Run(null);
 		}
 		#endregion
-		
+
+		/// <summary>
+		/// Init this instance.
+		/// </summary>
 		protected static void Init()
 		{
-//			Console.ReadKey();
-
 			Artefact.ArtefactTypes.AddRange(artefactTypes);
 			// Start service host thread and pause for a few seconds to ensure it has started
 			_serviceHostThread = ArtefactServiceHost.GetOrCreateAsyncThread();		//artefactTypes);
@@ -243,11 +249,14 @@ namespace ArtefactClientTest
 			Thread.Sleep(ServiceHostStartDelay);
 //						ArtefactServiceHost.Main(null);
 //						Thread.Sleep(ServiceHostStartDelay);
-
 			_clientProxy = new RepositoryClientProxy(new NetTcpBinding(), "net.tcp://localhost:3334/ArtefactRepository");
 			Console.WriteLine("\nService Artefact Repository: {0}\n", _clientProxy.ToString());
 		}
-		
+
+		/// <summary>
+		/// The entry point of the program, where the program control starts and ends.
+		/// </summary>
+		/// <param name="args">The command-line arguments.</param>
 		public static void Main(string[] args)
 		{
 			Init();

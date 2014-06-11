@@ -5,7 +5,6 @@
 	<joined-subclass name="Disk" extends="Artefacts.Artefact">
 		<key column="Id" />
 		<property name="Serial" unique="true" />
-		<many-to-one name="MostRecentHost" class="Artefacts.Host" cascade="all" />
-		<property name="DeviceName" />
+		<many-to-one name="MostRecentHost" class="Artefacts.Host" fetch="join" />
 	</joined-subclass>  
 </hibernate-mapping>

@@ -98,6 +98,9 @@ namespace Artefacts.Service
 		/// <param name="visitor">Client side <see cref="ExpressionVisitor"/> </param>
 		public RepositoryClientProxy(Binding binding, string address, ExpressionVisitor visitor = null)
 		{
+			if (Repository.Context != null)
+				throw new ApplicationException("Repository.Context != null");
+			Repository.Context = this;
 			Binding = binding;
 			Address = address;
 			ChannelFactory = new ChannelFactory<IRepository>(Binding, Address);				
@@ -280,19 +283,14 @@ namespace Artefacts.Service
 			// is used it can just supply the cheap simple identifier to the server operation in exchange for results (or maybe a
 			// similar method of returning id's only, .. .. dunno .. )
 
+			Expression parsedExpression = ExpressionVisitor.Visit(expression);
+			object id = parsedExpression.Id();
 			IQueryable query;
-			expression = ExpressionVisitor.Visit(expression);
-			object id = expression.Id();
-//			return (IQueryable<TElement>)(QueryCache.TryGetValue(id, out query) ? query : 
-//				QueryCache[id] = (IQueryable)typeof(Queryable<>).MakeGenericType(typeof(TElement))
-//					.GetConstructor(new Type[] { typeof(RepositoryClientProxy), typeof(Expression) })
-//					.Invoke(new object[] { this, expression }));
-//					// new Queryable<TElement>(this, expression);
 			if (QueryCache.TryGetValue(id, out query))
 				return (IQueryable<TElement>)query;
 			QueryCache[id] = (IQueryable)typeof(Queryable<>).MakeGenericType(typeof(TElement))
 				.GetConstructor(new Type[] { typeof(RepositoryClientProxy), typeof(Expression) })
-				.Invoke(new object[] { this, expression });
+				.Invoke(new object[] { this, parsedExpression });
 			return (IQueryable<TElement>)QueryCache[id];
 		}
 
@@ -308,8 +306,8 @@ namespace Artefacts.Service
 //				return _queryCache[expression];
 			if (expression.IsEnumerable())
 				throw new InvalidOperationException();
-//			Expression newExpression = _expressionVisitor.Visit(expression);
-			return Channel.QueryExecute(expression.ToBinary());		//.ToExpressionNode());	
+			Expression parsedExpression = ExpressionVisitor.Visit(expression);
+			return Channel.QueryExecute(parsedExpression.ToBinary());		//.ToExpressionNode());	
 		}
 
 		/// <summary>

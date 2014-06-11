@@ -129,7 +129,9 @@ namespace Artefacts.FileSystem
 				var q = from dr in Drives
 				where currentUri.LocalPath.StartsWith(dr.Label)
 				select dr;
-				Drive drive = q.First();
+				Drive drive;
+//				drive = q.FirstOrDefault();
+				drive = q.Take(1).ToArray().FirstOrDefault();
 
 				foreach (string relPath in EnumerateFiles(currentUri))
 				{

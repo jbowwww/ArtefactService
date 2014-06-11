@@ -219,9 +219,10 @@ namespace Artefacts.FileSystem
 		
 		public override string ToString()
 		{
-			return string.Format("[Drive: Partition={0} Label={1} Format={2} Type={3} Size={4} FreeSpace={5} AvailableFreeSpace={6}]\n" +
-				"\t[Artefact: Id={7}, TimeCreated={8}, TimeChecked={9}, TimeUpdated={10}]",
-				Partition, Label, Format, Type, Size, FreeSpace, AvailableFreeSpace, Id, TimeCreated, TimeChecked, TimeUpdated);
+			return string.Concat(string.Format(
+				"[Drive: Partition={0} Disk={7} Label={1} Format={2} Type={3} Size={4} FreeSpace={5} AvailableFreeSpace={6}]\n",
+				Partition, Label, Format, Type, Size, FreeSpace, AvailableFreeSpace,
+				Disk != null ? Disk.Id.HasValue ? Disk.Id.ToString() : "#idError!" : "(null)"), base.ToString().Indent());
 		}
 	}
 }

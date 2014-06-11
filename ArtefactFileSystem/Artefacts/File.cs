@@ -53,6 +53,12 @@ namespace Artefacts.FileSystem
 			Init(new FileInfo(Path), Drive.GetDrive(Path));	// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
 			return this;
 		}
+
+		public override string ToString()
+		{
+			return string.Concat(string.Format("[File: Size={0}, Name={1}, NameWithoutExtension={2}, Extension={3}]\n",
+				Size, Name, NameWithoutExtension, Extension), base.ToString().Indent());
+		}
 	}
 }
 

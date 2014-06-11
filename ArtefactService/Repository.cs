@@ -92,16 +92,25 @@ namespace Artefacts.Service
 		/// </summary>
 		/// <value>The session.</value>
 		public static ISession Session { get { return NhBootStrap.Session; } }
+
+		/// <summary>
+		/// Gets or sets the context.
+		/// </summary>
+		/// <value>The context.</value>
+		public static IRepository Context { get; set; }
 		#endregion
 		
-		#region Private/protected fields & properties
+		#region Fields & properties
+		#region Private fields
 		private Dictionary<int, Artefact> _artefactCache;
 		private Dictionary<object, int> _countCache;
 //		private Dictionary<object, QueryResult<Artefact>> _queryResultCache;
 		private ConcurrentQueue<object> _queryExecuteQueue;
 		private INhQueryProvider _nhQueryProvider;
 		private BinaryFormatter _binaryFormatter;
+		#endregion
 
+		#region Protected properties
 		/// <summary>
 		/// Gets the configuration.
 		/// </summary>
@@ -115,37 +124,54 @@ namespace Artefacts.Service
 		/// <summary>
 		/// Gets or sets the query context.
 		/// </summary>
-		protected ExpressionContext QueryContext { get; set; }
+//		protected ExpressionContext QueryContext { get; set; }
+		#endregion
+
+		#region Public properties
+		/// <summary>
+		/// Gets the query cache.
+		/// </summary>
+		public Dictionary<object, IQueryable> QueryCache { get; private set; }
 
 		/// <summary>
 		/// Gets the query next identifier.
 		/// </summary>
-		public int QueryNextId {
-			get
-			{
-				lock (_queryNextIdLock)
-				{
-					int id = _queryNextId;
-					_queryNextId++;
-					return id;
-				}
-			}
-		}
-		private int _queryNextId = 0;
-		private readonly object _queryNextIdLock = new object();
-		#endregion
+//		public int QueryNextId {
+//			get
+//			{
+//				lock (_queryNextIdLock)
+//				{
+//					int id = _queryNextId;
+//					_queryNextId++;
+//					return id;
+//				}
+//			}
+//		}
+//		private int _queryNextId = 0;
+//		private readonly object _queryNextIdLock = new object();
+
+		#region Collections/Enumerables/Queryables
+		/// <summary>
+		/// Root artefact collection
+		/// </summary>
+		/// <remarks>IRepository implementation</remarks>
+		public IQueryable<Artefact> Artefacts { get; private set; }
 
 		/// <summary>
-		/// Gets the query cache.
+		/// IQueryable root for each Type
 		/// </summary>
-		/// <value>The query cache.</value>
-		public Dictionary<object, IQueryable> QueryCache { get; private set; }
+		/// <remarks>IRepository implementation</remarks>
+		public IDictionary<Type, IQueryable> Queryables { get; private set; }
+		#endregion
+		#endregion
+		#endregion
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Artefacts.Service.ArtefactRepository"/> class.
 		/// </summary>
 		public Repository()
 		{
+			Context = this;
 			Configuration = new ArtefactServiceConfiguration();
 
 			_artefactCache = new Dictionary<int, Artefact>();
@@ -155,8 +181,7 @@ namespace Artefacts.Service
 			_nhQueryProvider = new DefaultQueryProvider(Session.GetSessionImplementation());
 			_binaryFormatter = new BinaryFormatter();
 
-			QueryContext = new ExpressionContext();
-			
+//			QueryContext = new ExpressionContext();
 
 			QueryVisitor = new ServerQueryVisitor(this);
 			QueryCache = new Dictionary<object, IQueryable>();
@@ -166,12 +191,12 @@ namespace Artefacts.Service
 			Queryables.Add(typeof(Artefact), Artefacts);
 		}
 
-		#region IRepository[Artefact] implementation		
 		#region Add/Get/Update/Remove singular artefact operations
 		/// <summary>
 		/// Add the specified artefact.
 		/// </summary>
 		/// <param name="artefact">Artefact.</param>
+		/// <remarks>IRepository implementation</remarks>
 		public int Add(Artefact artefact)
 		{
 			ITransaction transaction = null;
@@ -211,6 +236,7 @@ namespace Artefacts.Service
 		/// </summary>
 		/// <returns>The identifier.</returns>
 		/// <param name="artefact">Artefact.</param>
+		/// <remarks>IRepository implementation</remarks>
 		public int GetId(Artefact artefact)
 		{
 			try
@@ -228,12 +254,25 @@ namespace Artefacts.Service
 		/// </summary>
 		/// <returns>The by identifier.</returns>
 		/// <param name="id">Identifier.</param>
+		/// <remarks>IRepository implementation</remarks>
 		public Artefact GetById(int id)
 		{
 			try
 			{
-				return _artefactCache.ContainsKey(id) && (_artefactCache[id].UpdateAge > ArtefactUpdateAgeLimit)
-					? _artefactCache[id] : _artefactCache[id] = Session.Get<Artefact>(id);
+//				return _artefactCache.ContainsKey(id) && (_artefactCache[id].UpdateAge > ArtefactUpdateAgeLimit)
+//					? _artefactCache[id] : _artefactCache[id] = Session.Get<Artefact>(id);
+				Artefact artefact;
+				if (_artefactCache.ContainsKey(id) && _artefactCache[id].UpdateAge > ArtefactUpdateAgeLimit)
+					artefact = _artefactCache[id];
+				else
+				{
+					artefact = Session.Get<Artefact>(id);
+					_artefactCache.Add(id, artefact);
+				}
+				Type T = artefact.GetType();
+				if (artefact.Id != id)
+					throw new ApplicationException(string.Format("GetById(id={0}).Id != {0}", id));
+				return artefact;
 			}
 			catch (Exception ex)
 			{
@@ -245,6 +284,7 @@ namespace Artefacts.Service
 		/// Update the specified artefact.
 		/// </summary>
 		/// <param name="artefact">Artefact.</param>
+		/// <remarks>IRepository implementation</remarks>
 		public void Update(Artefact artefact)
 		{
 			ITransaction transaction = null;
@@ -279,6 +319,7 @@ namespace Artefacts.Service
 		/// Remove the specified artefact.
 		/// </summary>
 		/// <param name="artefact">Artefact.</param>
+		/// <remarks>IRepository implementation</remarks>
 		public void Remove(Artefact artefact)
 		{
 			ITransaction transaction = null;
@@ -311,7 +352,6 @@ namespace Artefacts.Service
 					transaction.Dispose();
 			}
 		}
-		#endregion
 		
 		#region Query methods
 		/// <summary>
@@ -349,17 +389,17 @@ namespace Artefacts.Service
 				int[] results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
 					query.Skip(startIndex) : // with a new custom server-side query provider, and implement caching??
 					query.Skip(startIndex).Take(count)).Select((a) => a.Id.Value).ToArray();
-				foreach (int artefactId in results)
-				{
-					Artefact artefact = GetById(artefactId);
-					if (_artefactCache.ContainsKey(artefactId))
-					{
-						if (_artefactCache[artefactId] != artefact)
-							_artefactCache[artefactId].CopyMembersFrom(artefact);
-					}
-					else
-						_artefactCache[artefactId] = artefact;
-				}
+//				foreach (int artefactId in results)
+//				{
+//					Artefact artefact = GetById(artefactId);
+//					if (_artefactCache.ContainsKey(artefactId))
+//					{
+//						if (_artefactCache[artefactId] != artefact)
+//							_artefactCache[artefactId].CopyMembersFrom(artefact);
+//					}
+//					else
+//						_artefactCache[artefactId] = artefact;
+//				}
 				return results;
 			}
 			catch (Exception ex)
@@ -388,21 +428,10 @@ namespace Artefacts.Service
 			}			
 		}
 		#endregion
-		
-		#region Collections/Enumerables/Queryables
-		/// <summary>
-		/// Root artefact collection
-		/// </summary>
-		public IQueryable<Artefact> Artefacts { get; private set; }
-
-		/// <summary>
-		/// IQueryable root for each Type
-		/// </summary>
-		public IDictionary<Type, IQueryable> Queryables { get; private set; }
 		#endregion
 
-		#endregion
-		
+
+
 		/// <summary>
 		/// Construct a <see cref="FaultException"/> describing the server side exception <paramref name="ex"/> for
 		/// communication to a client.

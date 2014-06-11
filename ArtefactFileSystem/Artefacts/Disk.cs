@@ -105,6 +105,13 @@ namespace Artefacts.FileSystem
 		{
 						return Convert.ToInt32(Serial);
 		}
+
+		public override string ToString()
+		{
+			return string.Concat(string.Format(
+				"[Disk: Serial={0}, MostRecentHostId={1}, MostRecentHost={2}, DeviceName={3}]\n",
+				Serial, MostRecentHostId, MostRecentHost, DeviceName), base.ToString().Indent());
+		}
 	}
 }
 
