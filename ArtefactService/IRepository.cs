@@ -31,7 +31,11 @@ namespace Artefacts.Service
 	///	object QueryExecute(byte[] binary);
 	///
 	/// </remarks>
-	[ServiceContract]
+	[ServiceContract(
+		Namespace = "http://teknowledge/Artefacts/Service/",
+		Name = "IRepository",
+		SessionMode = SessionMode.Allowed,
+		ProtectionLevel = System.Net.Security.ProtectionLevel.None)]
 //	[ServiceKnownType(typeof(Queryable<Artefact>))]
 	public interface IRepository
 	{
