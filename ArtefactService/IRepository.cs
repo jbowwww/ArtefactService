@@ -31,12 +31,11 @@ namespace Artefacts.Service
 	///	object QueryExecute(byte[] binary);
 	///
 	/// </remarks>
-	[ServiceContract(
+	[ServiceContract(Name = "IRepository",
 		Namespace = "http://teknowledge/Artefacts/Service/",
-		Name = "IRepository",
 		SessionMode = SessionMode.Allowed,
 		ProtectionLevel = System.Net.Security.ProtectionLevel.None)]
-//	[ServiceKnownType(typeof(Queryable<Artefact>))]
+	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
 	public interface IRepository
 	{
 		#region Collections/Enumerables/Queryables
@@ -116,6 +115,9 @@ namespace Artefacts.Service
 		/// <param name="expression">Expression.</param>
 		[OperationContract]
 		object QueryExecute(byte[] expression);//ExpressionNode expression);
+
+//		[OperationContract]
+//		Artefact QuerySingleResult()
 		#endregion
 	}
 }

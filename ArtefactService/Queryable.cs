@@ -171,7 +171,9 @@ namespace Artefacts.Service
 			get; private set;
 		}
 
-
+		/// <summary>
+		/// Gets the server identifier.
+		/// </summary>
 		public object ServerId {
 			get; private set;
 		}
@@ -202,19 +204,9 @@ namespace Artefacts.Service
 		/// Gets the count.
 		/// </summary>
 		public int Count {
-			get
-			{
-				
-				if (!IsUpToDate)
-					Retrieve();
-				return _count;
-			}
-			protected set
-			{
-				_count = value;
-			}
+			get { return _count < 0 ? _count = this.Count() : _count; }
 		}
-		private int _count;
+		private int _count = -1;
 
 		/// <summary>
 		/// Gets the <see cref="Artefacts.Service.Queryable`1[TArtefact]"/> at the specified index.
@@ -225,14 +217,14 @@ namespace Artefacts.Service
 			{
 				if (_resultIds == null)
 				{
-					_resultIds = Repository.QueryResults(ServerId);	//, pageStartIndex, Paging.PageSize);
+					_resultIds = Repository.Channel.QueryResults(ServerId);	//, pageStartIndex, Paging.PageSize);
 					_results = new TArtefact[_resultIds.Length];
 				}
 				if (_results[index] == null)
 				{
 //					int pageStartIndex = index - index % Paging.PageSize;
 //					_resultChunk.CopyTo(_results, pageStartIndex);
-					_results[index] = Repository.GetById(_resultIds[index]);
+					_results[index] = Repository.Channel.GetById(_resultIds[index]);
 				}
 				return _results[index];
 			}
@@ -244,7 +236,6 @@ namespace Artefacts.Service
 		/// The paging.
 		/// </summary>
 		public readonly PagingOptions Paging;
-
 		#endregion
 
 		/// <summary>
@@ -276,7 +267,7 @@ namespace Artefacts.Service
 			Expression = expression;
 			Id = expression.Id();
 			// TODO: See method remarks
-			ServerId = Repository.QueryPreload(expression.ToBinary());	//ToExpressionNode());
+			ServerId = Repository.Channel.QueryPreload(expression.ToBinary());	//ToExpressionNode());
 //			Debug.Assert(ServerId.GetType().Equals(typeof(int)) && Id.GetType().Equals(typeof(int)) && ((int)ServerId == (int)Id));
 //			if (serverId != Id)
 //				throw new Exception(string.Format("serverId != Id ({0} != {1})", serverId, Id));
@@ -295,11 +286,11 @@ namespace Artefacts.Service
 		/// <summary>
 		/// Retrieve this instance
 		/// </summary>
-		internal void Retrieve()
-		{
-			Count = this.Count<Artefact>();
-			TimeRetrieved = DateTime.Now;
-		}
+//		internal void Retrieve()
+//		{
+//			Count = this.Count<Artefact>();
+//			TimeRetrieved = DateTime.Now;
+//		}
 
 		/// <summary>
 		/// Gets the enumerator.
@@ -308,18 +299,19 @@ namespace Artefacts.Service
 		/// <remarks><see cref="System.Collections.Generic.IEnumerable[Artefact]" /> implementation</remarks>
 		public IEnumerator<TArtefact> GetEnumerator()
 		{
-			Retrieve();			// Could call here or let it get called on demand by the Count property get method
+//			Retrieve();			// Could call here or let it get called on demand by the Count property get method
+//			Count = this.Count<Artefact>();
+			TimeRetrieved = DateTime.Now;
 			return new QueryableEnumerator(this);
 		}
 		
 		/// <summary>
 		/// Gets the enumerator.
 		/// </summary>
-		/// <returns>The enumerator.</returns>
 		/// <remarks><see cref="System.Collections.IEnumerable" /> implementation</remarks>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return (IEnumerator)(this as IEnumerable<TArtefact>).GetEnumerator();
+			return (IEnumerator)GetEnumerator();
 		}
 	}
 }

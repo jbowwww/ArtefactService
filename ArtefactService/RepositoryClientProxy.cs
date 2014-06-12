@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using TextWriter=System.IO.TextWriter;
@@ -11,6 +12,7 @@ using Serialize.Linq.Nodes;
 using System.Reflection;
 using System.Diagnostics;
 using Serialize.Linq.Extensions;
+using System.Collections;
 
 namespace Artefacts.Service
 {
@@ -32,7 +34,8 @@ namespace Artefacts.Service
 	///
 	/// 
 	/// </remarks>
-	public class RepositoryClientProxy : IRepository, IQueryProvider
+	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
+	public class RepositoryClientProxy : IRepository, IOrderedQueryable<Artefact>, IQueryProvider
 	{
 		#region Fields & properties
 		#region Service channel
@@ -87,6 +90,21 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public IDictionary<Type, IQueryable> Queryables { get; private set; }
 		#endregion
+
+		#region IQueryable implementation
+		public Type ElementType {
+			get { return typeof(Artefact); }
+		}
+
+		public Expression Expression {
+			get { return _expression; }
+		}
+		private readonly Expression _expression = Expression.Parameter(typeof(IRepository), "Repository");
+
+		public IQueryProvider Provider {
+			get { return this; }
+		}
+		#endregion
 		#endregion
 		
 		#region Construction & initialisation methods
@@ -107,18 +125,14 @@ namespace Artefacts.Service
 //			ApplyChannelFactoryBehaviours(_channelFactory);
 			Channel = ChannelFactory.CreateChannel();
 
-			QueryCache = new Dictionary<object, IQueryable>();
-			ExpressionVisitor = visitor ?? new ClientQueryVisitor(this, QueryCache);
-
-			DefaultPagingOptions = new PagingOptions();
 			Queryables = new ConcurrentDictionary<Type, IQueryable>();
-			Queryables.Add(typeof(Artefact), Artefacts);
-			Artefacts = (IQueryable<Artefact>)BuildBaseQuery<Artefact>();
-
-//				IQueryable qu = (IQueryable<Artefact>) CreateQuery(
-//				Expression.PropertyOrField(
-//					Expression.Variable(typeof(IRepository), "Repository"),
-			//typeof(IQueryable<Artefact>)
+			QueryCache = new Dictionary<object, IQueryable>();
+			DefaultPagingOptions = new PagingOptions();
+			ExpressionVisitor = visitor ?? new ClientQueryVisitor(this, QueryCache);
+			Artefacts = BuildBaseQuery<Artefact>();
+				// ((IQueryProvider)this).CreateQuery<Artefact>(Expression.Property(Expression, "Artefacts"));
+				 	//(IQueryable<Artefact>)this;		//
+//			Queryables.Add(typeof(Artefact), Artefacts);
 		}
 
 		public IQueryable<TArtefact> BuildBaseQuery<TArtefact>() where TArtefact : Artefact
@@ -132,6 +146,7 @@ namespace Artefacts.Service
 					//"Query", new Type[] { typeof(TArtefact) }));
 			Queryables[typeof(TArtefact)] = g6;
 			return g6;
+//			return Artefacts.OfType<TArtefact>();
 		}
 
 		/// <summary>
@@ -240,6 +255,25 @@ namespace Artefacts.Service
 		}
 		#endregion
 
+		/// <summary>
+		/// Gets the enumerator.
+		/// </summary>
+		/// <returns>The enumerator.</returns>
+		/// <remarks><see cref="System.Collections.Generic.IEnumerable[Artefact]" /> implementation</remarks>
+		public IEnumerator<Artefact> GetEnumerator()
+		{
+			return Artefacts.GetEnumerator();
+		}
+
+		/// <summary>
+		/// Gets the enumerator.
+		/// </summary>
+		/// <remarks>IEnumerable implementation</remarks>
+		System.Collections.IEnumerator IEnumerable.GetEnumerator()
+		{
+			return (IEnumerator)GetEnumerator();
+		}
+
 		#region IQueryProvider implementation
 		/// <summary>
 		/// Creates the query.
@@ -312,9 +346,50 @@ namespace Artefacts.Service
 		{
 //			if (expression.IsEnumerable() && typeof(TArtefact).IsAssignableFrom(expression.Type) && _queryCache.ContainsKey(expression))
 //				return _queryCache[expression];
-			if (expression.IsEnumerable())
-				throw new InvalidOperationException();
+//			if (expression.IsEnumerable())
+//				throw new InvalidOperationException();
+
+			if (typeof(Artefact).IsAssignableFrom(expression.Type) && expression.IsMethodCallExpression())
+			{
+				MethodCallExpression mce = (MethodCallExpression)expression;
+				Expression instanceExp = mce.Object ?? (mce.Arguments.Count > 0 ? mce.Arguments[0] : null);
+				if (instanceExp != null && instanceExp.IsQueryable())
+				{
+					int[] r = Channel.QueryResults(Channel.QueryPreload(ExpressionVisitor.Visit(instanceExp).ToBinary()));
+					string methodName = mce.Method.Name;
+					if (methodName.Equals("First"))
+					{
+						if (r.Length == 0)
+							throw new IndexOutOfRangeException("First() method callled on empty array");
+						return Channel.GetById(r[0]);
+					}
+					else if (methodName.Equals("FirstOrDefault"))
+						return r.Length == 0 ? null : Channel.GetById(r[0]);
+					if (methodName.Equals("Last"))
+					{
+						if (r.Length == 0)
+							throw new IndexOutOfRangeException("Last() method callled on empty array");
+						return Channel.GetById(r[r.Length - 1]);
+					}
+					else if (methodName.Equals("LastOrDefault"))
+						return r.Length == 0 ? null : Channel.GetById(r[r.Length - 1]);
+					else
+						throw new NotSupportedException("Method \"" + methodName + "\" not supported");
+				}
+
+//					IEnumerable<Artefact> enumerable = ((IQueryable)(Execute(instanceExp))).Cast<Artefact>().ToList();
+//					return enumerable.AsQueryable().Provider.Execute(Expression.Call(mce.Method, Expression.Constant(enumerable.AsQueryable())));
+//				}
+					
+//				{
+//					IQueryable q = QueryCache[mce.Object.Id()];
+//					 QueryCache[mce.Object.Id()].Cast<Artefact>().AsEnumerable()
+//
+//				}
+			}
+
 			Expression parsedExpression = ExpressionVisitor.Visit(expression);
+
 			return !typeof(Artefact).IsAssignableFrom(parsedExpression.Type) ||
 				parsedExpression.NodeType != ExpressionType.Constant ?
 					Channel.QueryExecute(parsedExpression.ToBinary())

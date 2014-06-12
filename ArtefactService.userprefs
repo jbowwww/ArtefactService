@@ -1,16 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/ClientQueryVisitor.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/RepositoryClientProxy.cs">
     <Files>
-      <File FileName="ArtefactServiceHost/ServiceHost.cs" Line="1" Column="1" />
-      <File FileName="ArtefactService/IRepository.cs" Line="1" Column="1" />
-      <File FileName="ArtefactFileSystem/Artefacts/Disk.cs" Line="1" Column="1" />
-      <File FileName="ArtefactFileSystem/Client/FileSystemArtefactCreator.cs" Line="138" Column="77" />
-      <File FileName="ArtefactClientTest/ClientTest.cs" Line="234" Column="1" />
-      <File FileName="ArtefactService/RepositoryClientProxy.cs" Line="306" Column="6" />
-      <File FileName="ArtefactService/Extensions/Expression.cs" Line="56" Column="1" />
-      <File FileName="ArtefactService/Repository.cs" Line="194" Column="3" />
-      <File FileName="ArtefactService/ClientQueryVisitor.cs" Line="75" Column="4" />
+      <File FileName="ArtefactService/IRepository.cs" Line="39" Column="30" />
+      <File FileName="ArtefactService/Repository.cs" Line="149" Column="22" />
+      <File FileName="ArtefactService/RepositoryClientProxy.cs" Line="301" Column="33" />
+      <File FileName="ArtefactService/Queryable.cs" Line="96" Column="3" />
+      <File FileName="ArtefactService/Queryable (copy) - pre directly s'able.cs" Line="242" Column="25" />
+      <File FileName="ArtefactFileSystem/Client/FileSystemArtefactCreator.cs" Line="19" Column="3" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -21,17 +18,14 @@
           <Node name="ArtefactFileSystem" expanded="True">
             <Node name="Client" expanded="True" />
           </Node>
+          <Node name="Artefacts" selected="True" />
           <Node name="ArtefactService" expanded="True">
             <Node name="Extensions" expanded="True" />
-            <Node name="ClientQueryVisitor.cs" selected="True" />
           </Node>
         </State>
       </Pad>
       <Pad Id="ClassPad">
         <State expanded="True" selected="True" />
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

@@ -26,12 +26,17 @@ namespace Artefacts
 		public static List<Type> ArtefactTypes {
 			get { return _artefactTypes != null ? _artefactTypes : _artefactTypes = new List<Type>(); }
 		}
-		
+
+		public static Type[] GetArtefactTypes()
+		{
+			return GetArtefactTypes(null);
+		}
+
 		/// <summary>
 		/// Returns the <see cref="Artefact"/> stored in <see cref="ArtefactTypes"/>.
 		/// Called by WCF services' <see cref="DataContractResolver"/> as a KnownType or ServiceKnownType
 		/// </summary>
-		public static Type[] GetArtefactTypes()
+		public static Type[] GetArtefactTypes(ICustomAttributeProvider provider = null)
 		{
 			Type[] artefactTypes = new Type[ArtefactTypes.Count];
 			ArtefactTypes.CopyTo(artefactTypes, 0);

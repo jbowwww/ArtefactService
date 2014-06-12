@@ -21,6 +21,11 @@ namespace Artefacts.Service
 			return typeof(IEnumerable).IsAssignableFrom(e.Type);
 		}
 		
+		public static bool IsQueryable(this Expression e)
+		{
+			return typeof(IQueryable).IsAssignableFrom(e.Type);
+		}
+
 		public static Type GetElementType(this Expression e)
 		{
 			return e.GetType().GetElementType();
@@ -30,7 +35,7 @@ namespace Artefacts.Service
 		{
 			return e.NodeType == ExpressionType.Call;
 		}
-		
+
 		public static TExpression As<TExpression>(this Expression e)
 			where TExpression : Expression
 		{

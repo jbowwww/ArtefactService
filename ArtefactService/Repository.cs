@@ -23,18 +23,19 @@ namespace Artefacts.Service
 	/// 		be constructed using MemberExpressions referring to <see cref="IRepository"/>  ??
 	/// 
 	///	-	Removed parameters of <see cref="ServiceBehaviourAttribute"/>:
-	///			MaxItemsInObjectGraph=100,
-	///			ReleaseServiceInstanceOnTransactionComplete=false)]
+	///			//			AddressFilterMode = add,
+	///			ConfigurationName = "",
+	///			IgnoreExtensionDataObject = true,
+	///			MaxItemsInObjectGraph = 0, 
+	///			Namespace = "", Name = "",
+	///			ReleaseServiceInstanceOnTransactionComplete = false,
+	///			TransactionAutoCompleteOnSessionClose = false,
+	///			TransactionTimeout = "",
+	///			UseSynchronizationContext = true,
+	///			ValidateMustUnderstand = false,
 	/// 
 	/// 	- Removed experimental member method operation definitions:
-	/// 		/// <summary>
-	/// Create a query (serialized using binary formatter)
-	/// </summary>
-	/// <returns>The query identifier</returns>
-	/// <param name="binary">Binary</param>
-	/// <remarks>
 	/// 
-	/// </remarks>
 	///		public object CreateQuery(byte[] binary)
 	///		{
 	///			try
@@ -71,7 +72,8 @@ namespace Artefacts.Service
 	/// </remarks>
 	[ServiceBehavior(IncludeExceptionDetailInFaults=true,
 		InstanceContextMode=InstanceContextMode.Single,
-		ConcurrencyMode=ConcurrencyMode.Single)]
+		ConcurrencyMode=ConcurrencyMode.Multiple)]
+	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
 	public class Repository : IRepository
 	{		
 		#region Static members
@@ -99,8 +101,7 @@ namespace Artefacts.Service
 		/// <value>The context.</value>
 		public static IRepository Context { get; set; }
 		#endregion
-		
-		#region Fields & properties
+
 		#region Private fields
 		private Dictionary<int, Artefact> _artefactCache;
 		private Dictionary<object, int> _countCache;
@@ -110,21 +111,16 @@ namespace Artefacts.Service
 		private BinaryFormatter _binaryFormatter;
 		#endregion
 
-		#region Protected properties
+		#region Protected fields
 		/// <summary>
 		/// Gets the configuration.
 		/// </summary>
-		protected ArtefactServiceConfiguration Configuration { get; private set; }
+		protected readonly ArtefactServiceConfiguration Configuration;
 
 		/// <summary>
 		/// Gets or sets the query visitor.
 		/// </summary>
-		protected ExpressionVisitor QueryVisitor { get; set; }
-
-		/// <summary>
-		/// Gets or sets the query context.
-		/// </summary>
-//		protected ExpressionContext QueryContext { get; set; }
+		protected ExpressionVisitor QueryVisitor;
 		#endregion
 
 		#region Public properties
@@ -132,23 +128,6 @@ namespace Artefacts.Service
 		/// Gets the query cache.
 		/// </summary>
 		public Dictionary<object, IQueryable> QueryCache { get; private set; }
-
-		/// <summary>
-		/// Gets the query next identifier.
-		/// </summary>
-//		public int QueryNextId {
-//			get
-//			{
-//				lock (_queryNextIdLock)
-//				{
-//					int id = _queryNextId;
-//					_queryNextId++;
-//					return id;
-//				}
-//			}
-//		}
-//		private int _queryNextId = 0;
-//		private readonly object _queryNextIdLock = new object();
 
 		#region Collections/Enumerables/Queryables
 		/// <summary>
@@ -164,7 +143,6 @@ namespace Artefacts.Service
 		public IDictionary<Type, IQueryable> Queryables { get; private set; }
 		#endregion
 		#endregion
-		#endregion
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Artefacts.Service.ArtefactRepository"/> class.
@@ -172,7 +150,6 @@ namespace Artefacts.Service
 		public Repository()
 		{
 			Context = this;
-			Configuration = new ArtefactServiceConfiguration();
 
 			_artefactCache = new Dictionary<int, Artefact>();
 			_countCache = new Dictionary<object, int>();
@@ -181,11 +158,9 @@ namespace Artefacts.Service
 			_nhQueryProvider = new DefaultQueryProvider(Session.GetSessionImplementation());
 			_binaryFormatter = new BinaryFormatter();
 
-//			QueryContext = new ExpressionContext();
-
+			Configuration = new ArtefactServiceConfiguration();
 			QueryVisitor = new ServerQueryVisitor(this);
 			QueryCache = new Dictionary<object, IQueryable>();
-
 			Artefacts = Session.Query<Artefact>();
 			Queryables = new ConcurrentDictionary<Type, IQueryable>();
 			Queryables.Add(typeof(Artefact), Artefacts);
@@ -262,16 +237,14 @@ namespace Artefacts.Service
 //				return _artefactCache.ContainsKey(id) && (_artefactCache[id].UpdateAge > ArtefactUpdateAgeLimit)
 //					? _artefactCache[id] : _artefactCache[id] = Session.Get<Artefact>(id);
 				Artefact artefact;
-				if (_artefactCache.ContainsKey(id) && _artefactCache[id].UpdateAge > ArtefactUpdateAgeLimit)
+				if (_artefactCache.ContainsKey(id) && _artefactCache[id].UpdateAge < ArtefactUpdateAgeLimit)
 					artefact = _artefactCache[id];
 				else
-				{
-					artefact = Session.Get<Artefact>(id);
-					_artefactCache.Add(id, artefact);
-				}
-				Type T = artefact.GetType();
+					artefact = _artefactCache[id] = Session.Get<Artefact>(id);
+					
 				if (artefact.Id != id)
 					throw new ApplicationException(string.Format("GetById(id={0}).Id != {0}", id));
+//				Type T = artefact.GetType();
 				return artefact;
 			}
 			catch (Exception ex)
