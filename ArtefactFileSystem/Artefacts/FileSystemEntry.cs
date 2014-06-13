@@ -61,7 +61,7 @@ namespace Artefacts.FileSystem
 			if (!base.Equals(obj))
 				return false;
 			FileSystemEntry fse = (FileSystemEntry)obj;
-			return Drive == fse.Drive && Path == fse.Path;
+			return /*Drive == fse.Drive && */ Path == fse.Path;
 		}
 
 				public override int GetHashCode()

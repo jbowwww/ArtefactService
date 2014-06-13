@@ -1,36 +1,18 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/RepositoryClientProxy.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="ArtefactService/Repository.cs">
     <Files>
-      <File FileName="ArtefactService/IRepository.cs" Line="39" Column="30" />
-      <File FileName="ArtefactService/Repository.cs" Line="149" Column="22" />
-      <File FileName="ArtefactService/RepositoryClientProxy.cs" Line="301" Column="33" />
-      <File FileName="ArtefactService/Queryable.cs" Line="96" Column="3" />
-      <File FileName="ArtefactService/Queryable (copy) - pre directly s'able.cs" Line="242" Column="25" />
-      <File FileName="ArtefactFileSystem/Client/FileSystemArtefactCreator.cs" Line="19" Column="3" />
+      <File FileName="ArtefactService/Repository.cs" Line="377" Column="1" />
+      <File FileName="ArtefactClientTest/ClientTest.cs" Line="219" Column="124" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="ArtefactClientTest" expanded="True">
-            <Node name="References" expanded="True" />
-          </Node>
-          <Node name="ArtefactFileSystem" expanded="True">
-            <Node name="Client" expanded="True" />
-          </Node>
-          <Node name="Artefacts" selected="True" />
-          <Node name="ArtefactService" expanded="True">
-            <Node name="Extensions" expanded="True" />
-          </Node>
-        </State>
-      </Pad>
-      <Pad Id="ClassPad">
-        <State expanded="True" selected="True" />
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactService/Repository.cs" line="381" column="1" />
+      <Breakpoint file="/home/jk/Code/Projects/NET/ArtefactService/ArtefactService/Repository.cs" line="362" column="1" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="ArtefactService/Repository.cs" line="240" offsetX="1253" offsetY="1400" expression="_artefactCache" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
 </Properties>
