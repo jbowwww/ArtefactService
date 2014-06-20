@@ -119,7 +119,8 @@ namespace Artefacts.FileSystem
 			Drive.Repository = Repository;
 			int recursionDepth = -1;
 			Queue<Uri> subDirectories = new Queue<Uri>(new Uri[] { BaseUri });
-			Disk[] Disks = Disk.Disks.ToArray();
+//			Disk[] Disks = Disk.Disks.ToArray();
+			// TODO: Move code executed by calling Disk.Disks into here
 
 			// Recurse subdirectories
 			while (subDirectories.Count > 0)
