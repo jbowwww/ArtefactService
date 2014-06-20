@@ -121,6 +121,8 @@ namespace ArtefactClientTest
 			{
 				output.WriteLine(_runTestFormatError, name);
 				output.WriteLine(_runTestFormatException, ex.GetType().FullName, ex.Message, ex.StackTrace);
+				foreach (DictionaryEntry de in ex.Data)
+					output.Write("\t{0} = {1}\n", de.Key.ToString(), de.Value.ToString());
 				int indent = 0;
 				for (ExceptionDetail detail = ex.Detail; detail != null; detail = detail.InnerException)
 					output.WriteLine(string.Concat(" ------ Inner Exception ------\n",
@@ -131,6 +133,8 @@ namespace ArtefactClientTest
 			{
 				output.WriteLine(_runTestFormatError, name);
 				output.WriteLine(_runTestFormatException, ex.GetType().FullName, ex.Message, ex.StackTrace);
+				foreach (DictionaryEntry de in ex.Data)
+					output.Write("\t{0} = {1}\n", de.Key.ToString(), de.Value.ToString());
 				int indent = 0;
 				for (Exception innerEx = ex.InnerException; innerEx != null; innerEx = innerEx.InnerException)
 					output.WriteLine(string.Concat("\n ------ Inner Exception ------\n",
@@ -159,6 +163,8 @@ namespace ArtefactClientTest
 			{
 				output.WriteLine(_runTestFormatError, name);
 				output.WriteLine(_runTestFormatException, ex.GetType().FullName, ex.Message, ex.StackTrace);
+				foreach (DictionaryEntry de in ex.Data)
+					output.Write("\t{0} = {1}\n", de.Key.ToString(), de.Value.ToString());
 				int indent = 0;
 				for (ExceptionDetail detail = ex.Detail; detail != null; detail = detail.InnerException)
 					output.WriteLine(string.Concat(" ------ Inner Exception ------\n",
@@ -170,6 +176,8 @@ namespace ArtefactClientTest
 			{
 				output.WriteLine(_runTestFormatError, name);
 				output.WriteLine(_runTestFormatException, ex.GetType().FullName, ex.Message, ex.StackTrace);
+				foreach (DictionaryEntry de in ex.Data)
+					output.Write("\t{0} = {1}\n", de.Key.ToString(), de.Value.ToString());
 				int indent = 0;
 				for (Exception innerEx = ex.InnerException; innerEx != null; innerEx = innerEx.InnerException)
 					output.WriteLine(string.Concat("\n ------ Inner Exception ------\n",

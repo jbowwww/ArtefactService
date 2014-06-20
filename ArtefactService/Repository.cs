@@ -335,14 +335,26 @@ namespace Artefacts.Service
 		/// <param name="expression">Expression.</param>
 		public object QueryPreload(byte[] expression)	//ExpressionNode expression)
 		{
-			Expression e = expression.FromBinary();
-			object serverId = e.Id(); //QueryNextId;
-			if (!QueryCache.ContainsKey(serverId))
+			Expression serverSideExpression = null;
+			object serverId = null;
+			IQueryable serverSideQuery = null;
+			try
 			{
-				Expression serverSideExpression = QueryVisitor.Visit(e);
-				IQueryable serverSideQuery = _nhQueryProvider.CreateQuery(serverSideExpression);
-				
-				QueryCache[serverId] = serverSideQuery;
+				serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
+				serverId = serverSideExpression.Id();
+				if (!QueryCache.ContainsKey(serverId))
+				{
+					serverSideQuery = _nhQueryProvider.CreateQuery(serverSideExpression);				
+					QueryCache[serverId] = serverSideQuery;
+				}
+			}
+			catch (Exception ex)
+			{
+				FaultException fEx = Error(ex);
+				fEx.Data.Add("serverSideExpression", expression.NodeFromBinary().ToString());// serverSideExpression.ToString());
+				fEx.Data.Add("serverId", serverId.ToString());
+				fEx.Data.Add("serverSideQuery", serverSideQuery.ToString());
+				throw fEx;
 			}
 			return serverId;
 		}
@@ -356,13 +368,14 @@ namespace Artefacts.Service
 		/// <param name="count">Count.</param>
 		public int[] QueryResults(object queryId, int startIndex = 0, int count = -1)
 		{
+			IQueryable<Artefact> serverSideQuery = null;
+			int[] results = null;
 			try
-			{	
-//				Debug.Assert(QueryCache.ContainsKey(queryId))
-				IQueryable<Artefact> query = (IQueryable<Artefact>)QueryCache[queryId];
-				int[] results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
-					query.Skip(startIndex) : // with a new custom server-side query provider, and implement caching??
-					query.Skip(startIndex).Take(count)).Select((a) => a.Id.Value).ToArray();
+			{
+				serverSideQuery = (IQueryable<Artefact>)QueryCache[queryId];
+				results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
+					serverSideQuery.Skip(startIndex) : // with a new custom server-side query provider, and implement caching??
+					serverSideQuery.Skip(startIndex).Take(count)).Select((a) => a.Id.Value).ToArray();
 //				foreach (int artefactId in results)
 //				{
 //					Artefact artefact = GetById(artefactId);
@@ -378,7 +391,13 @@ namespace Artefacts.Service
 			}
 			catch (Exception ex)
 			{
-				throw Error(ex, queryId, startIndex, count);
+				FaultException fEx = Error(ex);
+				fEx.Data.Add("queryId", queryId.ToString());
+				fEx.Data.Add("startIndex", startIndex.ToString());
+				fEx.Data.Add("count", count.ToString());
+				fEx.Data.Add("serverSideQuery", serverSideQuery.ToString());
+				fEx.Data.Add("results", results.ToString());
+				throw fEx;
 			}
 		}
 
@@ -388,17 +407,22 @@ namespace Artefacts.Service
 		/// <returns>The execute.</returns>
 		/// <param name="binary">Binary.</param>
 		/// <param name="expression">Expression</param>
-		public object QueryExecute(byte[] expression)		//ExpressionNode expression)		//byte[] binary)
+		public object QueryExecute(byte[] expression)
 		{
+			Expression serverSideExpression = null;
+			object result = null;
 			try
 			{
-				Expression serverSideExpression = QueryVisitor.Visit(expression.FromBinary());		// ((ExpressionNode)_binaryFormatter.Deserialize(new System.IO.MemoryStream(binary))).ToExpression();
-				object result = _nhQueryProvider.Execute(serverSideExpression);
+				serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
+				result = _nhQueryProvider.Execute(serverSideExpression);
 				return result;
 			}
 			catch (Exception ex)
 			{
-				throw Error(ex, expression);		// binary);
+				FaultException fEx = Error(ex);
+				fEx.Data.Add("serverSideExpression", expression.NodeFromBinary().ToString());// serverSideExpression.ToString());
+				fEx.Data.Add("result", result.ToString());
+				throw fEx;
 			}			
 		}
 		#endregion
@@ -420,13 +444,16 @@ namespace Artefacts.Service
 		{
 			StackFrame errorFrame = new StackFrame(1, true);
 			MethodBase mb = errorFrame.GetMethod();
-			ParameterInfo[] pi = errorFrame.GetMethod().GetParameters();
+			MethodBody methodBody = mb.GetMethodBody();
+//			ParameterInfo[] pi = mb.GetParameters();
 			StringBuilder action = new StringBuilder();
 			action.AppendFormat("{0}:{1}.{2}(", mb.DeclaringType.Assembly.GetName().Name, mb.DeclaringType.FullName, mb.Name);
-			for (int i = 0; i < pi.Length; i++)
-				action.AppendFormat("\n\t{0}={1}{2}{3}", pi[i].Name, details[i].ToString().Contains('\n') ? "\n\t  " : "",
-					details[i].ToString().Replace("\n", "\n\t  "), i == pi.Length - 1 ? "" : ",");
-			action.AppendFormat("){0}[{1}:{2},{3}]:\n{4}: {5}\n{6}\n", pi.Length > 0 ? "\n" : " ",
+//			for (int i = 0; i < pi.Length; i++)
+//				action.AppendFormat("\n\t{0}={1}{2}{3}", pi[i].Name, details[i].ToString().Contains('\n') ? "\n\t  " : "",
+//					details[i].ToString().Replace("\n", "\n\t  "), i == pi.Length - 1 && methodBody.LocalVariables.Count == 0 ? "" : ",");
+			foreach (LocalVariableInfo lvInfo in methodBody.LocalVariables)
+				action.AppendFormat("\n\t{0}", lvInfo.ToString());
+			action.AppendFormat("){0}[{1}:{2},{3}]:\n{4}: {5}\n{6}\n", /*pi.Length > 0 ?*/ "\n", // : " ",
 				errorFrame.GetFileName(), errorFrame.GetFileLineNumber(), errorFrame.GetFileColumnNumber(),
 				ex.GetType().FullName, ex.Message, ex.StackTrace);
 			string actionStr = action.ToString();

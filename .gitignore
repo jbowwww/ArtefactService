@@ -1,10 +1,20 @@
 #
+# MonoDevelop workspace, solution, project, userprefs files
+#
+
+*.mdw
+*.sln
+*.csproj
+*.userprefs
+
+#
 # Binary output files
 #
 */[Bb]in
 */[Oo]bj
+*.exe
 *.dll
-*.dll.mdb
+*.mdb
 
 #
 # Not sure exactly what these are but not needed

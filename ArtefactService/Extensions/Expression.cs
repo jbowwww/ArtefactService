@@ -71,6 +71,16 @@ namespace Artefacts.Service
 			return binaryExpression;
 		}
 
+		public static ExpressionNode NodeFromBinary(this byte[] eBinary, BinaryFormatter bf)
+		{
+			return (ExpressionNode)bf.Deserialize(new System.IO.MemoryStream(eBinary));
+		}
+
+		public static ExpressionNode NodeFromBinary(this byte[] eBinary)
+		{
+			return NodeFromBinary(eBinary, _bf);
+		}
+
 		public static Expression FromBinary(this byte[] eBinary)
 		{
 			return FromBinary(eBinary, _bf);
@@ -78,7 +88,7 @@ namespace Artefacts.Service
 
 		public static Expression FromBinary(this byte[] eBinary, BinaryFormatter bf)
 		{
-			ExpressionNode en = (ExpressionNode)bf.Deserialize(new System.IO.MemoryStream(eBinary));
+			ExpressionNode en = eBinary.NodeFromBinary(bf);
 			Expression expression = en.ToExpression();
 			return expression;
 		}
