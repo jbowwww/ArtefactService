@@ -1,8 +1,8 @@
 using System;
 
-namespace ArtefactClientTest
+namespace Artefacts.TestClient
 {
-	[AttributeUsage(AttributeTargets.Method)]
+	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor)]
 	public class ClientTestMethodAttribute : Attribute
 	{
 		public string Name { get; set; }

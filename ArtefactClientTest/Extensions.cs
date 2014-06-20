@@ -1,6 +1,6 @@
 using System;
 
-namespace ArtefactClientTest
+namespace Artefacts.TestClient
 {
 	public static class Extensions
 	{
