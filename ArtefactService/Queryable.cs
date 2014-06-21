@@ -241,7 +241,7 @@ namespace Artefacts.Service
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Artefacts.Service.Queryable"/> class.
 		/// </summary>
-		/// <param name="provider">Provider.</param>
+		/// <param name="repository">Provider.</param>
 		/// <param name="expression">Expression.</param>
 		/// <remarks>
 		/// 	-	When a queryable is created it has a known expression. Logically this should be sent to server

@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.ServiceModel;
 using System.Reflection;
 using Artefacts.Service;
+using System.Diagnostics;
 
 namespace Artefacts.FileSystem
 {
@@ -82,7 +83,6 @@ namespace Artefacts.FileSystem
 			Repository = repository;
 
 			FileEntries = Repository.BuildBaseQuery<FileSystemEntry>();
-
 			Files = Repository.BuildBaseQuery<File>();
 			Directories = Repository.BuildBaseQuery<Directory>();
 			Drives = Repository.BuildBaseQuery<Drive>();
@@ -119,20 +119,15 @@ namespace Artefacts.FileSystem
 			Drive.Repository = Repository;
 			int recursionDepth = -1;
 			Queue<Uri> subDirectories = new Queue<Uri>(new Uri[] { BaseUri });
-//			Disk[] Disks = Disk.Disks.ToArray();
+//			Disk[] Disks = EnumerateDisks(Host.Current).ToArray();
 			// TODO: Move code executed by calling Disk.Disks into here
 
 			// Recurse subdirectories
 			while (subDirectories.Count > 0)
 			{
 				Uri currentUri = subDirectories.Dequeue();
-//				Drive drive = Drives.FirstOrDefault((d) => currentUri.LocalPath.StartsWith(d.Label));
-				var q = from dr in Drives
-				where currentUri.LocalPath.StartsWith(dr.Label)
-				select dr;
-				Drive drive;
-//				drive = q.FirstOrDefault();
-				drive = q.FirstOrDefault();		// This only doesn't work because my queyr provider executes it using a repository query method (QueryExecute)
+				Drive drive = Drives.FirstOrDefault((dr) => currentUri.LocalPath.StartsWith(dr.Label));
+						// This only doesn't work because my queyr provider executes it using a repository query method (QueryExecute)
 				// that has return type of object, and should only be used for scalar results. (It does not have any artefact KnownType's)
 				// for method calls like FirstOrDefault() that produce an Artefact, you
 				// will need to find some way of detecting that return value, and running the method call expression's argument[0] expression as a query, to
@@ -145,7 +140,7 @@ namespace Artefacts.FileSystem
 					if (file == null)
 						Repository.Add(new File(absPath));
 					else
-						Repository.Update(file.Update());
+						Repository.Update(file);//.Update());
 				}
 
 				if (RecursionLimit < 0 || ++recursionDepth < RecursionLimit)
@@ -153,6 +148,8 @@ namespace Artefacts.FileSystem
 					foreach (string relPath in EnumerateDirectories(currentUri))
 					{
 						string absPath = Path.Combine(currentUri.LocalPath, relPath);
+						
+						// TODO: !! This is what is causing the NotSupportedException for GetType(), somehow..?
 						Directory dir = Directories.FirstOrDefault((d) => d.Path == absPath);
 						if (dir == null)
 							Repository.Add(new Directory(new System.IO.DirectoryInfo(absPath), drive));
@@ -173,11 +170,25 @@ namespace Artefacts.FileSystem
 		#endregion
 
 		#region Overridable file system entry  (files and directories) enumerators
-		public virtual IEnumerable<string> EnumerateFiles(Uri uri)
+		public virtual IEnumerable<Disk> EnumerateDisks(Host host)
 		{
-			if (!uri.IsFile)
-				throw new NotImplementedException("Only URIs with a file schema are currently supported");
-			return System.IO.Directory.EnumerateFiles(uri.LocalPath, "*", SearchOption.TopDirectoryOnly);
+				List<Disk> disks = new List<Disk>();
+				Process lsblkProcess = Process.Start(
+						new ProcessStartInfo("lsblk")
+						{
+								RedirectStandardOutput = true,
+								RedirectStandardError = true,
+								UseShellExecute = false,
+						});
+				lsblkProcess.WaitForExit(1600);
+				string lsblkOutput;
+				while (!string.IsNullOrEmpty(lsblkOutput = lsblkProcess.StandardOutput.ReadLine()))
+				{
+						string[] tokens = lsblkOutput.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+						if (lsblkOutput.Contains("disk"))
+							disks.Add(new Disk(tokens[0], host));
+				}
+				return disks;
 		}
 
 		public virtual IEnumerable<string> EnumerateDirectories(Uri uri)
@@ -185,6 +196,13 @@ namespace Artefacts.FileSystem
 			if (!uri.IsFile)
 				throw new NotImplementedException("Only URIs with a file schema are currently supported");
 			return System.IO.Directory.EnumerateDirectories(uri.LocalPath, "*", SearchOption.TopDirectoryOnly);
+		}
+		
+		public virtual IEnumerable<string> EnumerateFiles(Uri uri)
+		{
+			if (!uri.IsFile)
+				throw new NotImplementedException("Only URIs with a file schema are currently supported");
+			return System.IO.Directory.EnumerateFiles(uri.LocalPath, "*", SearchOption.TopDirectoryOnly);
 		}
 		#endregion
 	}

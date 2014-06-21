@@ -142,7 +142,7 @@ namespace Artefacts.TestClient
 		/// <summary>
 		/// Queries all artefacts.
 		/// </summary>
-		[Test, ClientTestMethod(Order=10)]		//, Name="IQueryable<Artefact> _clientProxy.Artefacts")]
+		[Test, ClientTestMethod(Order=10, Name="IQueryable<Artefact> _clientProxy.Artefacts")]
 		public void QueryAllArtefacts()
 		{
 			Console.WriteLine("{0} artefacts currently in repository", _clientProxy.Artefacts.Count());
@@ -155,7 +155,7 @@ namespace Artefacts.TestClient
 		/// <summary>
 		/// Tests the query artefacts_ linq_ statement.
 		/// </summary>
-		[Test, ClientTestMethod(Order=20)]		//, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ statement")]
+		[Test, ClientTestMethod(Order=20, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ statement")]
 		public void TestQueryArtefacts_Linq_Statement()
 		{
 			var q = from a in _clientProxy.Artefacts
@@ -165,7 +165,10 @@ namespace Artefacts.TestClient
 				Console.WriteLine(artefact.ToString());
 		}
 
-		[Test, ClientTestMethod(Order=30)]		//, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ method syntax")]
+		/// <summary>
+		/// Tests the query artefacts_ linq_ method.
+		/// </summary>
+		[Test, ClientTestMethod(Order=30, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ method syntax")]
 		public void TestQueryArtefacts_Linq_Method()
 		{
 			var q = _clientProxy.Artefacts.Where((a) => a.Id > 32799);
@@ -173,7 +176,7 @@ namespace Artefacts.TestClient
 				Console.WriteLine(artefact.ToString());
 		}
 
-		[Test, ClientTestMethod(Order=50)]		//, Name="int _clientProxy.Artefacts.Count()")]
+		[Test, ClientTestMethod(Order=50, Name="int _clientProxy.Artefacts.Count()")]
 		public void TestQueryArtefactsDrivesCount()
 		{
 			Console.WriteLine("{0} artefacts currently in repository\n{1} drives",
@@ -183,13 +186,13 @@ namespace Artefacts.TestClient
 		/// <summary>
 		/// Tests the file system artefact creator.
 		/// </summary>
-		[Test, ClientTestMethod(Order=40)]		//, Name="FileSystemArtefactCreator")]
+		[Test, ClientTestMethod(Order=40, Name="FileSystemArtefactCreator")]
 		public void TestFileSystemArtefactCreator()
 		{
 			Console.WriteLine("{0} artefacts currently in repository\n{1} drives", _clientProxy.Artefacts.Count(), _fsCreator.Drives.Count());
 //				var q = _fsCreator.Drives.Where((a) => a.Id > 32799);
 			//a.GetType().FullName == typeof(Drive).FullName && 
-			foreach (Artefact artefact in _fsCreator.Drives)
+			foreach (Drive artefact in _fsCreator.Drives)
 				Console.WriteLine(artefact.ToString());
 			_fsCreator.Run(null);
 		}

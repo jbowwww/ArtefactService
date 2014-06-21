@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using NHibernate.Linq;
 using NHibernate.Hql.Ast.ANTLR;
 
@@ -22,6 +23,13 @@ namespace Artefacts.Service
 			Repository = repository;
 		}
 
+public override Expression Visit(Expression exp)
+		{
+			Expression reducedExp, longExp = base.Visit(exp);
+			reducedExp = longExp != null && longExp.CanReduce ? longExp.Reduce() : longExp;
+			return reducedExp;
+		}
+		
 		protected override Expression VisitUnary(UnaryExpression u)
 		{
 			object unExId = u.Id();
@@ -43,31 +51,34 @@ namespace Artefacts.Service
 				return p;
 		}
 
-//		protected override Expression VisitMemberAccess(MemberExpression m)
-//		{
-//			if (m.Expression.NodeType == ExpressionType.Constant && m.Type.Equals(typeof(Repository)))
-//			{
-//				if (m.Member.MemberType == System.Reflection.MemberTypes.Property && m.Member.Name.Equals("Session"))
-//					return Expression.Constant(Repository.Session);
-//			}
-//			return base.VisitMemberAccess(m);
-//		}
-//
-//				protected override Expression VisitMethodCall(MethodCallExpression m)
-//		{
-//			if (m.Type.IsGenericType && m.Method.Name.Equals("OfType") && ServerQueryVisitor.IsRepositoryPlaceHolder(m.Arguments[0]))
-//				return Expression.Constant(typeof(NHibernate.Linq.LinqExtensionMethods).GetMethods()
-//					.First((mi) => mi.Name.Equals("Query") && mi.GetGenericArguments().Length == 1)
-//					.MakeGenericMethod(m.Method.GetGenericArguments()[0]).Invoke(null, new object[] { Repository.Session }));
-//			return base.VisitMethodCall(m);
-//		}
-
-//		protected override Expression VisitTypeIs(TypeBinaryExpression b)
-//		{
-//
-//			return base.VisitTypeIs(b);
-//
-//		}
+		protected override Expression VisitMemberAccess(MemberExpression m)
+		{
+			if (m.Member.DeclaringType.Namespace.ToLower().CompareTo("artefacts.service") == 0)	//.Equals(typeof(Repository)))// && m.Expression == null)
+			{
+				object value = null;
+				object container = null;
+				if (m.Expression != null)
+				{
+					Expression mExp = this.Visit(m.Expression);
+					if (!(mExp is ConstantExpression))
+						throw new ApplicationException("m.Expression should be null or a ConstantExpression (after processing with ServerQueryVisitor)");
+					container = ((ConstantExpression)mExp).Value;
+				}
+				switch (m.Member.MemberType)
+				{
+					case MemberTypes.Field:
+						value = ((FieldInfo)m.Member).GetValue(container);
+						break;
+					case MemberTypes.Property:
+						value = ((PropertyInfo)m.Member).GetValue(container, null);		// TODO: Need to handle indexer properties? IndexExpression does not derive from MemberExpression
+						break;
+					default:
+						throw new ApplicationException(string.Format("Unknown MemberType in MemberExpression: \"{0}\"", m.Member.MemberType.ToString()));
+				}
+				return Expression.Constant(value);
+			}
+			return base.VisitMemberAccess(m);
+		}
 	}
 }
 

@@ -31,7 +31,9 @@ namespace Artefacts.FileSystem
 		
 		public File(string path)
 		{
-			Init(new FileInfo(path), Drive.GetDrive(path));	// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
+			Path = path;
+//			Update();
+//			Init(new FileInfo(path), Drive.GetDrive(path));
 		}
 		
 		protected File (FileInfo fInfo, Drive drive)

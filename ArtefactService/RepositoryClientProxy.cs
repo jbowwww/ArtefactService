@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Diagnostics;
 using Serialize.Linq.Extensions;
 using System.Collections;
+using NHibernate.Linq;
 
 namespace Artefacts.Service
 {
@@ -138,11 +139,14 @@ namespace Artefacts.Service
 		public IQueryable<TArtefact> BuildBaseQuery<TArtefact>() where TArtefact : Artefact
 		{
 //			IQueryable<TArtefact> query = Expression.PropertyOrField()
-				var g6= ((IQueryProvider )this).CreateQuery<TArtefact>(
-				Expression.Call(typeof(NHibernate.Linq.LinqExtensionMethods).
-					GetMethods().First((mi) => mi.Name.Equals("Query") && mi.GetGenericArguments().Length == 1
-					).MakeGenericMethod(typeof(TArtefact)), Expression.Property(/*Expression.Constant(*/null,//),
-						typeof(Repository).GetProperty("Session", BindingFlags.Static | BindingFlags.Public))));
+				var g6= ((IQueryProvider)this).CreateQuery<TArtefact>(
+				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) },
+					Expression.Property(null, typeof(Repository).GetProperty("Session", BindingFlags.Static | BindingFlags.Public))));
+//				Expression.Call(
+//					typeof(NHibernate.Linq.LinqExtensionMethods).GetMethods()
+//						.First((mi) => mi.Name.Equals("Query") && mi.GetGenericArguments().Length == 1)
+//							.MakeGenericMethod(typeof(TArtefact)), Expression.Property(Expression.Constant(null),
+//						typeof(Repository).GetProperty("Session", BindingFlags.Static | BindingFlags.Public))));
 					//"Query", new Type[] { typeof(TArtefact) }));
 			Queryables[typeof(TArtefact)] = g6;
 			return g6;
@@ -283,7 +287,7 @@ namespace Artefacts.Service
 		/// <remarks>IQueryProvider implementation</remarks>
 		public IQueryable CreateQuery(Expression expression)
 		{
-			Type T = expression.GetElementType();
+//			Type T = expression.GetElementType();
 //			MethodInfo mi = GetType().GetMethod("CreateQuery",
 //				                BindingFlags.Instance | BindingFlags.NonPublic);
 //				.MakeGenericMethod(T);
