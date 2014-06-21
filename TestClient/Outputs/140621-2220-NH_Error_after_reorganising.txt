@@ -1,0 +1,7 @@
+The following types may not be used as proxies:
+Artefacts.FileSystem.Drive: method set_DriveInfo should be 'public/protected virtual' or 'protected internal virtual'
+Artefacts.FileSystem.Drive: method get_DriveInfo should be 'public/protected virtual' or 'protected internal virtual'
+Artefacts.FileSystem.Directory: method set_DirectoryInfo should be 'public/protected virtual' or 'protected internal virtual'
+Artefacts.FileSystem.Directory: method get_DirectoryInfo should be 'public/protected virtual' or 'protected internal virtual'
+Artefacts.FileSystem.File: method set_FileInfo should be 'public/protected virtual' or 'protected internal virtual'
+Artefacts.FileSystem.File: method get_FileInfo should be 'public/protected virtual' or 'protected internal virtual'

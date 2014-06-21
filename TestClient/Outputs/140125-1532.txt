@@ -1,0 +1,70 @@
+ ServiceHost: Opening
+ServiceHost: Opened
+Service: Artefacts.Services.ArtefactRepository
+Name: http://tempuri.org//ArtefactRepository
+Configuration Name: 
+Base Addresses (0): 
+Endpoints (1):
+	NetTcpBinding_IRepository`1 Explicit net.tcp://localhost:3334/ArtefactRepository System.ServiceModel.NetTcpBinding
+ChannelDispatchers (1):
+	Opened : net.tcp://localhost:3334/ArtefactRepository
+Extensions (1):
+	System.ServiceModel.Description.ServiceMetadataExtension
+
+
+
+Service Artefact Repository: Artefacts.Services.RepositoryClientProxy`1[Artefacts.Artefact]
+
+
+########
+# RunTest: Start: FileSystemArtefactCreator
+########
+
+NHibernate: select artefact0_.Id as Id0_, artefact0_.TimeCreated as TimeCrea2_0_, artefact0_.TimeUpdated as TimeUpda3_0_, artefact0_.TimeChecked as TimeChec4_0_, artefact0_1_.Partition as Partition1_, artefact0_1_.Label as Label1_, artefact0_1_.Format as Format1_, artefact0_1_.Type as Type1_, artefact0_1_.Size as Size1_, artefact0_1_.FreeSpace as FreeSpace1_, artefact0_1_.AvailableFreeSpace as Availabl8_1_, artefact0_2_.Path as Path2_, artefact0_2_.Drive as Drive2_, artefact0_2_.Attributes as Attributes2_, artefact0_2_.CreationTime as Creation5_2_, artefact0_2_.AccessTime as AccessTime2_, artefact0_2_.ModifyTime as ModifyTime2_, artefact0_4_.Size as Size4_, case when artefact0_3_.Id is not null then 3 when artefact0_4_.Id is not null then 4 when artefact0_1_.Id is not null then 1 when artefact0_2_.Id is not null then 2 when artefact0_.Id is not null then 0 end as clazz_ from Artefact artefact0_ left outer join Drive artefact0_1_ on artefact0_.Id=artefact0_1_.Id left outer join FileSystemEntry artefact0_2_ on artefact0_.Id=artefact0_2_.Id left outer join Directory artefact0_3_ on artefact0_.Id=artefact0_3_.Id left outer join File artefact0_4_ on artefact0_.Id=artefact0_4_.Id
+NHibernate: select artefact0_.Id as Id0_, artefact0_.TimeCreated as TimeCrea2_0_, artefact0_.TimeUpdated as TimeUpda3_0_, artefact0_.TimeChecked as TimeChec4_0_, artefact0_1_.Partition as Partition1_, artefact0_1_.Label as Label1_, artefact0_1_.Format as Format1_, artefact0_1_.Type as Type1_, artefact0_1_.Size as Size1_, artefact0_1_.FreeSpace as FreeSpace1_, artefact0_1_.AvailableFreeSpace as Availabl8_1_, artefact0_2_.Path as Path2_, artefact0_2_.Drive as Drive2_, artefact0_2_.Attributes as Attributes2_, artefact0_2_.CreationTime as Creation5_2_, artefact0_2_.AccessTime as AccessTime2_, artefact0_2_.ModifyTime as ModifyTime2_, artefact0_4_.Size as Size4_, case when artefact0_3_.Id is not null then 3 when artefact0_4_.Id is not null then 4 when artefact0_1_.Id is not null then 1 when artefact0_2_.Id is not null then 2 when artefact0_.Id is not null then 0 end as clazz_ from Artefact artefact0_ left outer join Drive artefact0_1_ on artefact0_.Id=artefact0_1_.Id left outer join FileSystemEntry artefact0_2_ on artefact0_.Id=artefact0_2_.Id left outer join Directory artefact0_3_ on artefact0_.Id=artefact0_3_.Id left outer join File artefact0_4_ on artefact0_.Id=artefact0_4_.Id
+NHibernate: UPDATE Artefact SET TimeCreated = ?p0, TimeUpdated = ?p1, TimeChecked = ?p2 WHERE Id = ?p3;?p0 = 30/12/2013 5:08:18 AM [Type: DateTime (0)], ?p1 = 25/01/2014 3:24:09 PM [Type: DateTime (0)], ?p2 = 25/01/2014 3:24:09 PM [Type: DateTime (0)], ?p3 = 32768 [Type: Int32 (0)]
+
+########
+# RunTest: Failed: FileSystemArtefactCreator
+########
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation. ---> System.ArgumentException: Static method requires null instance, non-static method requires non-null instance.
+Parameter name: method
+  at System.Linq.Expressions.Expression.ValidateStaticOrInstanceMethod (System.Linq.Expressions.Expression instance, System.Reflection.MethodInfo method) [0x00000] in <filename unknown>:0 
+  at System.Linq.Expressions.Expression.Call (System.Linq.Expressions.Expression instance, System.Reflection.MethodInfo method, IEnumerable`1 arguments) [0x00000] in <filename unknown>:0 
+  at System.Linq.Expressions.Expression.Call (System.Reflection.MethodInfo method, IEnumerable`1 arguments) [0x00000] in <filename unknown>:0 
+  at Artefacts.Services.QueryTranslator.VisitMethodCall (System.Linq.Expressions.MethodCallExpression m) [0x00059] in /home/jk/Code/ArtefactService/ArtefactService/QueryTranslator.cs:44 
+  at Artefacts.Services.ExpressionVisitor.Visit (System.Linq.Expressions.Expression exp) [0x0012d] in /home/jk/Code/ArtefactService/ArtefactService/ExpressionVisitor.cs:65 
+  at Artefacts.Services.ExpressionVisitor.VisitBinary (System.Linq.Expressions.BinaryExpression b) [0x00000] in /home/jk/Code/ArtefactService/ArtefactService/ExpressionVisitor.cs:121 
+  at Artefacts.Services.ExpressionVisitor.Visit (System.Linq.Expressions.Expression exp) [0x000df] in /home/jk/Code/ArtefactService/ArtefactService/ExpressionVisitor.cs:53 
+  at Artefacts.Services.ExpressionVisitor.VisitBinary (System.Linq.Expressions.BinaryExpression b) [0x00000] in /home/jk/Code/ArtefactService/ArtefactService/ExpressionVisitor.cs:121 
+  at Artefacts.Services.ExpressionVisitor.Visit (System.Linq.Expressions.Expression exp) [0x000df] in /home/jk/Code/ArtefactService/ArtefactService/ExpressionVisitor.cs:53 
+  at Artefacts.Services.ExpressionVisitor.VisitLambda (System.Linq.Expressions.LambdaExpression lambda) [0x00000] in /home/jk/Code/ArtefactService/ArtefactService/ExpressionVisitor.cs:296 
+  at Artefacts.Services.ExpressionVisitor.Visit (System.Linq.Expressions.Expression exp) [0x0013a] in /home/jk/Code/ArtefactService/ArtefactService/ExpressionVisitor.cs:67 
+  at Artefacts.Services.ExpressionVisitor.VisitUnary (System.Linq.Expressions.UnaryExpression u) [0x00000] in /home/jk/Code/ArtefactService/ArtefactService/ExpressionVisitor.cs:111 
+  at Artefacts.Services.ExpressionVisitor.Visit (System.Linq.Expressions.Expression exp) [0x000d2] in /home/jk/Code/ArtefactService/ArtefactService/ExpressionVisitor.cs:29 
+  at Artefacts.Services.QueryTranslator.VisitMethodCall (System.Linq.Expressions.MethodCallExpression m) [0x0002f] in /home/jk/Code/ArtefactService/ArtefactService/QueryTranslator.cs:43 
+  at Artefacts.Services.ExpressionVisitor.Visit (System.Linq.Expressions.Expression exp) [0x0012d] in /home/jk/Code/ArtefactService/ArtefactService/ExpressionVisitor.cs:65 
+  at Artefacts.Services.QueryTranslator.VisitMethodCall (System.Linq.Expressions.MethodCallExpression m) [0x0002f] in /home/jk/Code/ArtefactService/ArtefactService/QueryTranslator.cs:43 
+  at Artefacts.Services.ExpressionVisitor.Visit (System.Linq.Expressions.Expression exp) [0x0012d] in /home/jk/Code/ArtefactService/ArtefactService/ExpressionVisitor.cs:65 
+  at Artefacts.Services.ClientQueryProvider`1[Artefacts.Artefact].Execute (System.Linq.Expressions.Expression expression) [0x00006] in /home/jk/Code/ArtefactService/ArtefactClientTest/ClientQueryProvider.cs:39 
+  at Artefacts.Services.ClientQueryProvider`1[Artefacts.Artefact].System.Linq.IQueryProvider.Execute[Artefact] (System.Linq.Expressions.Expression expression) [0x00000] in /home/jk/Code/ArtefactService/ArtefactClientTest/ClientQueryProvider.cs:57 
+  at System.Linq.Queryable.FirstOrDefault[Artefact] (IQueryable`1 source) [0x00000] in <filename unknown>:0 
+  at Artefacts.FileSystem.FileSystemArtefactCreator.Run (System.Object param) [0x00424] in /home/jk/Code/ArtefactService/ArtefactFileSystem/Client/FileSystemArtefactCreator.cs:161 
+  at ArtefactClientTest.ArtefactClientTest.TestFileSystemArtefactCreator () [0x00021] in /home/jk/Code/ArtefactService/ArtefactClientTest/ClientTest.cs:186 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in <filename unknown>:0 
+  --- End of inner exception stack trace ---
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in <filename unknown>:0 
+  at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in <filename unknown>:0 
+  at ArtefactClientTest.ArtefactClientTest+<RunTests>c__AnonStorey0.<>m__3 () [0x00000] in /home/jk/Code/ArtefactService/ArtefactClientTest/ClientTest.cs:105 
+  at ArtefactClientTest.ArtefactClientTest.RunTest (System.String name, System.Action testMethod, System.IO.TextWriter output) [0x00020] in /home/jk/Code/ArtefactService/ArtefactClientTest/ClientTest.cs:115 
+
+
+Exiting...
+Stopping service host thread... 
+ServiceHost: Closing
+ServiceHost: Closed
+done.
+
+Press any key to continue...
+
