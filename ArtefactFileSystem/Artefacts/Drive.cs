@@ -16,8 +16,12 @@ namespace Artefacts.FileSystem
 	public class Drive : Artefact
 	{
 		#region Static members
-		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
-		private static IDictionary<string, string> _partitionMountPaths = null;
+//		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+
+		/// <summary>
+		/// Gets the partition mount paths.
+		/// </summary>
+		/// <value>The partition mount paths.</value>
 		public static IDictionary<string, string> PartitionMountPaths {
 			get
 			{
@@ -44,8 +48,18 @@ namespace Artefacts.FileSystem
 				return _partitionMountPaths;				
 			}
 		}
+		private static IDictionary<string, string> _partitionMountPaths = null;
+
+		/// <summary>
+		/// Gets or sets the repository.
+		/// </summary>
+		/// <value>The repository.</value>
 		public static IRepository Repository { get; set; }
 		
+		/// <summary>
+		/// Gets the drives.
+		/// </summary>
+		/// <returns>The drives.</returns>
 		public static IQueryable<Drive> GetDrives()
 		{
 			List<Drive> drives = new List<Drive>();
@@ -60,7 +74,7 @@ namespace Artefacts.FileSystem
 						if (drive == null)
 							Repository.Add(drive = new Drive(dInfo));
 						else
-							Repository.Update(drive.Update(dInfo));
+							Repository.Update(drive.Update());
 					}
 					else
 						drive = new Drive(dInfo);
@@ -76,117 +90,130 @@ namespace Artefacts.FileSystem
 			}
 			return drives.AsQueryable();
 		}
-		
-		public static Drive GetDrive(string rootPath)
-		{
-//						var q =c
-//								from dr in FileSystemArtefactCreator.Singleton.Drives
-//									orderby dr.Label.Length descending
-//										where rootPath.StartsWith(dr.Label)
-//				select dr;
-						IQueryable<Drive> q = Repository.Artefacts
-								.Where((arg) => arg.GetType().FullName == typeof(Drive).FullName)
-								.Select((arg) => (Drive)arg)
-								.OrderByDescending((d) => d.Label.Length);
-//								.Where((d) => rootPath.StartsWith(d.Label));
-//						FileSystemArtefactCreator.Singleton.Drives
-						Drive dr = q.FirstOrDefault();
-						return dr;
-//								orderby dr.Label.Length descending
-//										where rootPath.StartsWith(dr.Label)
-//								select dr;
-//						return q.FirstOrDefault();
-		}
-//			return (from dr in Drive.GetDrives().AsEnumerable()
-		
-		public static Drive GetOrCreate(string driveName)
-		{
-						throw new NotImplementedException();
-		}
 		#endregion
 		
 		#region Properties
-//		public virtual int? DiskId {
-//			get { return Disk == null ? null : Disk.Id; }
-//		}
-
+		/// <summary>
+		/// Gets or sets the disk.
+		/// </summary>
+		/// <value>The disk.</value>
 		[DataMember]
 		public virtual Disk Disk { get; set; }
 		
+		/// <summary>
+		/// Gets or sets the name.
+		/// </summary>
+		/// <value>The name.</value>
 		[DataMember]
 		public virtual string Name { get; set; }
 		
+		/// <summary>
+		/// Gets or sets the partition.
+		/// </summary>
+		/// <value>The partition.</value>
 		[DataMember]
 		public virtual string Partition { get; set; }
 		
+		/// <summary>
+		/// Gets or sets the label.
+		/// </summary>
+		/// <value>The label.</value>
 		[DataMember]
 		public virtual string Label { get; set; }
 
+		/// <summary>
+		/// Gets or sets the format.
+		/// </summary>
+		/// <value>The format.</value>
 		[DataMember]
 		public virtual string Format { get; set; }
 
+		/// <summary>
+		/// Gets or sets the type.
+		/// </summary>
+		/// <value>The type.</value>
 		[DataMember]
 		public virtual DriveType Type { get; set; }
 
+		/// <summary>
+		/// Gets or sets the size.
+		/// </summary>
+		/// <value>The size.</value>
 		[DataMember]
 		public virtual long Size { get; set; }
 
+		/// <summary>
+		/// Gets or sets the free space.
+		/// </summary>
+		/// <value>The free space.</value>
 		[DataMember]
 		public virtual long FreeSpace { get; set; }
 
+		/// <summary>
+		/// Gets or sets the available free space.
+		/// </summary>
+		/// <value>The available free space.</value>
 		[DataMember]
 		public virtual long AvailableFreeSpace { get; set; }
+		
+		/// <summary>
+		/// Gets or sets the drive info.
+		/// </summary>
+		/// <value>The drive info.</value>
+		public DriveInfo DriveInfo {
+			get { return _driveInfo; }
+			set
+			{
+				_driveInfo = value;
+				Name = _driveInfo.Name;
+				Label = _driveInfo.VolumeLabel;
+				Format = _driveInfo.DriveFormat;
+				Type = _driveInfo.DriveType;
+				Size = _driveInfo.TotalSize;
+				FreeSpace = _driveInfo.TotalFreeSpace;
+				AvailableFreeSpace = _driveInfo.AvailableFreeSpace;
+				if (Drive.PartitionMountPaths != null)
+					Partition = PartitionMountPaths.ContainsKey(Label) ? PartitionMountPaths[Label] : string.Empty;
+			}
+		}
+		private DriveInfo _driveInfo;	
 		#endregion
 		
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Artefacts.FileSystem.Drive"/> class.
+		/// </summary>
+		/// <param name="driveName">Drive name.</param>
 		public Drive(string driveName)
 		{
-			Init(new DriveInfo(driveName));
+			DriveInfo = new DriveInfo(driveName);
 		}
 		
-		protected Drive(DriveInfo dInfo)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Artefacts.FileSystem.Drive"/> class.
+		/// </summary>
+		/// <param name="driveInfo">Drive info.</param>
+		protected Drive(DriveInfo driveInfo)
 		{
-			Init(dInfo);
+			DriveInfo = driveInfo;
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Artefacts.FileSystem.Drive"/> class.
+		/// </summary>
 		protected Drive() {}
-		
-		protected virtual void Init(DriveInfo dInfo)
-		{
-			Name = dInfo.Name;
-			Label = dInfo.VolumeLabel;
-			Format = dInfo.DriveFormat;
-			Type = dInfo.DriveType;
-			Size = dInfo.TotalSize;
-			FreeSpace = dInfo.TotalFreeSpace;
-			AvailableFreeSpace = dInfo.AvailableFreeSpace;
-			if (Drive.PartitionMountPaths != null)
-				Partition = PartitionMountPaths.ContainsKey(Label) ? PartitionMountPaths[Label] : string.Empty;
-//			if (!string.IsNullOrEmpty(Partition) && Partition.StartsWith("/dev/"))
-//			{
-//				Disk disk = new Disk(Partition
-//					.TrimEnd(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' })
-//					.Substring(Partition.LastIndexOfAny(new char[] { '/', '\\' }) + 1));
-//				if (Disk == null)
-//					Disk = disk;
-//				else
-//					Disk.CopyMembersFrom(disk);
-//			}			
-		}
-		
-		public override Artefact Update()
-		{
-			base.Update();
-			Init(new DriveInfo(Name));
-			return this;
-		}
-		
-		protected virtual Artefact Update(DriveInfo dInfo)
-		{
-			base.Update();
-			Init(dInfo);
-			return this;
-		}
-		
+				
+		/// <summary>
+		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Artefacts.FileSystem.Drive"/>.
+		/// </summary>
+		/// <param name="obj">The <see cref="System.Object"/> to compare with the current <see cref="Artefacts.FileSystem.Drive"/>.</param>
+		/// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to the current
+		/// <see cref="Artefacts.FileSystem.Drive"/>; otherwise, <c>false</c>.</returns>
+		/// <remarks>
+		///	Removed conditions:
+		/// 				Disk == drive.Disk && Partition == drive.Partition
+		///		&& Label == drive.Label && Format == drive.Format && Type == drive.Type && Size == drive.Size
+		///		&& FreeSpace == drive.FreeSpace && AvailableFreeSpace == drive.AvailableFreeSpace;
+		/// </remarks>
 		public override bool Equals(object obj)
 		{
 			if (!base.Equals(obj))
@@ -194,15 +221,32 @@ namespace Artefacts.FileSystem
 			Drive drive = (Drive)obj;
 			return Label == drive.Label;
 		}
-//				Disk == drive.Disk && Partition == drive.Partition
-//				&& Label == drive.Label && Format == drive.Format && Type == drive.Type && Size == drive.Size
-//				&& FreeSpace == drive.FreeSpace && AvailableFreeSpace == drive.AvailableFreeSpace;
 		
-				public override int GetHashCode()
+		/// <summary>
+		/// Serves as a hash function for a <see cref="Artefacts.FileSystem.Drive"/> object.
+		/// </summary>
+		/// <returns>A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a hash table.</returns>
+		public override int GetHashCode()
 		{
-						return Convert.ToInt32(Name);
+			return string.Concat(GetType().FullName, ":",
+				Disk != null ? Disk.GetHashCode().ToString() :
+				Host.Current != null ? Host.Current.GetHashCode().ToString() :
+				Guid.NewGuid().ToString(), ":", Name).GetHashCode();		// 			return Convert.ToInt32(Name);
 		}
 
+		/// <summary>
+		/// Update this instance.
+		/// </summary>
+		public override Artefact Update()
+		{
+			DriveInfo = new DriveInfo(Name);
+			return base.Update();
+		}
+		
+		/// <summary>
+		/// Copies the members from.
+		/// </summary>
+		/// <param name="source">Source.</param>
 		public override void CopyMembersFrom(Artefact source)
 		{
 			base.CopyMembersFrom(source);
@@ -217,6 +261,10 @@ namespace Artefacts.FileSystem
 			AvailableFreeSpace = srcDrive.AvailableFreeSpace;
 		}
 		
+		/// <summary>
+		/// Returns a <see cref="System.String"/> that represents the current <see cref="Artefacts.FileSystem.Drive"/>.
+		/// </summary>
+		/// <returns>A <see cref="System.String"/> that represents the current <see cref="Artefacts.FileSystem.Drive"/>.</returns>
 		public override string ToString()
 		{
 			return string.Concat(string.Format(

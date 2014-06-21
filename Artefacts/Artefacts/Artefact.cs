@@ -113,7 +113,7 @@ namespace Artefacts
 		#endregion
 		#endregion
 		
-		public Artefact()
+		protected Artefact()
 		{
 			TimeCreated = TimeUpdated = TimeChecked = DateTime.Now;
 		}
@@ -142,9 +142,9 @@ namespace Artefacts
 			return true;
 		}
 
-				public override int GetHashCode()
+		public override int GetHashCode()
 		{
-						return Convert.ToInt32(TimeCreated.Ticks) + Convert.ToInt32(TimeUpdated.Ticks) + Convert.ToInt32(TimeChecked.Ticks);
+			return Convert.ToInt32(TimeCreated.Ticks) + Convert.ToInt32(TimeUpdated.Ticks) + Convert.ToInt32(TimeChecked.Ticks);
 		}
 //			Artefact artefact = (Artefact)obj;
 //			return TimeCreated == artefact.TimeCreated

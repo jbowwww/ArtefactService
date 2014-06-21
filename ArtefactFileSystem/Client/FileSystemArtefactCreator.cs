@@ -69,7 +69,10 @@ namespace Artefacts.FileSystem
 		public Host ThisHost = new Host(true);
 		#endregion
 
-		#region Constructors & Initialization
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Artefacts.FileSystem.FileSystemArtefactCreator"/> class.
+		/// </summary>
+		/// <param name="repository">Repository.</param>
 		public FileSystemArtefactCreator(RepositoryClientProxy repository)
 		{
 			if (Singleton != null)
@@ -88,86 +91,56 @@ namespace Artefacts.FileSystem
 			Drives = Repository.BuildBaseQuery<Drive>();
 			Disks = Repository.BuildBaseQuery<Disk>();
 		}
-		//			BuildTypedQueryable<Artefacts.FileSystem.FileSystemEntry>();
-		//			BuildTypedQueryable<Artefacts.FileSystem.File>();
-		//			BuildTypedQueryable<Artefacts.FileSystem.Directory>();
-		//			BuildTypedQueryable<Artefacts.FileSystem.Drive>();
-		//			BuildTypedQueryable<Artefacts.FileSystem.Disk>();
-//		internal IQueryable<TArtefact> QueryBase<TArtefact>() where TArtefact : Artefact
-//		{
-//						var q = Repository.Artefacts.OfType<TArtefact>().Select((arg) => (TArtefact)arg);//Where((a) => a is TArtefact).Select((a) => (TArtefact)a);
-//						//;Where((arg) => arg.GetType().FullName == typeof(Artefact).FullName)//.AsQueryable();
-//						                                //.Where((arg) => arg.GetType().FullName == typeof(Artefact).FullName);
-//						                                //
-//			return q;
-			const BindingFlags bf = BindingFlags.Public | BindingFlags.Static;
-//			Expression expression =
-//				Expression.Call(typeof(NHibernate.Linq.LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) },
-//					Expression.Call(typeof(ArtefactRepository).GetProperty("Session", bf).GetGetMethod()));
-//			Expression expression = Expression.Parameter(typeof(IQueryable<TArtefact>), string.Concat("Artefacts:", typeof(TArtefact).FullName));
-//			Expression expression = Expression.Call(typeof(System.Linq.Queryable), "OfType", new Type[] { typeof(TArtefact) },
-//				Expression.Parameter(typeof(IQueryable<Artefact>), "Artefacts"));
-//			return Repository.Artefacts.Provider.CreateQuery<TArtefact>(expression);				//			Repository.Queryables.Add(typeof(TArtefact),
-//			return Repository.Artefacts.OfType<TArtefact>();
-//		}
-		#endregion
 
-		#region implemented abstract members of Artefacts.CreatorBase
+		/// <summary>
+		/// Run the specified param.
+		/// </summary>
+		/// <param name="param">Parameter.</param>
+		/// <remarks>Artefacts.CreatorBase implementation</remarks>
 		public override void Run(object param)
 		{
-			// Initialise 
-			Drive.Repository = Repository;
 			int recursionDepth = -1;
+			Drive drive;
 			Queue<Uri> subDirectories = new Queue<Uri>(new Uri[] { BaseUri });
-//			Disk[] Disks = EnumerateDisks(Host.Current).ToArray();
-			// TODO: Move code executed by calling Disk.Disks into here
-
+			Uri currentUri;
+			string absPath;
+			
 			// Recurse subdirectories
 			while (subDirectories.Count > 0)
 			{
-				Uri currentUri = subDirectories.Dequeue();
-				Drive drive = Drives.FirstOrDefault((dr) => currentUri.LocalPath.StartsWith(dr.Label));
-						// This only doesn't work because my queyr provider executes it using a repository query method (QueryExecute)
-				// that has return type of object, and should only be used for scalar results. (It does not have any artefact KnownType's)
-				// for method calls like FirstOrDefault() that produce an Artefact, you
-				// will need to find some way of detecting that return value, and running the method call expression's argument[0] expression as a query, to
-				// get artefact id, then retrieve artefact using repository getbyid() ??
+				currentUri = subDirectories.Dequeue();
+				drive = Drives.FirstOrDefault((dr) => currentUri.LocalPath.StartsWith(dr.Label));
 
 				foreach (string relPath in EnumerateFiles(currentUri))
 				{
-					string absPath = Path.Combine(currentUri.LocalPath, relPath);
+					absPath = Path.Combine(currentUri.LocalPath, relPath);
 					File file = Files.FirstOrDefault((f) => f.Path == absPath);
 					if (file == null)
 						Repository.Add(new File(absPath));
 					else
-						Repository.Update(file);//.Update());
+						Repository.Update(file.Update());
 				}
 
 				if (RecursionLimit < 0 || ++recursionDepth < RecursionLimit)
 				{
 					foreach (string relPath in EnumerateDirectories(currentUri))
 					{
-						string absPath = Path.Combine(currentUri.LocalPath, relPath);
-						
-						// TODO: !! This is what is causing the NotSupportedException for GetType(), somehow..?
+						absPath = Path.Combine(currentUri.LocalPath, relPath);
 						Directory dir = Directories.FirstOrDefault((d) => d.Path == absPath);
 						if (dir == null)
-							Repository.Add(new Directory(new System.IO.DirectoryInfo(absPath), drive));
+							Repository.Add(new Directory(new System.IO.DirectoryInfo(absPath)));
 						else if (dir.UpdateAge > TimeSpan.FromMinutes(1))
-							Repository.Update(
-								new Directory(
-									new System.IO.DirectoryInfo(absPath),
-									drive)
-								{
-									Id = dir.Id,
-									TimeCreated = dir.TimeCreated
-								});
+							Repository.Update(dir.Update());
+//								new Directory(new System.IO.DirectoryInfo(absPath))
+//								{
+//									Id = dir.Id,
+//									TimeCreated = dir.TimeCreated
+//								});
 						subDirectories.Enqueue(new Uri(currentUri, relPath));
 					}
 				}
 			}
 		}
-		#endregion
 
 		#region Overridable file system entry  (files and directories) enumerators
 		public virtual IEnumerable<Disk> EnumerateDisks(Host host)

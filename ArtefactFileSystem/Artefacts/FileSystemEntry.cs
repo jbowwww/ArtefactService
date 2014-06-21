@@ -1,7 +1,8 @@
 using System;
-using System.IO;
+//using System.IO;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+using System.Linq;
 
 namespace Artefacts.FileSystem
 {
@@ -9,22 +10,16 @@ namespace Artefacts.FileSystem
 	[ArtefactFormat("[FileSystemEntry: Drive={Drive} Path={Path} Attributes={Attributes} CreationTime={CreationTime} AccessTime={AccessTime} ModifyTime={ModifyTime}]")]
 	public class FileSystemEntry : Artefact
 	{
-		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+//		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
 
-//		public virtual int? DriveId { 
-//			get { return Drive == null ? -1 : Drive.Id; }
-//		}
-		
-//		[DataMember]
-//		public virtual ArtefactProxy<Drive> _Drive { get; set; }
-
+		[DataMember]
 		public virtual Drive Drive { get; set; }
 
+		[DataMember]													// think I need this for NHibernate/serialization so it can use default parameterless constructor and then set
+		public virtual string Path { get; private set; }	// the property however confirm this, check if maybe NH uses a c'tor with SerializationInfo & context params
+		
 		[DataMember]
-		public virtual string Path { get; set; }
-
-		[DataMember]
-		public virtual FileAttributes Attributes { get; set; }
+		public virtual System.IO.FileAttributes Attributes { get; set; }
 
 		[DataMember]
 		public virtual DateTime CreationTime { get; set; }
@@ -35,39 +30,51 @@ namespace Artefacts.FileSystem
 		[DataMember]
 		public virtual DateTime ModifyTime { get; set; }
 
-		public virtual string Directory {
-			get { return System.IO.Path.GetDirectoryName(Path); }
-		}
+		[DataMember]
+		public virtual Directory Directory { get; set; }
 		
-		protected FileSystemEntry(FileSystemInfo fsInfo, Drive drive = null)
+		public virtual System.IO.FileSystemInfo FileSystemInfo {
+			get { return _fileSystemInfo; }
+			set
+			{
+				if (_fileSystemInfo != null && !_fileSystemInfo.FullName.Equals(value.FullName))
+					throw new InvalidOperationException("Cannot set FileSystemEntry.FileSystemInfo to an instance with a different Path value due to hash code requirements");
+				_fileSystemInfo = value;
+				Path = _fileSystemInfo.FullName;
+				Attributes = _fileSystemInfo.Attributes;
+				CreationTime = _fileSystemInfo.CreationTime;
+				AccessTime = _fileSystemInfo.LastAccessTime;
+				ModifyTime = _fileSystemInfo.LastWriteTime;
+				if (FileSystemArtefactCreator.Singleton != null)
+				{
+					if (FileSystemArtefactCreator.Singleton.Drives != null)
+						Drive = FileSystemArtefactCreator.Singleton.Drives.FromPath(Path);
+					if (FileSystemArtefactCreator.Singleton.Directories != null)
+						Directory = (Directory)FileSystemArtefactCreator.Singleton.Directories.FromPath(Path);
+				}
+			}
+		}
+		private System.IO.FileSystemInfo _fileSystemInfo;
+		
+		protected FileSystemEntry(System.IO.FileSystemInfo fileSystemInfo)
 		{
-			Init(fsInfo, drive);
+			FileSystemInfo = fileSystemInfo;
 		}
 		
-		protected FileSystemEntry() {}
-		
-		protected virtual void Init(FileSystemInfo fsInfo, Drive drive = null)
-		{
-			Drive = drive;
-			Path = fsInfo.FullName;
-			Attributes = fsInfo.Attributes;
-			CreationTime = fsInfo.CreationTime;
-			AccessTime = fsInfo.LastAccessTime;
-			ModifyTime = fsInfo.LastWriteTime;
-		}
+		protected FileSystemEntry() {}		
 		
 		public override bool Equals(object obj)
 		{
 			if (!base.Equals(obj))
 				return false;
 			FileSystemEntry fse = (FileSystemEntry)obj;
-			return /*Drive == fse.Drive && */ Path == fse.Path;
+			return /*Drive == fse.Drive && */ Path.Equals(fse.Path);
 		}
 
-				public override int GetHashCode()
+		public override int GetHashCode()
 		{
-						return Convert.ToInt32(Path);
-		}
+			return string.Concat(GetType().FullName, ":", Path).GetHashCode();			// Convert.ToInt32(Path);
+		}			/*  _hashCode.HasValue ? _hashCode.Value : (_hashCode = .... ).Value */
 
 		public override string ToString()
 		{

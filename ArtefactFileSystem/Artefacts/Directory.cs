@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 
@@ -9,32 +8,34 @@ namespace Artefacts.FileSystem
 	[ArtefactFormat("[Directory: ]")]
 	public class Directory : FileSystemEntry
 	{
-		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
+//		public static Type[] GetArtefactTypes() { return Artefact.GetArtefactTypes(); }
 		
+		public System.IO.DirectoryInfo DirectoryInfo {
+			get { return (System.IO.DirectoryInfo)base.FileSystemInfo; }
+			set
+			{
+				base.FileSystemInfo = value;
+			}
+		}
+			
 		public Directory(string path)
 		{
-			
+			DirectoryInfo = new System.IO.DirectoryInfo(path);
 		}
 		
-		public Directory(DirectoryInfo dInfo, Drive drive)
+		public Directory(System.IO.DirectoryInfo directoryInfo)
 		{
-			Init(dInfo, drive);
+			DirectoryInfo = directoryInfo;
 		}
 
 		protected Directory() {}
 		
-		protected virtual void Init(DirectoryInfo dInfo, Drive drive)
-		{
-			base.Init(dInfo, drive);
-		}
-		
 		public override Artefact Update()
 		{
-			base.Update();
-			Init(new DirectoryInfo(Path), Drive.GetDrive(Path));		// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
-			return this;
+			DirectoryInfo = new System.IO.DirectoryInfo(Path);
+			return base.Update();
 		}
-
+		
 		public override string ToString()
 		{
 			return string.Format("[Directory: ]\n" + base.ToString().Indent());

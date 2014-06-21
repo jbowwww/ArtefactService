@@ -29,33 +29,36 @@ namespace Artefacts.FileSystem
 			get { return System.IO.Path.GetExtension(Path); }
 		}
 		
-		public File(string path)
-		{
-			Path = path;
-//			Update();
-//			Init(new FileInfo(path), Drive.GetDrive(path));
+		public FileInfo FileInfo {
+			get
+			{
+				return (FileInfo)base.FileSystemInfo;
+			}
+			set
+			{
+				Size = value.Length;
+				base.FileSystemInfo = value;
+			}
 		}
 		
-		protected File (FileInfo fInfo, Drive drive)
+		public File(string path)
 		{
-			Init(fInfo, drive);
+			FileInfo = new FileInfo(path);
+		}
+		
+		protected File (FileInfo fileInfo)
+		{
+			FileInfo = fileInfo;
 		}
 
 		protected File() {}
 		
-		protected virtual void Init(FileInfo fInfo, Drive drive)
-		{
-			Size = fInfo.Length;
-			base.Init(fInfo, drive);
-		}
-		
 		public override Artefact Update()
 		{
-			base.Update();
-			Init(new FileInfo(Path), Drive.GetDrive(Path));	// TODO: Warning!! shouldn't be null - need to think your strategy/architecture through better for these operations
-			return this;
+			FileInfo = new FileInfo(Path);
+			return base.Update();
 		}
-
+		
 		public override string ToString()
 		{
 			return string.Concat(string.Format("[File: Size={0}, Name={1}, NameWithoutExtension={2}, Extension={3}]\n",
