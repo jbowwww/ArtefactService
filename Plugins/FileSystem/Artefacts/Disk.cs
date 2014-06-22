@@ -121,8 +121,8 @@ namespace Artefacts.FileSystem
 		{
 			return string.Concat(string.Format(
 				"[Disk: Serial={0}, MostRecentHost=#{1} (HostId=#{2}), DeviceName={3}]\n",
-					Serial, MostRecentHost != null ? MostRecentHost.Id : "(null)",
-					MostRecentHost != null && MostRecentHost.Id.HasValue ? MostRecentHost.Id.Value : "",
+					Serial, MostRecentHost != null ? MostRecentHost.Id.ToString() ?? "(null)" : "(null)",
+					MostRecentHost != null ? MostRecentHost.HostId : string.Empty,
 					DeviceName), base.ToString().Indent());
 		}
 	}
