@@ -105,7 +105,10 @@ namespace Artefacts.FileSystem
 				if (dbDisk == null)
 					Repository.Add(disk);
 				else
+				{
+					dbDisk.CopyMembersFrom(disk);
 					Repository.Update(dbDisk.Update());
+				}
 			}
 			
 			int recursionDepth = -1;

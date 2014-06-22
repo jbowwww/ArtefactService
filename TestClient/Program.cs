@@ -57,11 +57,11 @@ namespace Artefacts.TestClient
 			using (ClientTestFixture _testFixture = new ClientTestFixture())
 			{
 				(typeof(ClientTestFixture).GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-					.Where(mi => mi.GetCustomAttributes(typeof(ClientTestMethodAttribute), false).Length > 0)
+					.Where(mi => mi.GetCustomAttributes(typeof(TestMethodAttribute), false).Length > 0)
 					.OrderBy<MethodInfo, int>(
-						mi => (mi.GetCustomAttributes(typeof(ClientTestMethodAttribute), false)[0] as ClientTestMethodAttribute).Order))
+						mi => (mi.GetCustomAttributes(typeof(TestMethodAttribute), false)[0] as TestMethodAttribute).Order))
 					.ToList().ForEach(mi => RunTest(
-						(mi.GetCustomAttributes(typeof(ClientTestMethodAttribute), false)[0] as ClientTestMethodAttribute).Name,
+						(mi.GetCustomAttributes(typeof(TestMethodAttribute), false)[0] as TestMethodAttribute).Name,
 						() => mi.Invoke(_testFixture, new object[] { })));
 			}
 		}

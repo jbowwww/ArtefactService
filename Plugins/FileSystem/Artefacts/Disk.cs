@@ -91,30 +91,38 @@ namespace Artefacts.FileSystem
 						return Convert.ToInt32(Serial);
 		}
 
-		public override Artefact Update()
+//		public override Artefact Update()
+//		{
+////			if (UpdateAge > Artefacts.Service.Repository.ArtefactUpdateAgeLimit)
+////			{
+//				Process getDiskSerialProcess = Process.Start(
+//					new ProcessStartInfo("udevadm", string.Format("info --query=property --name={0}", DeviceName))			//  | grep ID_SERIAL=
+//				{
+//					RedirectStandardOutput = true,
+//					RedirectStandardError = true,
+//					UseShellExecute = false
+//				});
+//				getDiskSerialProcess.WaitForExit(1111);
+//				string serialOut = getDiskSerialProcess.StandardOutput.ReadToEnd().Trim().Grep("ID_SERIAL=");
+//				if (string.IsNullOrEmpty(serialOut) || !serialOut.StartsWith("ID_SERIAL="))
+//					throw new InvalidDataException("Unexpected output data from udevadm command");
+//	//				{
+//	//					Data = Extensions.CreateDictionary<string, object>(
+//	//						new KeyValuePair<string, object>[]
+//	//					{ new KeyValuePair<string, object>("serialOut", serialOut) })
+//	//				};
+//				Serial = serialOut.Substring(10).Trim();
+//				return base.Update();
+////			}
+//			return this;
+//		}
+
+public override void CopyMembersFrom(Artefact source)
 		{
-//			if (UpdateAge > Artefacts.Service.Repository.ArtefactUpdateAgeLimit)
-//			{
-				Process getDiskSerialProcess = Process.Start(
-					new ProcessStartInfo("udevadm", string.Format("info --query=property --name={0}", DeviceName))			//  | grep ID_SERIAL=
-				{
-					RedirectStandardOutput = true,
-					RedirectStandardError = true,
-					UseShellExecute = false
-				});
-				getDiskSerialProcess.WaitForExit(1111);
-				string serialOut = getDiskSerialProcess.StandardOutput.ReadToEnd().Trim().Grep("ID_SERIAL=");
-				if (string.IsNullOrEmpty(serialOut) || !serialOut.StartsWith("ID_SERIAL="))
-					throw new InvalidDataException("Unexpected output data from udevadm command");
-	//				{
-	//					Data = Extensions.CreateDictionary<string, object>(
-	//						new KeyValuePair<string, object>[]
-	//					{ new KeyValuePair<string, object>("serialOut", serialOut) })
-	//				};
-				Serial = serialOut.Substring(10).Trim();
-				return base.Update();
-//			}
-			return this;
+			base.CopyMembersFrom(source);
+			Disk disk = (Disk)source;
+			DeviceName = disk.DeviceName;
+			Serial = disk.Serial;
 		}
 		
 		public override string ToString()
