@@ -66,7 +66,7 @@ namespace Artefacts.FileSystem
 //			private set { Repository.Queryables[typeof(Disk)] = value; }
 //		}
 
-		public Host ThisHost = new Host(true);
+//		public Host ThisHost = new Host(true);
 		#endregion
 
 		/// <summary>
@@ -99,17 +99,20 @@ namespace Artefacts.FileSystem
 		/// <remarks>Artefacts.CreatorBase implementation</remarks>
 		public override void Run(object param)
 		{
-			foreach (Disk disk in Disk.Disks)
-			{
-				Disk dbDisk = Disks.FirstOrDefault((d) => disk.Serial.ToLower().CompareTo(d.Serial.ToLower()) == 0);
-				if (dbDisk == null)
-					Repository.Add(disk);
-				else
-				{
-					dbDisk.CopyMembersFrom(disk);
-					Repository.Update(dbDisk.Update());
-				}
-			}
+//			if (Host.Current.IsTransient)
+//				Repository.Add(Host.Current);
+		
+//			foreach (Disk disk in Disk.Disks)
+//			{
+//				Disk dbDisk = Disks.FirstOrDefault((d) => disk.Serial.ToLower().CompareTo(d.Serial.ToLower()) == 0);
+//				if (dbDisk == null)
+//					Repository.Add(disk);
+//				else
+//				{
+//					dbDisk.CopyMembersFrom(disk);
+//					Repository.Update(dbDisk.Update());
+//				}
+//			}
 			
 			int recursionDepth = -1;
 			Drive drive;
@@ -126,7 +129,7 @@ namespace Artefacts.FileSystem
 				foreach (string relPath in EnumerateFiles(currentUri))
 				{
 					absPath = Path.Combine(currentUri.LocalPath, relPath);
-					File file = Files.FirstOrDefault((f) => f.Path == absPath);
+					File file = Files.Where((f) => f.Path.Equals(absPath)).FirstOrDefault();
 					if (file == null)
 						Repository.Add(new File(absPath));
 					else
@@ -138,7 +141,7 @@ namespace Artefacts.FileSystem
 					foreach (string relPath in EnumerateDirectories(currentUri))
 					{
 						absPath = Path.Combine(currentUri.LocalPath, relPath);
-						Directory dir = Directories.FirstOrDefault((d) => d.Path == absPath);
+						Directory dir = Directories.Where((d) => d.Path.Equals(absPath)).FirstOrDefault();
 						if (dir == null)
 							Repository.Add(new Directory(new System.IO.DirectoryInfo(absPath)));
 						else if (dir.UpdateAge > TimeSpan.FromMinutes(1))

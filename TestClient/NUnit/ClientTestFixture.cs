@@ -7,6 +7,10 @@ using Artefacts.FileSystem;
 
 using System.IO;
 using System.Threading;
+using System.Reflection;
+using System.Diagnostics;
+using System.Text;
+using System.Collections.Generic;
 
 namespace Artefacts.TestClient
 {
@@ -16,13 +20,13 @@ namespace Artefacts.TestClient
 	[TestFixture]
 	public class ClientTestFixture : IDisposable
 	{
-		#region Private static fields
+		#region Private fields
 		private int _init = 0;
 		private int _exit = 0;
-		private TimeSpan _defaultTimeout = new TimeSpan(0, 0, 10);
-		private int _serviceHostStartDelay = 1000;
-		private int _serviceHostStopTimeout = 2200;
-		private Type[] _artefactTypes = new Type[]
+		private readonly TimeSpan _defaultTimeout = new TimeSpan(0, 0, 10);
+		private const int _serviceHostStartDelay = 2200;
+		private const int _serviceHostStopTimeout = 2200;
+		private readonly Type[] _artefactTypes = new Type[]
 			#region Artefact known types
 			{
 				typeof(Artefacts.Artefact),
@@ -35,9 +39,12 @@ namespace Artefacts.TestClient
 			};
 			#endregion
 
+		private Process _serviceHostProcess = null;
 		private Thread _serviceHostThread = null;
-		private string _serviceHostLogFilePath = @"		ServiceHost.Log";
-		private FileStream _serviceHostLog = null;
+		private const string _clientLogFilePath = @"Client.Log";
+		private const string _serviceHostLogFilePath = @"ServiceHost.Log";
+		private readonly FileStream _serviceHostLog = null;
+		private TextWriter _clLogWriter = null;
 		private TextWriter _shLogWriter = null;
 
 		private RepositoryClientProxy _clientProxy = null;
@@ -49,6 +56,12 @@ namespace Artefacts.TestClient
 //		private static RepositoryClientProxy<Artefact> _clientProxy = null;
 		#endregion
 
+		protected TextWriter ConsoleOut = null;
+		protected TextWriter ConsoleError = null;
+		
+		protected readonly bool UseServiceHostAsync = false;
+		protected readonly bool UseServiceHostProc = false;
+		
 		#region Construction & disposal
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Artefacts.TestClient.ClientTests"/> class.
@@ -79,6 +92,12 @@ namespace Artefacts.TestClient
 		/// </summary>
 		public void Init()
 		{
+			Console.SetWindowSize(Console.LargestWindowWidth, Console.LargestWindowHeight);
+			ConsoleOut = Console.Out;
+			ConsoleError = Console.Error;
+			Console.SetOut(new MultiTextWriter(ConsoleOut, new LogTextWriter(_clientLogFilePath)));
+			Console.SetError(Console.Out);
+			
 			Console.Write("ClientTest.Init: ");
 			if (Thread.VolatileRead(ref _init) != 0)
 				Console.WriteLine("Already initialised");
@@ -88,9 +107,22 @@ namespace Artefacts.TestClient
 				Thread.VolatileWrite(ref _init, 1);
 				Artefact.ArtefactTypes.AddRange(_artefactTypes);
 				_shLogWriter = new LogTextWriter(_serviceHostLogFilePath);
-				_serviceHostThread = ArtefactServiceHost.GetOrCreateAsyncThread(_artefactTypes, _defaultTimeout, _shLogWriter);
-				_serviceHostThread.Start();
+				
+				if (UseServiceHostAsync)
+					_serviceHostThread = ArtefactHost.GetOrCreateAsyncThread(_artefactTypes, _defaultTimeout, _shLogWriter);
+				else if (UseServiceHostProc)
+				{
+					if (!ArtefactHost.IsRunning("ServiceHost.exe"))
+					{
+						IEnumerable<string> args =
+							_artefactTypes.Select<Type, string>((T) => string.Concat("-A", Path.GetFileName(T.Assembly.Location))).Distinct()
+							.Concat(_artefactTypes.Select<Type, string>((T) => string.Concat("-T", T.FullName)));
+						_serviceHostProcess = ArtefactHost.ExecuteViaCommandLine("ServiceHost.exe", string.Join(" ", args));
+//						AppDomain.CurrentDomain.ExecuteAssembly("ServiceHost.exe", args.ToArray());
+					}
+				}
 				Thread.Sleep(_serviceHostStartDelay);
+				
 				_clientProxy = new RepositoryClientProxy(new NetTcpBinding(), "net.tcp://localhost:3334/ArtefactRepository");
 				Console.WriteLine("\nService Artefact Repository: {0}\n", _clientProxy.ToString());
 				_fsCreator = new FileSystemArtefactCreator(_clientProxy)
@@ -116,14 +148,18 @@ namespace Artefacts.TestClient
 				if (_serviceHostThread != null)// && _serviceHostThread.IsAlive)
 				{
 					Console.Write("\tStopping service host thread... ");
-					ArtefactServiceHost.StopAsyncThread();
+					ArtefactHost.StopAsyncThread();
 					if (_serviceHostThread.Join(_serviceHostStopTimeout))
 						Console.WriteLine("done.");
 					else
 						Console.WriteLine("Error!");
 				}
+				else if (_serviceHostProcess != null)
+				{
+					_serviceHostProcess.Close();
+				}
 				else
-					Console.WriteLine("\tService host thread null!");
+					Console.WriteLine("\tService host not running via thread or process!");
 				Console.Write("\tClosing service host log... ");
 				if (_shLogWriter != null)
 				{
@@ -135,6 +171,8 @@ namespace Artefacts.TestClient
 				else
 					Console.WriteLine("\tnot open!");
 			}
+			Console.SetOut(ConsoleOut);
+			Console.SetError(ConsoleError);
 		}
 		#endregion
 
@@ -155,7 +193,7 @@ namespace Artefacts.TestClient
 		/// <summary>
 		/// Tests the query artefacts_ linq_ statement.
 		/// </summary>
-		[Test, TestMethod(Order=20, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ statement")]
+//		[Test, TestMethod(Order=20, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ statement")]
 		public void TestQueryArtefacts_Linq_Statement()
 		{
 			var q = from a in _clientProxy.Artefacts
@@ -168,7 +206,7 @@ namespace Artefacts.TestClient
 		/// <summary>
 		/// Tests the query artefacts_ linq_ method.
 		/// </summary>
-		[Test, TestMethod(Order=30, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ method syntax")]
+//		[Test, TestMethod(Order=30, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ method syntax")]
 		public void TestQueryArtefacts_Linq_Method()
 		{
 			var q = _clientProxy.Artefacts.Where((a) => a.Id > 32799);
@@ -176,6 +214,12 @@ namespace Artefacts.TestClient
 				Console.WriteLine(artefact.ToString());
 		}
 
+		[Test, TestMethod(Order=35, Name="Host.Current static property")]
+		public void TestHostArtefactCurrent()
+		{
+			Console.WriteLine(Host.Current.ToString());
+		}
+		
 		[Test, TestMethod(Order=50, Name="int _clientProxy.Artefacts.Count()")]
 		public void TestQueryArtefactsDrivesCount()
 		{

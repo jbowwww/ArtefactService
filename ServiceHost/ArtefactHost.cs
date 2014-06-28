@@ -6,19 +6,25 @@ using System.ServiceModel.Description;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Diagnostics;
+using System.Reflection;
+using System.Xml;
+using System.Linq;
 
 namespace Artefacts.Service
 {
 	/// <summary>
 	/// Host.
 	/// </summary>
-	public static class ArtefactServiceHost
+	public static class ArtefactHost
 	{
 		#region Private fields
 		private static TimeSpan _defaultTimeout = new TimeSpan(0, 0, 10);
 		private static TimeSpan _timeout = _defaultTimeout;
 		private static TextWriter _output;
 		private static TextWriter _error;
+		private static Type[] _artefactTypes = null;
+		private static Repository _serviceInstance = null;
+		private static ServiceHost _serviceHost = null;
 		private static Thread _serviceHostThread;
 		private static bool _exitServiceHost;
 		#endregion
@@ -62,10 +68,10 @@ namespace Artefacts.Service
 			host.AddServiceEndpoint(typeof(IRepository),
 				new NetTcpBinding(SecurityMode.None)
 				{
-										MaxBufferSize = 4096,
+					MaxBufferSize = 4096,
 					ReaderQuotas = new System.Xml.XmlDictionaryReaderQuotas()
 					{
-												MaxStringContentLength = 32768
+						MaxStringContentLength = 32768
 					}
 				},
 				new Uri("net.tcp://localhost:3334/ArtefactRepository"));
@@ -85,14 +91,14 @@ namespace Artefacts.Service
 		/// Builds the service host.
 		/// </summary>
 		/// <returns>The service host.</returns>
+		/// <param name="serviceInstance"></param>
 		/// <param name="timeout">Timeout.</param>
 		/// <param name="output">Output.</param>
 		/// <param name="error">Error.</param>
 		/// <param name="useCustomBehaviours">If set to <c>true</c> use custom behaviours.</param>
 		public static ServiceHost BuildServiceHost(
-			TimeSpan timeout = default(TimeSpan),
-			 TextWriter output = null,
-			 TextWriter error = null, 
+			object serviceInstance, TimeSpan timeout = default(TimeSpan),
+			TextWriter output = null, TextWriter error = null,
 			bool useCustomBehaviours = false)
 		{
 			if (output == null)
@@ -104,7 +110,7 @@ namespace Artefacts.Service
 			_output = output;
 			_error = error;
 			
-			ServiceHost sh = new ServiceHost(typeof(Repository));
+			ServiceHost sh = new ServiceHost(serviceInstance);
 			ApplyServiceHostSettings(sh, useCustomBehaviours);
 			
 			return sh;
@@ -116,22 +122,84 @@ namespace Artefacts.Service
 		/// <param name="args">The command-line arguments.</param>
 		public static void Main(string[] args)
 		{
-			ServiceHost sh = null;
 			try
 			{
-				sh = BuildServiceHost(_defaultTimeout, Console.Out, Console.Error, false);
-				sh.Open();
-				Console.WriteLine(sh.ToString());
-				Console.ReadKey();
+				string hostTypeName = typeof(ArtefactHost).FullName;
+				Process proc = Process.GetCurrentProcess();
+				ProcessStartInfo procInfo = proc.StartInfo;
+				Console.WriteLine("{0}\n({1}) {2}:{3} @ {4}\n{5} {6} {7}", hostTypeName,
+					proc.Id, proc.MachineName, proc.ProcessName, proc.StartTime.ToShortDateString(),
+					proc.PriorityClass, procInfo.FileName, procInfo.Arguments);
+				foreach (string arg in args)
+				{
+					Assembly pluginAssembly;
+					IEnumerable<Type> pluginArtefactTypes;
+					if (arg.StartsWith("-P"))
+					{
+						int pluginLoadCount = 0;
+						string pluginDir = arg.Length > 2 ? arg.Substring(2) : "Plugins/";
+						string[] pluginFiles = Directory.GetFiles(pluginDir, "*.dll", SearchOption.TopDirectoryOnly);
+						Console.WriteLine("{0}: Plugin directory {1} ({2} plugins):", hostTypeName, pluginDir, pluginFiles.Length);
+						foreach (string filePath in pluginFiles)
+						{
+//							string filePath = Path.Combine(pluginDir, filename);
+							Console.Write("\t{0}: ", filePath);
+							pluginAssembly = Assembly.LoadFrom(filePath);
+							if (pluginAssembly == null)
+								Console.WriteLine("fail!");
+							else
+							{
+								pluginArtefactTypes = pluginAssembly.ExportedTypes.Where((T) => typeof(Artefact).IsAssignableFrom(T));
+								Console.WriteLine("{0} artefact types", pluginArtefactTypes.Count());
+								Console.WriteLine(string.Concat("\t\t", string.Join(" ", pluginArtefactTypes.Select<Type, string>((T) => T.FullName))));
+								Artefact.ArtefactTypes.AddRange(pluginArtefactTypes);
+								pluginLoadCount++;
+							}
+						}
+						Console.WriteLine("{0}: {1} plugins loaded", hostTypeName, pluginLoadCount);
+					}
+					else if (arg.StartsWith("-A") || arg.StartsWith("-R"))
+					{
+						string assembly = arg.Substring(2);
+						Console.Write("{0}: {1} assembly {2}: ", hostTypeName, arg.StartsWith("-A") ? "Load" : "Ref", assembly);
+						pluginAssembly = Assembly.LoadFrom(assembly);
+						if (pluginAssembly == null)
+							Console.WriteLine("fail!");
+						else if (arg.StartsWith("-R"))
+							Console.WriteLine("OK");
+						else
+						{
+							pluginArtefactTypes = pluginAssembly.ExportedTypes.Where((T) => typeof(Artefact).IsAssignableFrom(T));
+							Console.WriteLine("{0} artefact types", pluginArtefactTypes.Count());
+							Console.WriteLine(string.Concat("\t\t", string.Join(" ", pluginArtefactTypes.Select<Type, string>((T) => T.FullName))));
+						}
+						
+					}
+					else if (arg.StartsWith("-T"))
+					{
+						string type = arg.Substring(2);
+						Console.Write("{0}: Load type \"{1}\": ", hostTypeName, type);
+						Type T = Type.GetType(type);
+						Console.WriteLine(T == null ? "fail!" : "OK");
+						if (T != null)
+							Artefact.ArtefactTypes.Add(T);
+					}
+				}				
+				
+				_serviceInstance = new Repository();
+				_serviceHost = BuildServiceHost(_serviceInstance, _defaultTimeout, Console.Out, Console.Error, false);
+				_serviceHost.Open();
+				Console.WriteLine(_serviceHost.ToString());
+				Console.ReadLine();
 			}
 			catch (/*Communication*/Exception ex)
 			{
-				Console.Error.WriteLine("\nServiceHost Exception (State=" + (sh == null ? "(null)" : sh.State.ToString()) + "):\n" + ex.ToString() + "\n");
+				Console.Error.WriteLine("\nServiceHost Exception (State=" + (_serviceHost == null ? "(null)" : _serviceHost.State.ToString()) + "):\n" + ex.ToString() + "\n");
 			}
 			finally
 			{
-				if (sh != null && sh.State != CommunicationState.Closed && sh.State != CommunicationState.Closing)
-					sh.Close();
+				if (_serviceHost != null && _serviceHost.State != CommunicationState.Closed && _serviceHost.State != CommunicationState.Closing)
+					_serviceHost.Close();
 			}
 		}
 
@@ -179,7 +247,7 @@ namespace Artefacts.Service
 				return _serviceHostThread;
 
 			_exitServiceHost = false;
-			return _serviceHostThread = new Thread(() =>
+			_serviceHostThread = new Thread(() =>
 			{
 //				if (artefactTypes != null)
 //				{
@@ -188,27 +256,27 @@ namespace Artefacts.Service
 //					Artefact.ArtefactTypes.AddRange(artefactTypes);
 //				}
 				
-					FileStream _logFileStream = null;
-				ServiceHost sh = null;
+				FileStream _logFileStream = null;
 				try
 				{
+						_serviceInstance = new Repository();
 						if (LogFilePath != null)
 							output = error = /*TextWriter.Synchronized(*/ new StreamWriter(_logFileStream = File.OpenWrite(LogFilePath));//);
-						sh = BuildServiceHost(timeout, output, error, false);
-					sh.Open();
+						_serviceHost = BuildServiceHost(_serviceInstance, timeout, output, error, false);
+					_serviceHost.Open();
 					
-					output.WriteLine(sh.ToString());
+					output.WriteLine(_serviceHost.ToString());
 					while (!_exitServiceHost)
 						Thread.Sleep(333);
 				}
 				catch (Exception ex)
 				{
-					error.WriteLine("\nServiceHost Exception (State={0}):\n{1}\n", (sh == null ? "(null)" : sh.State.ToString()), ex.ToString());
+					error.WriteLine("\nServiceHost Exception (State={0}):\n{1}\n", (_serviceHost == null ? "(null)" : _serviceHost.State.ToString()), ex.ToString());
 				}
 				finally
 				{
-					if (sh != null && sh.State != CommunicationState.Closed && sh.State != CommunicationState.Closing)
-						sh.Close();
+					if (_serviceHost != null && _serviceHost.State != CommunicationState.Closed && _serviceHost.State != CommunicationState.Closing)
+						_serviceHost.Close();
 					if (LogFilePath != null && _logFileStream != null)
 						{
 							_logFileStream.Flush(true);
@@ -218,6 +286,8 @@ namespace Artefacts.Service
 				}
 			});
 			_serviceHostThread.Priority = ThreadPriority.BelowNormal;	// this thread doesn't run the service host itself, and i don't think the thread created
+			_serviceHostThread.Start();
+			return _serviceHostThread;
 			// by sh.Open() will inherit this lower priority (should b e normal??)
 		}
 
@@ -226,10 +296,25 @@ namespace Artefacts.Service
 		/// </summary>
 		/// <param name="exe">Exe.</param>
 		/// <param name="args">Arguments.</param>
-		public static void ExecuteViaCommandLine(string exe, string args)
+		public static Process ExecuteViaCommandLine(string exe, string args = null)
 		{
-			ProcessStartInfo oInfo = new ProcessStartInfo(exe, args);
+//			ProcessStartInfo oInfo = new ProcessStartInfo(exe, args);
+			return Process.Start(exe, args);
+		}
+		
+		/// <summary>
+		/// Determines if is running the specified exe.
+		/// </summary>
+		/// <returns><c>true</c> if is running the specified exe; otherwise, <c>false</c>.</returns>
+		/// <param name="exe">Exe.</param>
+		public static bool IsRunning(string exe)
+		{
+			ProcessStartInfo oInfo = new ProcessStartInfo("ps", "-A");
+			oInfo.RedirectStandardOutput = true;
+			oInfo.UseShellExecute = false;
 			Process proc = Process.Start(oInfo);
+			proc.WaitForExit();
+			return proc != null && proc.StandardOutput != null && proc.StandardOutput.ReadToEnd().Contains(exe);
 		}
 		#endregion
 	}

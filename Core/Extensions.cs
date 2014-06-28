@@ -25,6 +25,16 @@ namespace Artefacts
 			return string.Concat(indent, s.Replace("\n", string.Concat("\n", indent)));
 		}
 
+// TODO: Might be nice for diagnostic etc formatting. Indents and also wraps (at spaces between words) to a specified width
+//		public static string IndentWrap(this string s, int width, string indent = "  ", string wrap = "\n")
+//		{
+//			int iNL = -1;
+//			string sw = s;
+//			for (string sw = sw.Insert(iNL + 1, indent); sw.Length > width; iNL = sw.LastIndexOf(" ", iNL + width, width))
+//				sw.Remove(iNL).Insert(iNL, string.Concat(wrap, indent))
+//			
+//		}
+		
 		public static string ToString(this object[] array)
 		{
 			StringBuilder sb = new StringBuilder(array.GetType().FullName).Append(" { ");
@@ -44,16 +54,16 @@ namespace Artefacts
 //			return r;
 //		}
 
-		public static Host GetOrCreateCurrentHost(this IQueryable<Host> hosts)
-		{
-			string hostId = Host.GetHostId();
-			if (string.IsNullOrEmpty(hostId))
-				throw new ApplicationException("Host.GetHostId() returned null or empty!");
-			Host dbHost = hosts.Where((h) => h.HostId == hostId).FirstOrDefault();
-			if (dbHost == null)
-				dbHost = new Host(true);
-			return dbHost;
-		}
+//		public static Host GetOrCreateCurrentHost(this IQueryable<Host> hosts)
+//		{
+//			string hostId = Host.GetHostId();
+//			if (string.IsNullOrEmpty(hostId))
+//				throw new ApplicationException("Host.GetHostId() returned null or empty!");
+//			Host dbHost = hosts.Where((h) => h.HostId == hostId).FirstOrDefault();
+//			if (dbHost == null)
+//				dbHost = new Host(true);
+//			return dbHost;
+//		}
 	}
 }
 

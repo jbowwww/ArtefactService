@@ -135,7 +135,9 @@ namespace Artefacts.Service
 				 	//(IQueryable<Artefact>)this;		//
 //			Queryables.Add(typeof(Artefact), Artefacts);
 
-			Host.Current = BuildBaseQuery<Host>().GetOrCreateCurrentHost();
+			Host.Current = BuildBaseQuery<Host>().Where((host) => Host.GetHostId() == host.HostId).FirstOrDefault() ?? new Host();
+			
+			
 			if (Host.Current.IsTransient)
 				Channel.Add(Host.Current);
 			
@@ -183,7 +185,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public int Add(Artefact artefact)
 		{
-			return Channel.Add(artefact);
+			return (artefact.Id = Channel.Add(artefact)).Value;
 		}
 
 		/// <summary>

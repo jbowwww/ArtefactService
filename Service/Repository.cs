@@ -99,7 +99,12 @@ namespace Artefacts.Service
 		/// Gets or sets the context.
 		/// </summary>
 		/// <value>The context.</value>
-		public static IRepository Context { get; set; }
+		[ThreadStatic]
+		private static IRepository _context = null;
+		public static IRepository Context {
+			get { return _context; }
+			set { _context = value; }
+		}
 		#endregion
 
 		#region Private fields

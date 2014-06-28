@@ -17,15 +17,19 @@ namespace Artefacts
 		}
 		
 		private static Host _current = null;
-		
 		public static Host Current {
-			get; set; }
+			get; set;
+//			get
 //			{
 //				if (_current == null)
-//					_current = new Host(true);
+//				{
+//					Host tempNewHost = new Host();
+//					_current = 
+//					
+//				}
 //				return _current;
 //			}
-//		}
+		}
 		
 		public static string GetHostId()
 		{
@@ -47,14 +51,10 @@ namespace Artefacts
 		[DataMember]
 		public virtual string HostId { get; set; }
 
-		public Host(bool createNew = true)
+		public Host()
 		{
-			if (createNew)
-			{
-			}
+			HostId = GetHostId();
 		}
-		
-		protected Host() {}
 
 		public override Artefact Update()
 		{
