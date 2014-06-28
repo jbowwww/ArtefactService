@@ -2,9 +2,9 @@
 # MonoDevelop workspace, solution, project, userprefs files
 #
 
-*.mdw
-*.sln
-*.csproj
+#*.mdw
+#*.sln
+#*.csproj
 *.userprefs
 
 #
