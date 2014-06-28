@@ -73,7 +73,9 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="Configuration\ArtefactService.config.exclude" />
-    <None Include="Configuration\hibernate_server.cfg.xml" />
+    <None Include="Configuration\hibernate_server.cfg.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

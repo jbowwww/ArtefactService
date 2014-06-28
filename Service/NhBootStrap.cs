@@ -26,7 +26,7 @@ namespace Artefacts.Service
 				if (_configuration == null)
 				{
 					_configuration = new Configuration()
-						.Configure("hibernate_server.cfg.xml")
+						.Configure("Configuration/hibernate_server.cfg.xml")
 						.DataBaseIntegration((p) =>
 					{
 //						p.ConnectionReleaseMode = ConnectionReleaseMode.OnClose;
