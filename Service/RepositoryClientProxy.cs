@@ -36,9 +36,12 @@ namespace Artefacts.Service
 	/// 
 	/// </remarks>
 	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
-	public class RepositoryClientProxy : IRepository, IOrderedQueryable<Artefact>, IQueryProvider
+	public class RepositoryClientProxy : IRepository, IOrderedQueryable<Artefact>, IQueryProvider, IDisposable
 	{
 		#region Fields & properties
+		private bool _init;
+		private bool _close;
+		private readonly string _proxyTypeName;
 		#region Service channel
 		/// <summary>
 		/// The binding.
@@ -53,12 +56,14 @@ namespace Artefacts.Service
 		/// <summary>
 		/// The channel factory.
 		/// </summary>
-		public readonly ChannelFactory<IRepository> ChannelFactory;
+		public ChannelFactory<IRepository> ChannelFactory;
 
 		/// <summary>
 		/// The channel.
 		/// </summary>
-		public readonly IRepository Channel;
+		public IRepository Channel;
+		
+		private int _clientId;
 		#endregion
 		
 		#region Queries
@@ -108,42 +113,92 @@ namespace Artefacts.Service
 		#endregion
 		#endregion
 		
-		#region Construction & initialisation methods
+		#region Construction & disposal methods
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Artefacts.Service.RepositoryClientProxy"/> class.
 		/// </summary>
 		/// <param name="binding">Binding.</param>
 		/// <param name="address">Address.</param>
 		/// <param name="visitor">Client side <see cref="ExpressionVisitor"/> </param>
-		public RepositoryClientProxy(Binding binding, string address, ExpressionVisitor visitor = null)
+		public RepositoryClientProxy(Binding binding, string address, bool init = true)
 		{
+			_init = _close = false;
+			_proxyTypeName = GetType().FullName;
 			if (Repository.Context != null)
 				throw new ApplicationException("Repository.Context != null");
 			Repository.Context = this;
 			Binding = binding;
 			Address = address;
-			ChannelFactory = new ChannelFactory<IRepository>(Binding, Address);				
-//			ApplyChannelFactoryBehaviours(_channelFactory);
-			Channel = ChannelFactory.CreateChannel();
-
-			Queryables = new ConcurrentDictionary<Type, IQueryable>();
-			QueryCache = new Dictionary<object, IQueryable>();
-			DefaultPagingOptions = new PagingOptions();
-			ExpressionVisitor = visitor ?? new ClientQueryVisitor(this, QueryCache);
-			Artefacts = BuildBaseQuery<Artefact>();
-				// ((IQueryProvider)this).CreateQuery<Artefact>(Expression.Property(Expression, "Artefacts"));
-				 	//(IQueryable<Artefact>)this;		//
-//			Queryables.Add(typeof(Artefact), Artefacts);
-
-			Host.Current = BuildBaseQuery<Host>().Where((host) => Host.GetHostId() == host.HostId).FirstOrDefault() ?? new Host();
-			
-			
-			if (Host.Current.IsTransient)
-				Channel.Add(Host.Current);
-			else
-				Channel.Update(Host.Current.Update());
+			if (init)
+				Init();
 		}
 
+		/// <summary>
+		/// Releases all resource used by the <see cref="Artefacts.Service.RepositoryClientProxy"/> object.
+		/// </summary>
+		/// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="Artefacts.Service.RepositoryClientProxy"/>.
+		/// The <see cref="Dispose"/> method leaves the <see cref="Artefacts.Service.RepositoryClientProxy"/> in an unusable
+		/// state. After calling <see cref="Dispose"/>, you must release all references to the
+		/// <see cref="Artefacts.Service.RepositoryClientProxy"/> so the garbage collector can reclaim the memory that the
+		/// <see cref="Artefacts.Service.RepositoryClientProxy"/> was occupying.</remarks>
+		public void Dispose()
+		{
+			Close();
+		}
+		#endregion
+		
+		#region (De)Initialisation routines
+		/// <summary>
+		/// Init this instance.
+		/// </summary>
+		public void Init()
+		{
+			if (_init)
+				Console.WriteLine("{0}: Already initialised", _proxyTypeName);
+			else
+			{
+				_init = true;
+				Console.WriteLine("{0}: Initialising", _proxyTypeName);
+				ChannelFactory = new ChannelFactory<IRepository>(Binding, Address);				
+	//			ApplyChannelFactoryBehaviours(_channelFactory);
+				Channel = ChannelFactory.CreateChannel();
+				Queryables = new ConcurrentDictionary<Type, IQueryable>();
+				QueryCache = new Dictionary<object, IQueryable>();
+				DefaultPagingOptions = new PagingOptions();
+				ExpressionVisitor = new ClientQueryVisitor(this, QueryCache);
+				Artefacts = BuildBaseQuery<Artefact>();
+				// ((IQueryProvider)this).CreateQuery<Artefact>(Expression.Property(Expression, "Artefacts"));
+				//(IQueryable<Artefact>)this;		//
+				//			Queryables.Add(typeof(Artefact), Artefacts);
+				Host.Current = BuildBaseQuery<Host>().Where(host => Host.GetHostId() == host.HostId).FirstOrDefault() ?? new Host();
+				if (Host.Current.IsTransient)
+					Channel.Add(Host.Current);
+				else
+					Channel.Update(Host.Current.Update());
+				_clientId = Channel.Connect(Host.Current);
+			}
+		}
+
+		/// <summary>
+		/// Close this instance.
+		/// </summary>
+		public void Close()
+		{
+			if (_close)
+				Console.WriteLine("{0}: Already closed", _proxyTypeName);
+			else
+			{
+				_close = true;
+				Channel.Disconnect(Host.Current);
+				ChannelFactory.Close();
+			}
+		}
+		
+		/// <summary>
+		/// Builds the base query.
+		/// </summary>
+		/// <returns>The base query.</returns>
+		/// <typeparam name="TArtefact">The 1st type parameter.</typeparam>
 		public IQueryable<TArtefact> BuildBaseQuery<TArtefact>() where TArtefact : Artefact
 		{
 //			IQueryable<TArtefact> query = Expression.PropertyOrField()
@@ -177,6 +232,16 @@ namespace Artefacts.Service
 //			}
 		}
 		#endregion
+		
+		public int Connect(Host host)
+		{
+			throw new NotImplementedException();
+		}
+		
+		public void Disconnect(Host host)
+		{
+			throw new NotImplementedException();
+		}
 		
 		#region Add/Get/Update/Remove singular artefact operations
 		/// <summary>

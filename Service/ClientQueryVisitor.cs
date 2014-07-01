@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System;
 using System.Reflection;
 using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace Artefacts.Service
 {
@@ -44,14 +45,15 @@ namespace Artefacts.Service
 			return base.VisitUnary((UnaryExpression)StripQuotes(u));
 		}
 
-		protected override Expression VisitConstant(ConstantExpression c)
-		{
-			return base.VisitConstant(c);
-		}
+//		protected override Expression VisitConstant(ConstantExpression c)
+//		{
+//			return base.VisitConstant(c);
+//		}
 
 		protected override Expression VisitMemberAccess(MemberExpression m)
 		{
-			if (m.Expression != null && m.Expression.NodeType == ExpressionType.Constant)
+			Expression mExpression = Visit(m.Expression);
+			if (mExpression != null && mExpression.NodeType == ExpressionType.Constant)
 			{
 				const BindingFlags bf = BindingFlags.GetField | BindingFlags.GetProperty
 				                        | BindingFlags.Instance | BindingFlags.Static
@@ -59,7 +61,7 @@ namespace Artefacts.Service
 				return Expression.Constant(
 					m.Member.DeclaringType.InvokeMember(
 					m.Member.Name, bf, null,
-					(m.Expression as ConstantExpression).Value,
+					(mExpression as ConstantExpression).Value,
 					new object[] {}), m.Type);
 			}
 			return base.VisitMemberAccess(m);
@@ -79,11 +81,18 @@ namespace Artefacts.Service
 		/// </remarks>
 		protected override Expression VisitMethodCall(MethodCallExpression m)
 		{
+			Expression mObject = Visit(m.Object);
+			ReadOnlyCollection<Expression> mArguments = VisitExpressionList(m.Arguments);			
 			MethodInfo mi = m.Method;
 			ParameterInfo[] pi = mi.GetParameters();
-			if (pi.Length > 0 && (typeof(IEnumerable).IsAssignableFrom(pi[0].GetType()) || typeof(IQueryable).IsAssignableFrom(pi[0].GetType())))
+			
+			if (mObject != null && mObject.NodeType == ExpressionType.Constant
+			 && mArguments.All<Expression>((arg) => arg.NodeType == ExpressionType.Constant))
+				return Expression.Constant(m.Method.Invoke((mObject as ConstantExpression).Value,
+					mArguments.Cast<ConstantExpression>().Select<ConstantExpression, object>((ce) => ce.Value).ToArray()));
+			else if (pi.Length > 0 && (typeof(IEnumerable).IsAssignableFrom(pi[0].GetType()) || typeof(IQueryable).IsAssignableFrom(pi[0].GetType())))
 			{
-				object id = Repository.QueryPreload(this.Visit(m.Arguments[0]).ToBinary());
+				object id = Repository.QueryPreload(Visit(m.Arguments[0]).ToBinary());
 				int[] result = null;
 				if (mi.Name.Equals("First") || mi.Name.Equals("FirstOrDefault")
 				 || mi.Name.Equals("Single") || mi.Name.Equals("SingleOrDefault"))
@@ -99,6 +108,19 @@ namespace Artefacts.Service
 				return Expression.Constant(artefact);
 			}
 			return base.VisitMethodCall(m);
+		}
+		
+		protected override Expression VisitNewArray(NewArrayExpression na)
+		{
+			ReadOnlyCollection<Expression> naExpressions = VisitExpressionList(na.Expressions);
+			if (naExpressions.All<Expression>((arg) => arg.NodeType == ExpressionType.Constant))
+			{
+				Array elements = Array.CreateInstance(na.Type.GetElementType(), naExpressions.Count);
+				for (int i = 0; i < naExpressions.Count; i++)
+					elements.SetValue(((ConstantExpression)naExpressions[i]).Value, i);
+				return Expression.Constant(elements, na.Type);
+			}
+			return base.VisitNewArray(na);
 		}
 	}
 }

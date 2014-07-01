@@ -54,7 +54,7 @@ namespace Artefacts
 // TODO: Connection closing/timeout
 		public virtual int ConnectionId { get; set; }
 
-		public virtual bool Connected { get { return ConnectionId >= 0; } }
+		public virtual bool Connected { get { return ConnectionId != default(int); } }
 		
 		public virtual DateTime ConnectTime { get; set; }
 		

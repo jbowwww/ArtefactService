@@ -63,9 +63,10 @@ namespace Artefacts.TestClient
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Artefacts.TestClient.ClientTests"/> class.
 		/// </summary>
-		public ClientTestFixture()
+		public ClientTestFixture(bool init = true)
 		{
-			Init();
+			if (init)
+				Init();
 		}
 
 		/// <summary>

@@ -113,5 +113,13 @@
     <None Include="Outputs\140621-2220-NH_Error_after_reorganising.txt" />
     <None Include="Outputs\140621-2311_AllTestsSuccessfulAfterRecreatingSolutionAndProjects.txt" />
     <None Include="Outputs\140628-1824-FileSystemCreatorWOrkingBetterAndHostArtefactWorking.txt" />
+    <None Include="Outputs\140602-0420-SeparateClientAndServer-ConsoleLog\client.txt" />
+    <None Include="Outputs\140602-0420-SeparateClientAndServer-ConsoleLog\server.txt" />
+    <None Include="Outputs\140602-0550-ImprovedClientSideQueryVisitor\client.txt" />
+    <None Include="Outputs\140602-0550-ImprovedClientSideQueryVisitor\server.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Outputs\140602-0420-SeparateClientAndServer-ConsoleLog\" />
+    <Folder Include="Outputs\140602-0550-ImprovedClientSideQueryVisitor\" />
   </ItemGroup>
 </Project>

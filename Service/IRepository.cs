@@ -39,7 +39,19 @@ namespace Artefacts.Service
 	public interface IRepository
 	{
 		#region Basic Service Operations
-//		int Connect(Host host);
+		/// <summary>
+		/// Connect the specified host.
+		/// </summary>
+		/// <param name="host">Host.</param>
+		[OperationContract]
+		int Connect(Host host);
+		
+		/// <summary>
+		/// Disconnect the specified clientId.
+		/// </summary>
+		/// <param name="clientId">Client identifier.</param>
+		[OperationContract]
+		void Disconnect(Host host);
 		#endregion
 		
 		#region Collections/Enumerables/Queryables
@@ -100,7 +112,7 @@ namespace Artefacts.Service
 		/// <returns>The query.</returns>
 		/// <param name="expression">Expression.</param>
 		[OperationContract]
-		object QueryPreload(byte[] expression);//ExpressionNode expression);
+		object QueryPreload(byte[] expression);
 
 		/// <summary>
 		/// Queries the results.
@@ -118,10 +130,7 @@ namespace Artefacts.Service
 		/// <returns>The execute.</returns>
 		/// <param name="expression">Expression.</param>
 		[OperationContract]
-		object QueryExecute(byte[] expression);//ExpressionNode expression);
-
-//		[OperationContract]
-//		Artefact QuerySingleResult()
+		object QueryExecute(byte[] expression);
 		#endregion
 	}
 }

@@ -108,6 +108,7 @@ namespace Artefacts.Service
 		#endregion
 
 		#region Private fields
+		private Random _randomGenerator;
 		private Dictionary<int, Artefact> _artefactCache;
 		private Dictionary<object, int> _countCache;
 //		private Dictionary<object, QueryResult<Artefact>> _queryResultCache;
@@ -156,7 +157,7 @@ namespace Artefacts.Service
 		public Repository()
 		{
 			Context = this;
-
+			_randomGenerator = new Random(DateTime.Now.Second);
 			_artefactCache = new Dictionary<int, Artefact>();
 			_countCache = new Dictionary<object, int>();
 			//_queryResultCache = new Dictionary<object, QueryResult<Artefact>>();
@@ -186,7 +187,28 @@ namespace Artefacts.Service
 		#endregion
 		
 		#region Basic service operations
+		public int Connect(Host host)
+		{
+			if (host.Connected)
+				throw Error(new ApplicationException("Already connected"), host.ConnectionId);
+			host.ConnectionId = _randomGenerator.Next(1, int.MaxValue);
+			if (host.IsTransient)
+				Add(host);
+			else
+				Update(host);
+			Console.WriteLine("\nConnect({0} #{1}) = {2}", typeof(Host).FullName, host.Id, host.ConnectionId);
+			return host.ConnectionId;
+		}
 		
+		public void Disconnect(Host host)
+		{
+			if (host.IsTransient)
+				throw Error(new ApplicationException("Cannot disconnect transient host"));
+			if (!host.Connected)
+				throw Error(new ApplicationException("Not connected"), host.ConnectionId);
+			Console.WriteLine("Disconnect({0} #{1} [connectionId={2}])\n", typeof(Host).FullName, host.Id, host.ConnectionId);
+			host.ConnectionId = -1;
+		}
 		#endregion
 
 		#region Add/Get/Update/Remove singular artefact operations
@@ -371,6 +393,7 @@ namespace Artefacts.Service
 			{
 				serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
 				serverId = serverSideExpression.Id();
+				Console.WriteLine("QueryPreload([{0}] \"{1}\")", serverId, serverSideExpression);
 				if (!QueryCache.ContainsKey(serverId))
 				{
 					serverSideQuery = _nhQueryProvider.CreateQuery(serverSideExpression);				
@@ -379,6 +402,8 @@ namespace Artefacts.Service
 			}
 			catch (Exception ex)
 			{
+				Console.Write("\n--- Repository Exception ---\n{0}: {1}\nStackTrace:\n  {2}\n\n",
+					ex.GetType().FullName, ex.Message, ex.StackTrace.Trim('\n').Insert(0, "\n").Replace("\n", "\n  "));
 				FaultException fEx = Error(ex);
 				fEx.Data.Add("serverSideExpression", expression.NodeFromBinary().ToString());// serverSideExpression.ToString());
 				fEx.Data.Add("serverId", serverId.ToString());
@@ -402,6 +427,8 @@ namespace Artefacts.Service
 			try
 			{
 				serverSideQuery = (IQueryable<Artefact>)QueryCache[queryId];
+				Console.WriteLine("QueryResults({0})\n  expression = \"{1}\"", queryId, serverSideQuery.Expression);
+				
 				results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
 					serverSideQuery.Skip(startIndex) : // with a new custom server-side query provider, and implement caching??
 					serverSideQuery.Skip(startIndex).Take(count)).Select((a) => a.Id.Value).ToArray();
@@ -420,6 +447,8 @@ namespace Artefacts.Service
 			}
 			catch (Exception ex)
 			{
+				Console.Write("\n--- Repository Exception ---\n{0}: {1}\nStackTrace:\n  {2}\n\n",
+					ex.GetType().FullName, ex.Message, ex.StackTrace.Trim('\n').Insert(0, "\n").Replace("\n", "\n  "));
 				FaultException fEx = Error(ex);
 				fEx.Data.Add("queryId", queryId.ToString());
 				fEx.Data.Add("startIndex", startIndex.ToString());
@@ -443,11 +472,14 @@ namespace Artefacts.Service
 			try
 			{
 				serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
+				Console.WriteLine("QueryExecute([{0}] \"{1}\") = ", serverSideExpression.Id(), serverSideExpression);
 				result = _nhQueryProvider.Execute(serverSideExpression);
 				return result;
 			}
 			catch (Exception ex)
 			{
+				Console.Write("\n--- Repository Exception ---\n{0}: {1}\nStackTrace:\n  {2}\n\n",
+					ex.GetType().FullName, ex.Message, ex.StackTrace.Trim('\n').Insert(0, "\n").Replace("\n", "\n  "));
 				FaultException fEx = Error(ex);
 				fEx.Data.Add("serverSideExpression", expression.NodeFromBinary().ToString());// serverSideExpression.ToString());
 				fEx.Data.Add("result", result.ToString());
