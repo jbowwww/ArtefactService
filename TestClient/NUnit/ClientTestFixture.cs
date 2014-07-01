@@ -41,10 +41,8 @@ namespace Artefacts.TestClient
 
 		private Process _serviceHostProcess = null;
 		private Thread _serviceHostThread = null;
-		private const string _clientLogFilePath = @"Client.Log";
 		private const string _serviceHostLogFilePath = @"ServiceHost.Log";
 		private readonly FileStream _serviceHostLog = null;
-		private TextWriter _clLogWriter = null;
 		private TextWriter _shLogWriter = null;
 
 		private RepositoryClientProxy _clientProxy = null;
@@ -58,7 +56,6 @@ namespace Artefacts.TestClient
 
 		protected TextWriter ConsoleOut = null;
 		protected TextWriter ConsoleError = null;
-		
 		protected readonly bool UseServiceHostAsync = false;
 		protected readonly bool UseServiceHostProc = false;
 		
@@ -92,12 +89,6 @@ namespace Artefacts.TestClient
 		/// </summary>
 		public void Init()
 		{
-			Console.SetWindowSize(Console.LargestWindowWidth, Console.LargestWindowHeight);
-			ConsoleOut = Console.Out;
-			ConsoleError = Console.Error;
-			Console.SetOut(new MultiTextWriter(ConsoleOut, new LogTextWriter(_clientLogFilePath)));
-			Console.SetError(Console.Out);
-			
 			Console.Write("ClientTest.Init: ");
 			if (Thread.VolatileRead(ref _init) != 0)
 				Console.WriteLine("Already initialised");
@@ -106,10 +97,13 @@ namespace Artefacts.TestClient
 				Console.WriteLine("Initialising...");
 				Thread.VolatileWrite(ref _init, 1);
 				Artefact.ArtefactTypes.AddRange(_artefactTypes);
-				_shLogWriter = new LogTextWriter(_serviceHostLogFilePath);
 				
 				if (UseServiceHostAsync)
+				{
 					_serviceHostThread = ArtefactHost.GetOrCreateAsyncThread(_artefactTypes, _defaultTimeout, _shLogWriter);
+					_shLogWriter = new LogTextWriter(_serviceHostLogFilePath);
+					Thread.Sleep(_serviceHostStartDelay);
+				}
 				else if (UseServiceHostProc)
 				{
 					if (!ArtefactHost.IsRunning("ServiceHost.exe"))
@@ -119,9 +113,9 @@ namespace Artefacts.TestClient
 							.Concat(_artefactTypes.Select<Type, string>((T) => string.Concat("-T", T.FullName)));
 						_serviceHostProcess = ArtefactHost.ExecuteViaCommandLine("ServiceHost.exe", string.Join(" ", args));
 //						AppDomain.CurrentDomain.ExecuteAssembly("ServiceHost.exe", args.ToArray());
+						Thread.Sleep(_serviceHostStartDelay);
 					}
 				}
-				Thread.Sleep(_serviceHostStartDelay);
 				
 				_clientProxy = new RepositoryClientProxy(new NetTcpBinding(), "net.tcp://localhost:3334/ArtefactRepository");
 				Console.WriteLine("\nService Artefact Repository: {0}\n", _clientProxy.ToString());
@@ -156,23 +150,22 @@ namespace Artefacts.TestClient
 				}
 				else if (_serviceHostProcess != null)
 				{
+					Console.Write("\tStopping service host process... ");
 					_serviceHostProcess.Close();
+					if (_serviceHostProcess.WaitForExit(_serviceHostStopTimeout))		// TODO: Check this works (haven't tested yet)
+						Console.WriteLine("done.");
+					else
+						Console.WriteLine("Error!");
 				}
-				else
-					Console.WriteLine("\tService host not running via thread or process!");
-				Console.Write("\tClosing service host log... ");
 				if (_shLogWriter != null)
 				{
+					Console.Write("\tClosing service host log... ");
 					_shLogWriter.Flush();
-					_shLogWriter.Close();
+					_shLogWriter.Close();//.Dispose();
 					_shLogWriter = null;
 					Console.WriteLine("done.");
 				}
-				else
-					Console.WriteLine("\tnot open!");
 			}
-			Console.SetOut(ConsoleOut);
-			Console.SetError(ConsoleError);
 		}
 		#endregion
 

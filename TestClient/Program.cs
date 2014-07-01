@@ -3,20 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using TextWriter=System.IO.TextWriter;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
 using System.ServiceModel;
-using System.ServiceModel.Description;
-using System.Runtime.Serialization;
 using System.Reflection;
-using System.Diagnostics;
-
-//using Serialize.Linq.Extensions;
-//using Serialize.Linq.Nodes;
-
-using Artefacts;
-using Artefacts.Service;
-using Artefacts.FileSystem;
 
 namespace Artefacts.TestClient
 {
@@ -28,6 +16,8 @@ namespace Artefacts.TestClient
 	/// </remarks>
 	public static class Program
 	{
+		private const string _clientLogFilePath = @"Client.Log";
+		
 		#region Debug Writer Constants
 //		private const string _runTestOutputPrefix = "\n";
 		private const string _runTestOutputNewLine = "\n";		//"\n# ";
@@ -45,25 +35,47 @@ namespace Artefacts.TestClient
 		/// <param name="args">The command-line arguments.</param>
 		public static void Main(string[] args)
 		{
+			Console.Write("\n--- Client starting ---\n\n");
+			TextWriter consoleOut = Console.Out;
+			TextWriter consoleError = Console.Error;
+			List<TextWriter> textWriters = new List<TextWriter>();
+			foreach (string arg in args)
+			{
+				if (string.Compare(arg, "-C") == 0)
+					textWriters.Add(consoleOut);
+				else if (arg.StartsWith("-L"))
+					textWriters.Add(new LogTextWriter(arg.Length > 3 ? arg.Substring(3) : _clientLogFilePath));
+			}
+			if (textWriters.Count > 0)
+			{
+				Console.SetOut(textWriters.Count == 1 ? textWriters[0] : new MultiTextWriter(textWriters.ToArray()));
+				Console.SetError(consoleOut);
+			}
 			RunTests();
+			Console.Write("\n--- Client exiting ---\n\n");
+			consoleOut.Close();
+			if (textWriters.Count > 0)
+			{
+				Console.SetOut(consoleOut);
+				Console.SetError(consoleError);
+			}
 		}
 
 		/// <summary>
 		/// Runs the tests.
 		/// </summary>
 		/// <param name="output">Output.</param>
-		public static void RunTests(TextWriter output = null)
+		public static void RunTests()
 		{
-			using (ClientTestFixture _testFixture = new ClientTestFixture())
-			{
-				(typeof(ClientTestFixture).GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-					.Where(mi => mi.GetCustomAttributes(typeof(TestMethodAttribute), false).Length > 0)
-					.OrderBy<MethodInfo, int>(
-						mi => (mi.GetCustomAttributes(typeof(TestMethodAttribute), false)[0] as TestMethodAttribute).Order))
-					.ToList().ForEach(mi => RunTest(
-						(mi.GetCustomAttributes(typeof(TestMethodAttribute), false)[0] as TestMethodAttribute).Name,
-						() => mi.Invoke(_testFixture, new object[] { })));
-			}
+			ClientTestFixture _testFixture = new ClientTestFixture();
+			_testFixture.Init();
+			(typeof(ClientTestFixture).GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+				.Where(mi => mi.GetCustomAttributes(typeof(TestMethodAttribute), false).Length > 0)
+				.OrderBy<MethodInfo, int>(
+					mi => (mi.GetCustomAttributes(typeof(TestMethodAttribute), false)[0] as TestMethodAttribute).Order))
+				.ToList().ForEach(mi => RunTest(
+					(mi.GetCustomAttributes(typeof(TestMethodAttribute), false)[0] as TestMethodAttribute).Name,
+					() => mi.Invoke(_testFixture, new object[] { })));
 		}
 
 		/// <summary>

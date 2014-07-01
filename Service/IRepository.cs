@@ -38,6 +38,10 @@ namespace Artefacts.Service
 	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
 	public interface IRepository
 	{
+		#region Basic Service Operations
+//		int Connect(Host host);
+		#endregion
+		
 		#region Collections/Enumerables/Queryables
 		/// <summary>
 		/// Root artefact collection

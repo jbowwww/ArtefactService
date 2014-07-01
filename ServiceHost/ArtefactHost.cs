@@ -122,14 +122,15 @@ namespace Artefacts.Service
 		/// <param name="args">The command-line arguments.</param>
 		public static void Main(string[] args)
 		{
+			string hostTypeName = typeof(ArtefactHost).FullName;
+			Process proc = Process.GetCurrentProcess();
+			ProcessStartInfo procInfo = proc.StartInfo;
 			try
 			{
-				string hostTypeName = typeof(ArtefactHost).FullName;
-				Process proc = Process.GetCurrentProcess();
-				ProcessStartInfo procInfo = proc.StartInfo;
-				Console.WriteLine("{0}\n({1}) {2}:{3} @ {4}\n{5} {6} {7}", hostTypeName,
-					proc.Id, proc.MachineName, proc.ProcessName, proc.StartTime.ToShortDateString(),
-					proc.PriorityClass, procInfo.FileName, procInfo.Arguments);
+				Console.Write("\n--- {0} starting ---\n{2}:{3} ({1}) [{5}] @ {4}\n{6} {7}\n",
+					hostTypeName, proc.Id, proc.MachineName, proc.ProcessName,
+					proc.StartTime.ToShortDateString(), proc.PriorityClass,
+					procInfo.FileName, procInfo.Arguments);
 				foreach (string arg in args)
 				{
 					Assembly pluginAssembly;
@@ -139,7 +140,7 @@ namespace Artefacts.Service
 						int pluginLoadCount = 0;
 						string pluginDir = arg.Length > 2 ? arg.Substring(2) : "Plugins/";
 						string[] pluginFiles = Directory.GetFiles(pluginDir, "*.dll", SearchOption.TopDirectoryOnly);
-						Console.WriteLine("{0}: Plugin directory {1} ({2} plugins):", hostTypeName, pluginDir, pluginFiles.Length);
+						Console.WriteLine("{0}: Plugin directory \"{1}\" ({2} plugins):", hostTypeName, pluginDir, pluginFiles.Length);
 						foreach (string filePath in pluginFiles)
 						{
 //							string filePath = Path.Combine(pluginDir, filename);
@@ -191,15 +192,41 @@ namespace Artefacts.Service
 				_serviceHost.Open();
 				Console.WriteLine(_serviceHost.ToString());
 				Console.ReadLine();
+				_serviceHost.Close();
 			}
-			catch (/*Communication*/Exception ex)
+			catch (FaultException<ExceptionDetail> ex)
 			{
-				Console.Error.WriteLine("\nServiceHost Exception (State=" + (_serviceHost == null ? "(null)" : _serviceHost.State.ToString()) + "):\n" + ex.ToString() + "\n");
+				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  Detail:\n{2}\n  StackTrace:\n{3}\n\n",
+					ex.GetType().FullName, ex.Message,
+					ex.Detail.ToString().Trim('\n').Insert(0, "  ").Replace("\n", "\n  "),
+					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
+				_serviceHost.Abort();
+			}
+			catch (FaultException ex)
+			{
+				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  StackTrace:\n{2}\n\n",
+					ex.GetType().FullName, ex.Message,
+					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
+				_serviceHost.Abort();
+			}
+//			catch (CommunicationException ex)
+//			{
+//				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  StackTrace:\n{2}\n\n",
+//					ex.GetType().FullName, ex.Message,
+//					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
+//				_serviceHost.Abort();
+//			}
+			catch (Exception ex)
+			{
+				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  StackTrace:\n{2}\n\n",
+					ex.GetType().FullName, ex.Message,
+					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
+				_serviceHost.Abort();
 			}
 			finally
 			{
-				if (_serviceHost != null && _serviceHost.State != CommunicationState.Closed && _serviceHost.State != CommunicationState.Closing)
-					_serviceHost.Close();
+				Console.Write("\n--- {0} exiting ---\nService host state: {1}\n\n",
+					hostTypeName, _serviceHost == null ? "(null)" : _serviceHost.State.ToString());
 			}
 		}
 

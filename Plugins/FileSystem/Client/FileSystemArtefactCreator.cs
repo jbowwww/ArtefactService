@@ -99,9 +99,6 @@ namespace Artefacts.FileSystem
 		/// <remarks>Artefacts.CreatorBase implementation</remarks>
 		public override void Run(object param)
 		{
-//			if (Host.Current.IsTransient)
-//				Repository.Add(Host.Current);
-		
 //			foreach (Disk disk in Disk.Disks)
 //			{
 //				Disk dbDisk = Disks.FirstOrDefault((d) => disk.Serial.ToLower().CompareTo(d.Serial.ToLower()) == 0);

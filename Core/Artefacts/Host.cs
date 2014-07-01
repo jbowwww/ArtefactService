@@ -47,20 +47,38 @@ namespace Artefacts
 					throw new InvalidDataException("Unexpected output data from hostid command");
 					return hostId;
 		}
-		
+
 		[DataMember]
 		public virtual string HostId { get; set; }
 
+// TODO: Connection closing/timeout
+		public virtual int ConnectionId { get; set; }
+
+		public virtual bool Connected { get { return ConnectionId >= 0; } }
+		
+		public virtual DateTime ConnectTime { get; set; }
+		
+		public virtual TimeSpan ConnectionAge { get { return ConnectTime == DateTime.MinValue ? TimeSpan.Zero : DateTime.Now - ConnectTime; } }
+		
 		public Host()
 		{
+			ConnectionId = -1;
+			ConnectTime = DateTime.MinValue;
 			HostId = GetHostId();
 		}
 
+/// <summary>
+/// Not suyre this oiperation entirely makes sense for a Host - what will it ever update?? Besides a timestamp?
+/// </summary>
 		public override Artefact Update()
 		{
-//			if (UpdateAge > Artefacts.Service.Repository.ArtefactUpdateAgeLimit)
+			if (UpdateAge > Artefact.UpdateAgeLimit)
+			{
+				if (GetHostId().CompareTo(HostId) != 0)
+					throw new ApplicationException(string.Format("HostId has somehow changed!! From {0} to {1}", HostId, GetHostId()));
 				return base.Update();
-//			return this;
+			}
+			return this;
 		}		
 
 		public override void CopyMembersFrom(Artefact source)
@@ -82,6 +100,11 @@ namespace Artefacts
 				public override int GetHashCode()
 		{
 						return Convert.ToInt32(HostId);
+		}
+		
+		public override string ToString()
+		{
+			return string.Format("[Host: HostId={0}]", HostId);
 		}
 	}
 }

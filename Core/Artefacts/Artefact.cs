@@ -15,6 +15,8 @@ namespace Artefacts
 	public abstract class Artefact : IArtefact
 	{
 		#region Static members (store and return Type arrays for WCF service known types)
+		public static TimeSpan UpdateAgeLimit = new TimeSpan(0, 1, 0);
+		
 		/// <summary>
 		/// Backing store for <see cref="ArtefactTypes"/>
 		/// </summary>
@@ -85,6 +87,10 @@ namespace Artefacts
 			get { return !this.Id.HasValue; }
 		}
 		
+		public virtual bool IsOutdated {
+			get { return UpdateAge >= Artefact.UpdateAgeLimit; }
+		}
+		
 		public virtual TimeSpan CreatedAge {
 			get { return DateTime.Now - TimeCreated; }
 		}
@@ -110,12 +116,15 @@ namespace Artefacts
 		[DataMember]
 		public virtual DateTime TimeChecked { get; set; }
 
+		public virtual DateTime TimeUpdatesCommitted { get; set; }
+		
 		#endregion
 		#endregion
 		
 		protected Artefact()
 		{
 			TimeCreated = TimeUpdated = TimeChecked = DateTime.Now;
+			TimeUpdatesCommitted = DateTime.MinValue;
 		}
 		
 		public virtual Artefact Update()

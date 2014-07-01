@@ -140,7 +140,8 @@ namespace Artefacts.Service
 			
 			if (Host.Current.IsTransient)
 				Channel.Add(Host.Current);
-			
+			else
+				Channel.Update(Host.Current.Update());
 		}
 
 		public IQueryable<TArtefact> BuildBaseQuery<TArtefact>() where TArtefact : Artefact
@@ -217,7 +218,11 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public void Update(Artefact artefact)
 		{
-			Channel.Update(artefact);
+			if (artefact.TimeUpdatesCommitted < artefact.TimeUpdated)
+			{
+				Channel.Update(artefact);
+				artefact.TimeUpdatesCommitted = DateTime.Now;
+			}
 		}
 
 		/// <summary>

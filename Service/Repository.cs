@@ -74,14 +74,14 @@ namespace Artefacts.Service
 		InstanceContextMode=InstanceContextMode.Single,
 		ConcurrencyMode=ConcurrencyMode.Multiple)]
 	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
-	public class Repository : IRepository
+	public class Repository : IRepository, IDisposable
 	{		
 		#region Static members
 		/// <summary>
 		/// Constant artefact update age limit.
 		/// </summary>
 		/// <remarks>May not remain constant - make configurable by clients</remarks>
-		public static TimeSpan ArtefactUpdateAgeLimit = new TimeSpan(0, 1, 0);
+		public static TimeSpan ArtefactUpdateAgeLimit { get { return Artefact.UpdateAgeLimit; } }
 
 		/// <summary>
 		/// Gets the transaction.
@@ -149,6 +149,7 @@ namespace Artefacts.Service
 		#endregion
 		#endregion
 
+		#region Construction & disposal
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Artefacts.Service.ArtefactRepository"/> class.
 		/// </summary>
@@ -171,6 +172,23 @@ namespace Artefacts.Service
 			Queryables.Add(typeof(Artefact), Artefacts);
 		}
 
+		/// <summary>
+		/// Releases all resource used by the <see cref="Artefacts.Service.Repository"/> object.
+		/// </summary>
+		/// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="Artefacts.Service.Repository"/>. The
+		/// <see cref="Dispose"/> method leaves the <see cref="Artefacts.Service.Repository"/> in an unusable state. After
+		/// calling <see cref="Dispose"/>, you must release all references to the <see cref="Artefacts.Service.Repository"/> so
+		/// the garbage collector can reclaim the memory that the <see cref="Artefacts.Service.Repository"/> was occupying.</remarks>
+		public void Dispose()
+		{
+			
+		}
+		#endregion
+		
+		#region Basic service operations
+		
+		#endregion
+
 		#region Add/Get/Update/Remove singular artefact operations
 		/// <summary>
 		/// Add the specified artefact.
@@ -179,6 +197,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public int Add(Artefact artefact)
 		{
+			Console.WriteLine("Add({0} artefact #{1})", artefact.GetType().FullName, artefact.Id);
 			ITransaction transaction = null;
 			int id = -1;
 			try
@@ -202,6 +221,7 @@ namespace Artefacts.Service
 					if (_artefactCache.ContainsKey(id))
 						_artefactCache.Remove(id);
 				}
+				Console.WriteLine(ex.ToString());
 				throw Error(ex, artefact);
 			}
 			finally
@@ -219,6 +239,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public int GetId(Artefact artefact)
 		{
+			Console.WriteLine("GetId({0} artefact #{1})", artefact.GetType().FullName, artefact.Id);
 			try
 			{
 				return artefact.IsTransient ? (artefact.Id = (int)Session.GetIdentifier(artefact)).Value : artefact.Id.Value;
@@ -237,6 +258,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public Artefact GetById(int id)
 		{
+			Console.WriteLine("GetById(#{0})", id);
 			try
 			{
 //				return _artefactCache.ContainsKey(id) && (_artefactCache[id].UpdateAge > ArtefactUpdateAgeLimit)
@@ -265,6 +287,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public void Update(Artefact artefact)
 		{
+			Console.WriteLine("Update({0} artefact #{1})", artefact.GetType().FullName, artefact.Id);
 			ITransaction transaction = null;
 			try
 			{
@@ -300,6 +323,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public void Remove(Artefact artefact)
 		{
+			Console.WriteLine("Remove({0} artefact #{1})", artefact.GetType().FullName, artefact.Id);
 			ITransaction transaction = null;
 //			int id = -1;
 			try
