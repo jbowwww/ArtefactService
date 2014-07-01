@@ -47,6 +47,8 @@
     <Compile Include="Artefacts\ArtefactFormatAttribute.cs" />
     <Compile Include="Artefacts\Host.cs" />
     <Compile Include="Artefacts\IArtefact.cs" />
+    <Compile Include="LogTextWriter.cs" />
+    <Compile Include="MultiTextWriter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

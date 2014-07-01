@@ -4,7 +4,7 @@ using System.Text;
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace Artefacts.TestClient
+namespace Artefacts
 {
 	public class LogTextWriter : TextWriter
 	{
@@ -52,13 +52,10 @@ namespace Artefacts.TestClient
 			_suffix = suffix;
 		}
 
-		protected override void Dispose(bool disposing)
+		public override void Close()
 		{
-			if (disposing)
-			{
-				Thread.VolatileWrite(ref _outputRun, 0);
-			}
-			base.Dispose(disposing);
+			Thread.VolatileWrite(ref _outputRun, 0);
+			base.Close();
 		}
 
 		public override void Write(char value)

@@ -96,23 +96,11 @@ namespace Artefacts.Service
 		/// <param name="output">Output.</param>
 		/// <param name="error">Error.</param>
 		/// <param name="useCustomBehaviours">If set to <c>true</c> use custom behaviours.</param>
-		public static ServiceHost BuildServiceHost(
-			object serviceInstance, TimeSpan timeout = default(TimeSpan),
-			TextWriter output = null, TextWriter error = null,
-			bool useCustomBehaviours = false)
+		public static ServiceHost BuildServiceHost(object serviceInstance, TimeSpan timeout = default(TimeSpan), bool useCustomBehaviours = false)
 		{
-			if (output == null)
-				output = Console.Out;
-			if (error == null)
-				error = Console.Error;
-
-			_timeout = timeout;
-			_output = output;
-			_error = error;
-			
+			_timeout = timeout;			
 			ServiceHost sh = new ServiceHost(serviceInstance);
-			ApplyServiceHostSettings(sh, useCustomBehaviours);
-			
+			ApplyServiceHostSettings(sh, useCustomBehaviours);			
 			return sh;
 		}
 
@@ -125,12 +113,17 @@ namespace Artefacts.Service
 			string hostTypeName = typeof(ArtefactHost).FullName;
 			Process proc = Process.GetCurrentProcess();
 			ProcessStartInfo procInfo = proc.StartInfo;
+			TextWriter consoleOut = Console.Out;
+			TextWriter consoleError = Console.Error;			
+
+			_output = new MultiTextWriter(consoleOut, new LogTextWriter("Server.Log")) { UseTimeStamp = true };
+			Console.SetOut(_output);
+			Console.SetError(_output);			
 			try
 			{
-				Console.Write("\n--- {0} starting ---\n{2}:{3} ({1}) [{5}] @ {4}\n{6} {7}\n",
-					hostTypeName, proc.Id, proc.MachineName, proc.ProcessName,
-					proc.StartTime.ToShortDateString(), proc.PriorityClass,
-					procInfo.FileName, procInfo.Arguments);
+				Console.Write("--- {0} starting ---\n", hostTypeName);
+				Console.WriteLine("{2}:{3} ({1}) [{5}] @ {4}\n------------\n\n",
+					null, proc.Id, proc.MachineName, proc.ProcessName, proc.StartTime.ToString("s"), proc.PriorityClass);
 				foreach (string arg in args)
 				{
 					Assembly pluginAssembly;
@@ -188,45 +181,47 @@ namespace Artefacts.Service
 				}				
 				
 				_serviceInstance = new Repository();
-				_serviceHost = BuildServiceHost(_serviceInstance, _defaultTimeout, Console.Out, Console.Error, false);
+				_serviceHost = BuildServiceHost(_serviceInstance, _defaultTimeout, false);
 				_serviceHost.Open();
-				Console.WriteLine(_serviceHost.ToString());
+				Console.WriteLine(_serviceHost);
 				Console.ReadLine();
 				_serviceHost.Close();
 			}
 			catch (FaultException<ExceptionDetail> ex)
 			{
-				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  Detail:\n{2}\n  StackTrace:\n{3}\n\n",
-					ex.GetType().FullName, ex.Message,
+				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  Action: {2}\n  Fault: {3}{4}: {5}\n  Detail:\n{6}\n  StackTrace:\n{7}\n------------\n\n",
+					ex.GetType().FullName, ex.Message, ex.Action, ex.Code.Namespace, ex.Code.Name, ex.Reason.GetMatchingTranslation(),
 					ex.Detail.ToString().Trim('\n').Insert(0, "  ").Replace("\n", "\n  "),
 					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
 				_serviceHost.Abort();
 			}
 			catch (FaultException ex)
 			{
-				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  StackTrace:\n{2}\n\n",
-					ex.GetType().FullName, ex.Message,
+				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  Action: {2}\n  Fault: {3}{4}: {5}\n  StackTrace:\n{6}\n------------\n\n",
+					ex.GetType().FullName, ex.Message, ex.Action, ex.Code.Name, ex.Code.Name, ex.Reason.GetMatchingTranslation(),
 					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
 				_serviceHost.Abort();
 			}
 //			catch (CommunicationException ex)
 //			{
-//				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  StackTrace:\n{2}\n\n",
+//				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  StackTrace:\n{2}\n------------\n\n",
 //					ex.GetType().FullName, ex.Message,
 //					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
 //				_serviceHost.Abort();
 //			}
 			catch (Exception ex)
 			{
-				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  StackTrace:\n{2}\n\n",
-					ex.GetType().FullName, ex.Message,
-					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
+				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  StackTrace:\n{2}\n------------\n\n",
+					ex.GetType().FullName, ex.Message, ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
 				_serviceHost.Abort();
 			}
 			finally
 			{
-				Console.Write("\n--- {0} exiting ---\nService host state: {1}\n\n",
+				Console.Write("\n--- {0} exiting ---\nService host state: {1}\n------------\n\n",
 					hostTypeName, _serviceHost == null ? "(null)" : _serviceHost.State.ToString());
+				_output.Close();
+				Console.SetOut(consoleOut);
+				Console.SetError(consoleError);
 			}
 		}
 
@@ -236,21 +231,6 @@ namespace Artefacts.Service
 		public static void StopAsyncThread ()
 		{
 			_exitServiceHost = true;
-		}
-
-		/// <summary>
-		/// Gets the or create async thread.
-		/// </summary>
-		/// <returns>The or create async thread.</returns>
-		/// <param name="artefactTypes">Artefact types.</param>
-		/// <param name="timeout">Timeout.</param>
-		/// <param name="useOutput">If set to <c>true</c> use output.</param>
-		public static Thread GetOrCreateAsyncThread(Type[] artefactTypes = null, TimeSpan timeout = default(TimeSpan), bool useOutput = true)
-		{
-			if (useOutput)
-				return GetOrCreateAsyncThread(artefactTypes, timeout, Console.Out, Console.Error);
-			else
-				return GetOrCreateAsyncThread(artefactTypes, timeout, TextWriter.Null);
 		}
 
 		/// <summary>
@@ -289,7 +269,7 @@ namespace Artefacts.Service
 						_serviceInstance = new Repository();
 						if (LogFilePath != null)
 							output = error = /*TextWriter.Synchronized(*/ new StreamWriter(_logFileStream = File.OpenWrite(LogFilePath));//);
-						_serviceHost = BuildServiceHost(_serviceInstance, timeout, output, error, false);
+						_serviceHost = BuildServiceHost(_serviceInstance, timeout, false);
 					_serviceHost.Open();
 					
 					output.WriteLine(_serviceHost.ToString());

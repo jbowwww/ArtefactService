@@ -101,8 +101,8 @@ namespace Artefacts.TestClient
 				
 				if (UseServiceHostAsync)
 				{
-					_serviceHostThread = ArtefactHost.GetOrCreateAsyncThread(_artefactTypes, _defaultTimeout, _shLogWriter);
-					_shLogWriter = new LogTextWriter(_serviceHostLogFilePath);
+					_serviceHostThread = ArtefactHost.GetOrCreateAsyncThread(_artefactTypes, _defaultTimeout);
+//					_shLogWriter = new LogTextWriter(_serviceHostLogFilePath);
 					Thread.Sleep(_serviceHostStartDelay);
 				}
 				else if (UseServiceHostProc)

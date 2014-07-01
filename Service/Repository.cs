@@ -8,8 +8,6 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.ServiceModel;
 using System.Text;
-using Serialize.Linq;
-using Serialize.Linq.Nodes;
 using NHibernate;
 using NHibernate.Linq;
 
@@ -393,7 +391,7 @@ namespace Artefacts.Service
 			{
 				serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
 				serverId = serverSideExpression.Id();
-				Console.WriteLine("QueryPreload([{0}] \"{1}\")", serverId, serverSideExpression);
+				Console.WriteLine("QueryPreload(\"{0}\") = {1}", serverSideExpression, serverId);
 				if (!QueryCache.ContainsKey(serverId))
 				{
 					serverSideQuery = _nhQueryProvider.CreateQuery(serverSideExpression);				
@@ -427,8 +425,6 @@ namespace Artefacts.Service
 			try
 			{
 				serverSideQuery = (IQueryable<Artefact>)QueryCache[queryId];
-				Console.WriteLine("QueryResults({0})\n  expression = \"{1}\"", queryId, serverSideQuery.Expression);
-				
 				results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
 					serverSideQuery.Skip(startIndex) : // with a new custom server-side query provider, and implement caching??
 					serverSideQuery.Skip(startIndex).Take(count)).Select((a) => a.Id.Value).ToArray();
@@ -443,6 +439,7 @@ namespace Artefacts.Service
 //					else
 //						_artefactCache[artefactId] = artefact;
 //				}
+				Console.Write("QueryResults({0}, {1}, {2}) = \"{3}\"", queryId, startIndex, count, results);	
 				return results;
 			}
 			catch (Exception ex)
@@ -472,8 +469,8 @@ namespace Artefacts.Service
 			try
 			{
 				serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
-				Console.WriteLine("QueryExecute([{0}] \"{1}\") = ", serverSideExpression.Id(), serverSideExpression);
 				result = _nhQueryProvider.Execute(serverSideExpression);
+				Console.WriteLine("QueryExecute(\"{0}\") = {1}", serverSideExpression, result);
 				return result;
 			}
 			catch (Exception ex)

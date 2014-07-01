@@ -44,18 +44,16 @@ namespace Artefacts.TestClient
 				if (string.Compare(arg, "-C") == 0)
 					textWriters.Add(consoleOut);
 				else if (arg.StartsWith("-L"))
-					textWriters.Add(new LogTextWriter(arg.Length > 3 ? arg.Substring(3) : _clientLogFilePath));
+					textWriters.Add(new LogTextWriter(arg.Length > 2 ? arg.Substring(2) : _clientLogFilePath));
 			}
-			if (textWriters.Count > 0)
-			{
-				Console.SetOut(textWriters.Count == 1 ? textWriters[0] : new MultiTextWriter(textWriters.ToArray()));
-				Console.SetError(consoleOut);
-			}
+			Console.SetOut(new MultiTextWriter(textWriters.Count > 0 ? textWriters.ToArray() : new TextWriter[] { Console.Out }) { UseTimeStamp = true });
+			Console.SetError(consoleOut);
 			RunTests();
 			Console.Write("\n--- Client exiting ---\n\n");
 			consoleOut.Close();
 			if (textWriters.Count > 0)
 			{
+				Console.Out.Close();
 				Console.SetOut(consoleOut);
 				Console.SetError(consoleError);
 			}

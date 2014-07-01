@@ -45,6 +45,17 @@ namespace Artefacts
 			sb.Remove(sb.Length - 2, 2).Append(" }");
 			return sb.ToString();
 		}
+		
+		public static string ToString<T>(this T[] array)
+		{
+			StringBuilder sb = new StringBuilder(array.GetType().FullName).Append(" { ");
+			foreach (T item in array)
+				sb.AppendFormat("{0}, ",		// [{1}], ",
+					item != null ? item.ToString() : "(null)");
+					//item != null ? item.GetType().FullName : "(System.Object)");
+			sb.Remove(sb.Length - 2, 2).Append(" }");
+			return sb.ToString();
+		}
 //		public static IDictionary<TKey, TValue> CreateDictionary<TKey, TValue>(KeyValuePair<TKey, TValue>[] initialPairs)
 //		{
 //			IDictionary<TKey, TValue> r = new Dictionary<TKey, TValue>();

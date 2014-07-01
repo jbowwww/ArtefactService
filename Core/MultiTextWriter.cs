@@ -2,18 +2,22 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-namespace Artefacts.TestClient
+namespace Artefacts
 {
 	public class MultiTextWriter : TextWriter
 	{
+		private bool _lastCharWasNewLine = true;
 		public readonly List<TextWriter> Outputs = new List<TextWriter>();
+		
+		public bool UseTimeStamp = false;
+		public string TimeStampFormat = "s";
 		
 		public MultiTextWriter(params TextWriter[] outputs)
 		{
 			Outputs.AddRange(outputs);
 		}
 
-		protected override void Dispose(bool disposing)
+		public override void Close()
 		{
 			foreach (TextWriter output in Outputs)
 			{
@@ -23,6 +27,7 @@ namespace Artefacts.TestClient
 					output.Close();
 				}
 			}
+			base.Close();
 		}
 		
 		/// <summary>
@@ -39,8 +44,11 @@ namespace Artefacts.TestClient
 			{
 				if (output != null)
 				{
+					if (_lastCharWasNewLine)
+						output.Write(DateTime.Now.ToString(TimeStampFormat) + " ");
 					output.Write(value);
 //					output.Flush();		// don't flush just for one char?
+					_lastCharWasNewLine = value == '\n';
 				}
 			}
 		}
@@ -52,8 +60,11 @@ namespace Artefacts.TestClient
 			{
 				if (output != null)
 				{
+					if (_lastCharWasNewLine)
+						output.Write(DateTime.Now.ToString(TimeStampFormat) + " ");
 					output.Write(buffer);
 					output.Flush();
+					_lastCharWasNewLine = buffer[buffer.Length - 1] == '\n';
 				}
 			}
 		}

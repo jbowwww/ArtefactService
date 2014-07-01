@@ -22,6 +22,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <Externalconsole>true</Externalconsole>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <Commandlineparameters>-C -LClient.Log</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -58,10 +59,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NUnit\ClientTestFixture.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="LogTextWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="TestMethodAttribute.cs" />
-    <Compile Include="MultiTextWriter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
