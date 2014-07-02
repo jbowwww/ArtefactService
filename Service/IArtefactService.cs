@@ -31,79 +31,90 @@ namespace Artefacts.Service
 	///	object QueryExecute(byte[] binary);
 	///
 	/// </remarks>
-	[ServiceContract(Name = "IRepository", Namespace = "http://teknowledge.net.au/Artefacts/Service/",
+	[ServiceContract(Name = "IArtefactService", Namespace = "http://teknowledge.net.au/Artefacts/Service/",
 		SessionMode = SessionMode.Allowed, ProtectionLevel = System.Net.Security.ProtectionLevel.None)]
 	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
-	public interface IRepository
+	public interface IArtefactService
 	{
-		#region Basic Service Operations
-		/// <summary>
-		/// Connect the specified host.
-		/// </summary>
-		/// <param name="host">Host.</param>
-		[OperationContract]
-		int Connect(Host host);
-		
-		/// <summary>
-		/// Disconnect the specified clientId.
-		/// </summary>
-		/// <param name="clientId">Client identifier.</param>
-		[OperationContract]
-		void Disconnect(Host host);
-		#endregion
-		
-		#region Collections/Enumerables/Queryables
 		/// <summary>
 		/// Root artefact collection
 		/// </summary>
 		IQueryable<Artefact> Artefacts { get; }
+		
+		#region Add/Get/Exists/Update/Remove singular artefact operations
+		/// <summary>
+		/// Checks for the existence of an <see cref="Artefact"/> with the given URI
+		/// </summary>
+		/// <param name="uri"><see cref="Artefact"/> URI</param>
+		/// <returns><c>true</c> if found, otherwise <c>false</c></returns>
+		[OperationContract]
+		bool Exists(Uri uri);
 
 		/// <summary>
-		/// IQueryable root for each Type
+		/// Checks for the existence of an <see cref="Artefact"/> with the given identifier
 		/// </summary>
-		IDictionary<Type, IQueryable> Queryables { get; }
-		#endregion
+		/// <param name="id"><see cref="Artefact"/> identifier</param>
+		/// <returns><c>true</c> if found, otherwise <c>false</c></returns>
+		[OperationContract]
+		bool Exists(int id);
+
+		/// <summary>
+		/// Gets an <see cref="Artefact"/> with the given URI
+		/// </summary>
+		/// <param name="uri"><see cref="Artefact"/> URI</param>
+		/// <returns>The retrieved <see cref="Artefact"/></returns>
+		[OperationContract]
+		Artefact Get(Uri uri);
+
+		/// <summary>
+		/// Gets an <see cref="Artefact"/> with the given identifier
+		/// </summary>
+		/// <param name="id">Identifier.</param>
+		/// <returns>The retrieved <see cref="Artefact"/></returns>
+		[OperationContract]
+		Artefact Get(int id);
 		
-		#region Add/Get/Update/Remove singular artefact operations
 		/// <summary>
 		/// Add the specified artefact.
 		/// </summary>
-		/// <param name="artefact">Artefact.</param>
+		/// <param name="uri"><see cref="Artefact"/> URI</param>
+		/// <returns>The new <see cref="Artefact"/></returns>
 		[OperationContract]
-		int Add(Artefact artefact);
-
-		/// <summary>
-		/// Gets the identifier.
-		/// </summary>
-		/// <returns>The identifier.</returns>
-		/// <param name="artefact">Artefact.</param>
-		[OperationContract]
-		int GetId(Artefact artefact);
-
-		/// <summary>
-		/// Gets the by identifier.
-		/// </summary>
-		/// <returns>The by identifier.</returns>
-		/// <param name="id">Identifier.</param>
-		[OperationContract]
-		Artefact GetById(int id);
+		Artefact Add(Uri uri);
 
 		/// <summary>
 		/// Update the specified artefact.
 		/// </summary>
-		/// <param name="artefact">Artefact.</param>
+		/// <param name="artefact">The <see cref="Artefact"/> to update</param>
+		/// <remarks>
+		/// In this experimental (iffy, dodgy) new approach, this would only need to update the aspects of the artefact if anything? (and the timestamps)
+		/// </remarks>
 		[OperationContract]
 		void Update(Artefact artefact);
 
 		/// <summary>
 		/// Remove the specified artefact.
 		/// </summary>
-		/// <param name="artefact">Artefact.</param>
+		/// <param name="artefact">The <see cref="Artefact"/> to remove</param>
 		[OperationContract]
 		void Remove(Artefact artefact);
+		
+		/// <summary>
+		/// Remove the specified artefact.
+		/// </summary>
+		/// <param name="uri">The URI of the <see cref="Artefact"/> to remove</param>
+		[OperationContract]
+		void Remove(Uri uri);
+		
+		/// <summary>
+		/// Remove the specified artefact.
+		/// </summary>
+		/// <param name="id">The identifier of the <see cref="Artefact"/> to remove</param>
+		[OperationContract]
+		void Remove(int id);
 		#endregion
 		
-		#region Query Methods
+		#region Expression / Query Methods
 		/// <summary>
 		/// Creates the query.
 		/// </summary>

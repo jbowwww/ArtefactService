@@ -59,7 +59,6 @@
     <Compile Include="ArtefactServiceConfiguration.cs" />
     <Compile Include="ClientQueryVisitor.cs" />
     <Compile Include="ExpressionVisitor.cs" />
-    <Compile Include="IRepository.cs" />
     <Compile Include="NhBootStrap.cs" />
     <Compile Include="PagingOptions.cs" />
     <Compile Include="Queryable.cs" />
@@ -69,6 +68,7 @@
     <Compile Include="Extensions\Expression.cs" />
     <Compile Include="Extensions\ServiceModel.cs" />
     <Compile Include="Extensions\Type.cs" />
+    <Compile Include="IArtefactService.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

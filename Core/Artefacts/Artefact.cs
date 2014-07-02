@@ -15,12 +15,7 @@ namespace Artefacts
 	public abstract class Artefact : IArtefact
 	{
 		#region Static members (store and return Type arrays for WCF service known types)
-		/// <summary>
-		/// The longest <see cref="TimeSpan"/> that an <see cref="Artefact"/> may use cached values.
-		/// After that it must be updated from <see cref="Repository"/>.
-		/// </summary>
-		public static TimeSpan UpdateAgeLimit = new TimeSpan(0, 1, 0);
-		
+		#region Type-related stuff
 		/// <summary>
 		/// Collection of <see cref="Artefact"/> types for use as known types in WCF service's <see cref="DataContractSerializer"/> 
 		/// </summary>
@@ -84,7 +79,35 @@ namespace Artefacts
 		}
 		#endregion
 		
+		/// <summary>
+		/// The longest <see cref="TimeSpan"/> that an <see cref="Artefact"/> may use cached values.
+		/// After that it must be updated from <see cref="Repository"/>.
+		/// </summary>
+		public static TimeSpan UpdateAgeLimit = new TimeSpan(0, 1, 0);
+		#endregion
+		
 		#region Properties
+		private readonly Dictionary<Type, object> _aspects = new Dictionary<Type, object>();
+		
+		#region IArtefact implementation
+		[DataMember(IsRequired = false, EmitDefaultValue = false)]
+		public virtual int? Id { get; set; }
+
+		[DataMember(IsRequired = true)]
+		public virtual Uri Uri { get; private set; }
+
+		[DataMember(IsRequired = false)]
+		public virtual DateTime TimeCreated { get; set; }
+
+		[DataMember(IsRequired = false)]
+		public virtual DateTime TimeUpdated { get; set; }
+
+		[DataMember(IsRequired = false)]
+		public virtual DateTime TimeChecked { get; set; }
+
+		public virtual DateTime TimeUpdatesCommitted { get; set; }
+		#endregion
+		
 		public virtual bool IsTransient {
 			get { return !this.Id.HasValue; }
 		}
@@ -104,22 +127,6 @@ namespace Artefacts
 		public virtual TimeSpan CheckedAge {
 			get { return DateTime.Now - TimeChecked; }
 		}
-		
-		#region IArtefact implementation
-		[DataMember]
-		public virtual int? Id { get; set; }
-
-		[DataMember]
-		public virtual DateTime TimeCreated { get; set; }
-
-		[DataMember]
-		public virtual DateTime TimeUpdated { get; set; }
-
-		[DataMember]
-		public virtual DateTime TimeChecked { get; set; }
-
-		public virtual DateTime TimeUpdatesCommitted { get; set; }
-		#endregion
 		#endregion
 		
 		protected Artefact()
@@ -127,6 +134,20 @@ namespace Artefacts
 			TimeCreated = TimeUpdated = TimeChecked = DateTime.Now;
 			TimeUpdatesCommitted = DateTime.MinValue;
 		}
+		
+		public virtual TAspect GetAspect<TAspect>()
+		{
+			Type _TAspect = typeof(TAspect);
+			if (!_aspects.ContainsKey(_TAspect))
+				throw new ApplicationException(string.Format("Aspect type \"{0}\" does not exist for {1} artefact with Id #{2}",
+					_TAspect.FullName, GetType().FullName, Id.HasValue ? Id.Value.ToString() : "(null)"));
+			return (TAspect)_aspects[_TAspect];
+		}
+		
+//		public virtual TAspect AddAspect<TAspect>()
+//		{
+//			// TODO
+//		}
 		
 		public virtual Artefact Update()
 		{

@@ -12,7 +12,7 @@ namespace Artefacts.Service
 		public static bool IsRepositoryPlaceHolder(Expression e)
 		{
 			return e.NodeType == ExpressionType.Parameter
-				&& typeof(IRepository).IsAssignableFrom(e.Type)
+				&& typeof(IArtefactService).IsAssignableFrom(e.Type)
 				&& ((ParameterExpression)e).Name.Equals("Repository");
 		}
 

@@ -53,6 +53,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="Artefacts\Mappings\blank.hbm.xml" />
+    <None Include="Artefacts\IAspect.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Artefacts\Mappings\Artefact.hbm.xml" />

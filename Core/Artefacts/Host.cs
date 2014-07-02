@@ -16,36 +16,23 @@ namespace Artefacts
 			return Artefact.GetArtefactTypes();
 		}
 		
-		private static Host _current = null;
-		public static Host Current {
-			get; set;
-//			get
-//			{
-//				if (_current == null)
-//				{
-//					Host tempNewHost = new Host();
-//					_current = 
-//					
-//				}
-//				return _current;
-//			}
-		}
+		public static Host Current { get; set; }
 		
 		public static string GetHostId()
 		{
 			string hostId;
-		Process getDiskSerialProcess = Process.Start(
+			Process getDiskSerialProcess = Process.Start(
 				new ProcessStartInfo("hostid")
 				{
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
 					UseShellExecute = false
 				});
-				getDiskSerialProcess.WaitForExit(1111);
-				hostId = getDiskSerialProcess.StandardOutput.ReadLine();
-				if (string.IsNullOrEmpty(hostId))
-					throw new InvalidDataException("Unexpected output data from hostid command");
-					return hostId;
+			getDiskSerialProcess.WaitForExit(1111);
+			hostId = getDiskSerialProcess.StandardOutput.ReadLine();
+			if (string.IsNullOrEmpty(hostId))
+				throw new InvalidDataException("Unexpected output data from hostid command");
+			return hostId;
 		}
 
 		[DataMember]

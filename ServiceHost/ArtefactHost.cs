@@ -65,7 +65,7 @@ namespace Artefacts.Service
 				host.Description.Behaviors.Add(sdb = new ServiceDebugBehavior());
 			sdb.IncludeExceptionDetailInFaults = true;
 			
-			host.AddServiceEndpoint(typeof(IRepository),
+			host.AddServiceEndpoint(typeof(IArtefactService),
 				new NetTcpBinding(SecurityMode.None)
 				{
 					MaxBufferSize = 4096,

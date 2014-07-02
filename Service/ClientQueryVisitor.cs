@@ -10,7 +10,7 @@ namespace Artefacts.Service
 {
 	public class ClientQueryVisitor : ClientQueryVisitor<Artefact>
 	{
-		public ClientQueryVisitor(IRepository repository, IDictionary<object, IQueryable> queryCache)
+		public ClientQueryVisitor(IArtefactService repository, IDictionary<object, IQueryable> queryCache)
 			: base(repository, queryCache) { }
 	}
 
@@ -18,9 +18,9 @@ namespace Artefacts.Service
 	{
 		private IDictionary<object, IQueryable> _queryCache;
 
-		public IRepository Repository { get; private set; }
+		public IArtefactService Repository { get; private set; }
 		
-		public ClientQueryVisitor(IRepository repository, IDictionary<object, IQueryable> queryCache)
+		public ClientQueryVisitor(IArtefactService repository, IDictionary<object, IQueryable> queryCache)
 		{
 			Repository = repository;
 			_queryCache = queryCache;
@@ -103,7 +103,7 @@ namespace Artefacts.Service
 				// TODO: ElementAt()
 				Artefact artefact =
 					result != null && result.Length > 0 ?
-						Repository.GetById(result[0]) :
+						Repository.Get(result[0]) :
 						(Artefact)Activator.CreateInstance(m.Arguments[0].Type.GetElementType());
 				return Expression.Constant(artefact);
 			}

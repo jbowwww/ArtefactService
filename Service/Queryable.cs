@@ -224,7 +224,7 @@ namespace Artefacts.Service
 				{
 //					int pageStartIndex = index - index % Paging.PageSize;
 //					_resultChunk.CopyTo(_results, pageStartIndex);
-					_results[index] = Repository.Channel.GetById(_resultIds[index]);
+					_results[index] = Repository.Channel.Get(_resultIds[index]);
 				}
 				return _results[index];
 			}

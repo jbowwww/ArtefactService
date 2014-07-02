@@ -54,7 +54,7 @@ namespace Artefacts.FileSystem
 		/// Gets or sets the repository.
 		/// </summary>
 		/// <value>The repository.</value>
-		public static IRepository Repository { get; set; }
+		public static IArtefactService Repository { get; set; }
 		
 		/// <summary>
 		/// Gets the drives.

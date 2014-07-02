@@ -72,7 +72,7 @@ namespace Artefacts.Service
 		InstanceContextMode=InstanceContextMode.Single,
 		ConcurrencyMode=ConcurrencyMode.Multiple)]
 	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
-	public class Repository : IRepository, IDisposable
+	public class Repository : IArtefactService, IDisposable
 	{		
 		#region Static members
 		/// <summary>
@@ -98,8 +98,8 @@ namespace Artefacts.Service
 		/// </summary>
 		/// <value>The context.</value>
 		[ThreadStatic]
-		private static IRepository _context = null;
-		public static IRepository Context {
+		private static IArtefactService _context = null;
+		public static IArtefactService Context {
 			get { return _context; }
 			set { _context = value; }
 		}
