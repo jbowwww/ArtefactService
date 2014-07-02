@@ -15,57 +15,62 @@ namespace Artefacts
 	public abstract class Artefact : IArtefact
 	{
 		#region Static members (store and return Type arrays for WCF service known types)
+		/// <summary>
+		/// The longest <see cref="TimeSpan"/> that an <see cref="Artefact"/> may use cached values.
+		/// After that it must be updated from <see cref="Repository"/>.
+		/// </summary>
 		public static TimeSpan UpdateAgeLimit = new TimeSpan(0, 1, 0);
 		
 		/// <summary>
-		/// Backing store for <see cref="ArtefactTypes"/>
+		/// Collection of <see cref="Artefact"/> types for use as known types in WCF service's <see cref="DataContractSerializer"/> 
 		/// </summary>
-		private static List<Type> _artefactTypes = null;
+		public static readonly List<Type> ArtefactTypes = new List<Type>();
+//		 {
+//			get { return _artefactTypes ?? _artefactTypes = new List<Type>(); }
+//		}
+//		private static List<Type> _artefactTypes = null;
 		
 		/// <summary>
-		/// Collection of <see cref="Artefact"/> types
+		/// Backing store for <see cref="Artefact.GetTypeHeirarchy"/>
 		/// </summary>
-		public static List<Type> ArtefactTypes {
-			get { return _artefactTypes != null ? _artefactTypes : _artefactTypes = new List<Type>(); }
-		}
-
+		public static readonly Dictionary<Type, Type[]> TypeHeirarchies = new Dictionary<Type, Type[]>();
+		
+		/// <summary>
+		/// Gets the known artefact types for the <see cref="DataContractSerializer"/> in WCF services
+		/// </summary>
+		/// <returns>The artefact types.</returns>
 		public static Type[] GetArtefactTypes()
 		{
-			return GetArtefactTypes(null);
+			return ArtefactTypes.ToArray();				//		return GetArtefactTypes(null);
 		}
 
 		/// <summary>
 		/// Returns the <see cref="Artefact"/> stored in <see cref="ArtefactTypes"/>.
 		/// Called by WCF services' <see cref="DataContractResolver"/> as a KnownType or ServiceKnownType
 		/// </summary>
-		public static Type[] GetArtefactTypes(ICustomAttributeProvider provider = null)
-		{
-			Type[] artefactTypes = new Type[ArtefactTypes.Count];
-			ArtefactTypes.CopyTo(artefactTypes, 0);
-			return artefactTypes;
-		}
-		
-		/// <summary>
-		/// Backing store for <see cref="Artefact.GetTypeHeirarchy"/>
-		/// </summary>
-		private static Dictionary<Type, Type[]> _typeHeirarchies = null;
+//		public static Type[] GetArtefactTypes(ICustomAttributeProvider provider = null)
+//		{
+//			Type[] artefactTypes = new Type[ArtefactTypes.Count];
+//			ArtefactTypes.CopyTo(artefactTypes, 0);
+//			return artefactTypes;
+//		}
 		
 		/// <summary>
 		/// Gets a type's inheritance heirarchy
 		/// </summary>
-		/// <returns>A <see cref="System.Type"/> array representing the type heirarchy</returns>
 		/// <param name="artefactType">Artefact type</param>
+		/// <returns>A <see cref="System.Type"/> array representing the type heirarchy</returns>
 		public static Type[] GetTypeHeirarchy(Type artefactType)
 		{
-			if (_typeHeirarchies == null)
-				_typeHeirarchies = new Dictionary<Type, Type[]>();
-			if (_typeHeirarchies.ContainsKey(artefactType))
-				return _typeHeirarchies[artefactType];
-			List<Type> heirarchy = new List<Type>();
+//			if (TypeHeirarchies == null)
+//				TypeHeirarchies = new Dictionary<Type, Type[]>();
+			if (TypeHeirarchies.ContainsKey(artefactType))
+				return TypeHeirarchies[artefactType];
+			Stack<Type> heirarchy = new Stack<Type>();
 			for (Type T = artefactType; T.BaseType != null; T = T.BaseType)
-				heirarchy.Add(T);
-			heirarchy.Reverse();
-			return _typeHeirarchies[artefactType] = heirarchy.ToArray();
+				heirarchy.Push(T);
+			TypeHeirarchies[artefactType] = heirarchy.ToArray();
+			return TypeHeirarchies[artefactType];
 		}
 		
 		/// <summary>
@@ -73,11 +78,8 @@ namespace Artefacts
 		/// </summary>
 		/// <typeparam name="TArtefact"><see cref="Artefacts.Artefact"/> type</typeparam>
 		/// <exception cref="ArgumentException">Is thrown when an argument passed to a method is invalid</exception>
-		public static int GetInheritanceLevel<TArtefact>()
-			where TArtefact : Artefact
+		public static int GetInheritanceLevel<TArtefact>() where TArtefact : Artefact
 		{
-//			if (!artefactType.IsSubclassOf(typeof(Artefact)))
-//				throw new ArgumentException("Not derived from class Artefact", "artefactType");
 			return GetTypeHeirarchy(typeof(TArtefact)).Length - 2;
 		}
 		#endregion
@@ -117,7 +119,6 @@ namespace Artefacts
 		public virtual DateTime TimeChecked { get; set; }
 
 		public virtual DateTime TimeUpdatesCommitted { get; set; }
-		
 		#endregion
 		#endregion
 		
