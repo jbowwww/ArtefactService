@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{AE6F7AD2-65C8-486E-9A74-EB2D79E72154}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -42,15 +42,12 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="Iesi.Collections">
       <HintPath>..\bin\Debug\Iesi.Collections.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="NHibernate">
       <HintPath>..\bin\Debug\NHibernate.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Serialize.Linq">
       <HintPath>..\bin\Debug\Serialize.Linq.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -69,6 +66,9 @@
     <Compile Include="Extensions\Expression.cs" />
     <Compile Include="Extensions\ServiceModel.cs" />
     <Compile Include="Extensions\Type.cs" />
+    <Compile Include="EndpointFormatterBehaviour.cs" />
+    <Compile Include="ClientMessageInspector.cs" />
+    <Compile Include="ClientParameterInspector.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

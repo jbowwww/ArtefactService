@@ -113,7 +113,7 @@ namespace Artefacts.Service
 		#endregion
 		#endregion
 		
-		#region Construction & disposal methods
+		#region Construction, disposal & (De)Initialisation routines
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Artefacts.Service.RepositoryClientProxy"/> class.
 		/// </summary>
@@ -134,21 +134,6 @@ namespace Artefacts.Service
 		}
 
 		/// <summary>
-		/// Releases all resource used by the <see cref="Artefacts.Service.RepositoryClientProxy"/> object.
-		/// </summary>
-		/// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="Artefacts.Service.RepositoryClientProxy"/>.
-		/// The <see cref="Dispose"/> method leaves the <see cref="Artefacts.Service.RepositoryClientProxy"/> in an unusable
-		/// state. After calling <see cref="Dispose"/>, you must release all references to the
-		/// <see cref="Artefacts.Service.RepositoryClientProxy"/> so the garbage collector can reclaim the memory that the
-		/// <see cref="Artefacts.Service.RepositoryClientProxy"/> was occupying.</remarks>
-		public void Dispose()
-		{
-			Close();
-		}
-		#endregion
-		
-		#region (De)Initialisation routines
-		/// <summary>
 		/// Init this instance.
 		/// </summary>
 		public void Init()
@@ -160,7 +145,7 @@ namespace Artefacts.Service
 				_init = true;
 				Console.WriteLine("{0}: Initialising", _proxyTypeName);
 				ChannelFactory = new ChannelFactory<IRepository>(Binding, Address);				
-	//			ApplyChannelFactoryBehaviours(_channelFactory);
+				ApplyChannelFactoryBehaviours(_channelFactory);
 				Channel = ChannelFactory.CreateChannel();
 				Queryables = new ConcurrentDictionary<Type, IQueryable>();
 				QueryCache = new Dictionary<object, IQueryable>();
@@ -180,17 +165,19 @@ namespace Artefacts.Service
 		}
 
 		/// <summary>
-		/// Close this instance.
+		/// Applies the channel factory behaviours.
 		/// </summary>
-		public void Close()
+		/// <param name="factory">Factory.</param>
+		private void ApplyChannelFactoryBehaviours(ChannelFactory<IRepository> factory)
 		{
-			if (_close)
-				Console.WriteLine("{0}: Already closed", _proxyTypeName);
-			else
+			foreach (OperationDescription operation in factory.Endpoint.Contract.Operations)
 			{
-				_close = true;
-				Channel.Disconnect(Host.Current);
-				ChannelFactory.Close();
+				
+//				DataContractSerializerOperationBehavior dcsb = operation.Behaviors.Find<DataContractSerializerOperationBehavior>();
+//				if (dcsb == null)
+//					operation.Behaviors.Add(dcsb = new MyDataContractBehaviour(operation));
+//				dcsb.DataContractResolver = new WCFTypeResolver();
+//				dcsb.DataContractSurrogate = new WCFDataSerializerSurrogate();
 			}
 		}
 		
@@ -217,21 +204,33 @@ namespace Artefacts.Service
 		}
 
 		/// <summary>
-		/// Applies the channel factory behaviours.
+		/// Releases all resource used by the <see cref="Artefacts.Service.RepositoryClientProxy"/> object.
 		/// </summary>
-		/// <param name="factory">Factory.</param>
-		private void ApplyChannelFactoryBehaviours(ChannelFactory<IRepository> factory)
+		/// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="Artefacts.Service.RepositoryClientProxy"/>.
+		/// The <see cref="Dispose"/> method leaves the <see cref="Artefacts.Service.RepositoryClientProxy"/> in an unusable
+		/// state. After calling <see cref="Dispose"/>, you must release all references to the
+		/// <see cref="Artefacts.Service.RepositoryClientProxy"/> so the garbage collector can reclaim the memory that the
+		/// <see cref="Artefacts.Service.RepositoryClientProxy"/> was occupying.</remarks>
+		public void Dispose()
 		{
-//			foreach (OperationDescription operation in factory.Endpoint.Contract.Operations)
-//			{
-//				DataContractSerializerOperationBehavior dcsb = operation.Behaviors.Find<DataContractSerializerOperationBehavior>();
-//				if (dcsb == null)
-//					operation.Behaviors.Add(dcsb = new MyDataContractBehaviour(operation));
-//				dcsb.DataContractResolver = new WCFTypeResolver();
-//				dcsb.DataContractSurrogate = new WCFDataSerializerSurrogate();
-//			}
+			Close();
 		}
-		#endregion
+		
+		/// <summary>
+		/// Close this instance.
+		/// </summary>
+		public void Close()
+		{
+			if (_close)
+				Console.WriteLine("{0}: Already closed", _proxyTypeName);
+			else
+			{
+				_close = true;
+				Channel.Disconnect(Host.Current);
+				ChannelFactory.Close();
+			}
+		}
+		#endregion		
 		
 		public int Connect(Host host)
 		{
