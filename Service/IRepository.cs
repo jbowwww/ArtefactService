@@ -64,7 +64,7 @@ namespace Artefacts.Service
 		IDictionary<Type, IQueryable> Queryables { get; }
 		#endregion
 		
-		#region Add/Get/Update/Remove singular artefact operations
+		#region Add/Get/Exists/Update/Remove singular artefact operations
 		/// <summary>
 		/// Add the specified artefact.
 		/// </summary>

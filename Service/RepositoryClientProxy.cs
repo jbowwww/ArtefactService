@@ -171,11 +171,12 @@ namespace Artefacts.Service
 				//(IQueryable<Artefact>)this;		//
 				//			Queryables.Add(typeof(Artefact), Artefacts);
 				Host.Current = BuildBaseQuery<Host>().Where(host => Host.GetHostId() == host.HostId).FirstOrDefault() ?? new Host();
+				_clientId = Channel.Connect(Host.Current);
 				if (Host.Current.IsTransient)
 					Channel.Add(Host.Current);
 				else
 					Channel.Update(Host.Current.Update());
-				_clientId = Channel.Connect(Host.Current);
+				
 			}
 		}
 
@@ -457,20 +458,9 @@ namespace Artefacts.Service
 					else
 						throw new NotSupportedException("Method \"" + methodName + "\" not supported");
 				}
-
-//					IEnumerable<Artefact> enumerable = ((IQueryable)(Execute(instanceExp))).Cast<Artefact>().ToList();
-//					return enumerable.AsQueryable().Provider.Execute(Expression.Call(mce.Method, Expression.Constant(enumerable.AsQueryable())));
-//				}
-					
-//				{
-//					IQueryable q = QueryCache[mce.Object.Id()];
-//					 QueryCache[mce.Object.Id()].Cast<Artefact>().AsEnumerable()
-//
-//				}
 			}
 
 			Expression parsedExpression = ExpressionVisitor.Visit(expression);
-
 			return !typeof(Artefact).IsAssignableFrom(parsedExpression.Type) ||
 				parsedExpression.NodeType != ExpressionType.Constant ?
 					Channel.QueryExecute(parsedExpression.ToBinary())

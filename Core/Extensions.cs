@@ -37,7 +37,8 @@ namespace Artefacts
 		
 		public static string ToString(this object[] array)
 		{
-			StringBuilder sb = new StringBuilder(array.GetType().FullName).Append(" { ");
+			StringBuilder sb = new StringBuilder(array.Length * 4);
+			sb.AppendFormat("{0}[{1}] { ", array.GetType().GetElementType().FullName, array.Length);
 			foreach (object item in array)
 				sb.AppendFormat("{0} [{1}], ",
 					item != null ? item.ToString() : "(null)",
@@ -48,7 +49,8 @@ namespace Artefacts
 		
 		public static string ToString<T>(this T[] array)
 		{
-			StringBuilder sb = new StringBuilder(array.GetType().FullName).Append(" { ");
+			StringBuilder sb = new StringBuilder(array.Length * 4);
+			sb.AppendFormat("{0}[{1}] { ", array.GetType().GetElementType().FullName, array.Length);
 			foreach (T item in array)
 				sb.AppendFormat("{0}, ",		// [{1}], ",
 					item != null ? item.ToString() : "(null)");

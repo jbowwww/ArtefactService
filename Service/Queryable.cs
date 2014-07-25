@@ -204,7 +204,15 @@ namespace Artefacts.Service
 		/// Gets the count.
 		/// </summary>
 		public int Count {
-			get { return _count < 0 ? _count = this.Count() : _count; }
+			get
+			{
+				BindingFlags bf = BindingFlags.Static | BindingFlags.Public;
+				MethodInfo method = typeof(System.Linq.Queryable).GetMethod("Count", bf, null,
+					new Type[] {}, /*new Type[] { typeof(IQueryable<>).MakeGenericType(ElementType) }, */ null);	//new ParameterModifier[] { new ParameterModifier(1) })
+//				return _count >= 0 ? _count : _count =
+//					(int)Repository.Execute(Expression.Call(method, Expression));
+				return _count >= 0 && IsUpToDate ? _count : _count = this.Count();
+			}
 		}
 		private int _count = -1;
 

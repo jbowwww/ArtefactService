@@ -38,6 +38,7 @@ namespace Artefacts.Service
 		/// <param name="host">Host.</param>
 		private static void ApplyServiceHostBehaviours(ServiceHost host)
 		{
+//		new ServiceDebugBehavior() {
 //			foreach (ServiceEndpoint endpoint in host.Description.Endpoints)
 //			{
 //				foreach (OperationDescription operation in endpoint.Contract.Operations)
@@ -269,6 +270,8 @@ namespace Artefacts.Service
 						_serviceInstance = new Repository();
 						if (LogFilePath != null)
 							output = error = /*TextWriter.Synchronized(*/ new StreamWriter(_logFileStream = File.OpenWrite(LogFilePath));//);
+						_output = output;
+						_error = error;
 						_serviceHost = BuildServiceHost(_serviceInstance, timeout, false);
 					_serviceHost.Open();
 					

@@ -9,13 +9,18 @@ using Serialize.Linq;
 using Serialize.Linq.Extensions;
 using Serialize.Linq.Nodes;
 using Serialize.Linq.Serializers;
+using System.Text;
+using System.Reflection;
+using System.Collections.Generic;
+using NHibernate.Linq;
 
 namespace Artefacts.Service
 {
 	public static class Expression_Extensions
 	{
 		private static readonly BinaryFormatter _bf = new BinaryFormatter();
-
+		private static readonly ToStringVisitor _qfv = new ToStringVisitor();
+		
 		public static bool IsEnumerable(this Expression e)
 		{
 			return typeof(IEnumerable).IsAssignableFrom(e.Type);
@@ -91,6 +96,16 @@ namespace Artefacts.Service
 			ExpressionNode en = eBinary.NodeFromBinary(bf);
 			Expression expression = en.ToExpression();
 			return expression;
+		}
+		
+		/// <summary>
+		/// Formats an <see cref="Expression"/> to a string, including generic params ( + anything else you add??)
+		/// </summary>
+		/// <returns>The string.</returns>
+		/// <param name="expression">Expression.</param>
+		public static string FormatString(this Expression expression)
+		{
+			return _qfv.MakeString(expression);
 		}
 	}
 }

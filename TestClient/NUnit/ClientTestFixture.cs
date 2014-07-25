@@ -56,7 +56,7 @@ namespace Artefacts.TestClient
 
 		protected TextWriter ConsoleOut = null;
 		protected TextWriter ConsoleError = null;
-		protected readonly bool UseServiceHostAsync = false;
+		protected readonly bool UseServiceHostAsync = true;
 		protected readonly bool UseServiceHostProc = false;
 		
 		#region Construction & disposal

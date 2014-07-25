@@ -11,7 +11,7 @@ namespace Artefacts
 		private bool _lastCharWasNewLine = true;
 		public readonly List<TextWriter> Outputs = new List<TextWriter>();	
 		public bool UseTimeStamp = false;
-		public string TimeStampFormat = "yyyy-MM-dd HH:mm:s:fff";		//"s";
+		public string TimeStampFormat = "s";
 		#endregion
 		
 		/// <summary>
@@ -57,13 +57,13 @@ namespace Artefacts
 		/// <remarks>implemented abstract member of TextWriter</remarks>
 		public override void Write(char value)
 		{
-			string timeStamp = DateTime.Now.ToString(TimeStampFormat) + " ";
+			string timestamp = DateTime.Now.ToString(TimeStampFormat) + " ";
 			foreach (TextWriter output in Outputs)
 			{
 				if (output != null)
 				{
 					if (_lastCharWasNewLine)
-						output.Write(timeStamp);
+						output.Write(timestamp);
 					output.Write(value);
 //					output.Flush();		// don't flush just for one char?
 				}
@@ -78,18 +78,38 @@ namespace Artefacts
 		/// <remarks>implemented abstract member of TextWriter</remarks>
 		public override void Write(char[] buffer)
 		{
-			string timeStamp = DateTime.Now.ToString(TimeStampFormat) + " ";
+			string timeStamp = string.Format("{0} ", DateTime.Now.ToString(TimeStampFormat));
+			StringBuilder sb = new StringBuilder(buffer.Length + 32);
+			string o;
+			int i, start = 0;
+			for (i = 0; i < buffer.Length; i++)
+			{
+				if (i == buffer.Length)
+				{
+					sb.Append(timeStamp);
+					sb.Append(buffer, start, i - start + 1);
+					start = i + 1;
+					_lastCharWasNewLine = buffer[i - 1] == '\n';
+				}
+				else if (buffer[i] == '\n')
+				{
+					while (i < buffer.Length - 1 && buffer[i] == '\n')
+						i++;
+					sb.Append(timeStamp);
+					sb.Append(buffer, start, i - start + 1);
+					start = i + 1;
+				}
+			}
+			o = sb.ToString();				
 			foreach (TextWriter output in Outputs)
 			{
 				if (output != null)
 				{
-					if (_lastCharWasNewLine)
-						output.Write(timeStamp);
-					output.Write(buffer);
+					output.Write(o);
 					output.Flush();
 				}
 			}
-			_lastCharWasNewLine = buffer[buffer.Length - 1] == '\n';
+						
 		}
 	}
 }

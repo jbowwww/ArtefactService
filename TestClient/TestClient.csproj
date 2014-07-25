@@ -116,6 +116,7 @@
     <None Include="Outputs\140602-0420-SeparateClientAndServer-ConsoleLog\server.txt" />
     <None Include="Outputs\140602-0550-ImprovedClientSideQueryVisitor\client.txt" />
     <None Include="Outputs\140602-0550-ImprovedClientSideQueryVisitor\server.txt" />
+    <None Include="runoptions_future.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Outputs\140602-0420-SeparateClientAndServer-ConsoleLog\" />

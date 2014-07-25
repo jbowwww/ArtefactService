@@ -4,6 +4,7 @@ using System.Text;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace Artefacts
 {
@@ -12,7 +13,7 @@ namespace Artefacts
 	/// </summary>
 	[DataContract, KnownType("GetArtefactTypes")]
 	[ArtefactFormat("[Artefact: Id={Id}]")]	// TimeCreated={TimeCreated} TimeUpdated={TimeUpdated} TimeChecked={TimeChecked}]")]
-	public abstract class Artefact : IArtefact
+	public abstract class Artefact : IArtefact		//, INotifyPropertyChanged
 	{
 		#region Static members (store and return Type arrays for WCF service known types)
 		/// <summary>
@@ -41,19 +42,19 @@ namespace Artefacts
 		/// <returns>The artefact types.</returns>
 		public static Type[] GetArtefactTypes()
 		{
-			return ArtefactTypes.ToArray();				//		return GetArtefactTypes(null);
+			return GetArtefactTypes(null);				//	ArtefactTypes.ToArray();	
 		}
 
 		/// <summary>
 		/// Returns the <see cref="Artefact"/> stored in <see cref="ArtefactTypes"/>.
 		/// Called by WCF services' <see cref="DataContractResolver"/> as a KnownType or ServiceKnownType
 		/// </summary>
-//		public static Type[] GetArtefactTypes(ICustomAttributeProvider provider = null)
-//		{
-//			Type[] artefactTypes = new Type[ArtefactTypes.Count];
-//			ArtefactTypes.CopyTo(artefactTypes, 0);
-//			return artefactTypes;
-//		}
+		public static Type[] GetArtefactTypes(ICustomAttributeProvider provider = null)
+		{
+			Type[] artefactTypes = new Type[ArtefactTypes.Count];
+			ArtefactTypes.CopyTo(artefactTypes, 0);
+			return artefactTypes;
+		}
 		
 		/// <summary>
 		/// Gets a type's inheritance heirarchy
@@ -121,6 +122,19 @@ namespace Artefacts
 		public virtual DateTime TimeUpdatesCommitted { get; set; }
 		#endregion
 		#endregion
+
+//		#region INotifyPropertyChanged implementation
+//
+//		public event PropertyChangedEventHandler PropertyChanged;
+//
+//		protected void OnPropertyChanged(string propertyName)
+//		{
+//			PropertyChangedEventHandler handler = PropertyChanged;
+//			if (handler != null)
+//				handler(this, new PropertyChangedEventArgs(propertyName));
+//		}
+//		
+//		#endregion
 		
 		protected Artefact()
 		{

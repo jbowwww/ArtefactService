@@ -68,9 +68,10 @@ namespace Artefacts.Service
 	///				new Queryable<Artefact>(this, _nhQueryProvider, expression);
 	///				new QueryableNhProxy<Artefact>(new NhQueryable<Artefact>(_nhQueryProvider, Expression.Empty));			//				(NhQueryable<Artefact>)_nhQueryProvider.CreateQuery<Artefact>(Expression.Empty));
 	/// </remarks>
-	[ServiceBehavior(IncludeExceptionDetailInFaults=true,
-		InstanceContextMode=InstanceContextMode.Single,
-		ConcurrencyMode=ConcurrencyMode.Multiple)]
+	[ServiceBehavior(IncludeExceptionDetailInFaults = true,
+		InstanceContextMode = InstanceContextMode.Single,
+		ConcurrencyMode = ConcurrencyMode.Multiple,
+		MaxItemsInObjectGraph = 100)]
 	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
 	public class Repository : IRepository, IDisposable
 	{		
@@ -125,6 +126,11 @@ namespace Artefacts.Service
 		/// Gets or sets the query visitor.
 		/// </summary>
 		protected ExpressionVisitor QueryVisitor;
+		
+		/// <summary>
+		/// The query formatter visitor.
+		/// </summary>
+		protected ExpressionVisitor QueryFormatterVisitor;
 		#endregion
 
 		#region Public properties
@@ -165,6 +171,7 @@ namespace Artefacts.Service
 
 			Configuration = new ArtefactServiceConfiguration();
 			QueryVisitor = new ServerQueryVisitor(this);
+			QueryFormatterVisitor = new ToStringVisitor();
 			QueryCache = new Dictionary<object, IQueryable>();
 			Artefacts = Session.Query<Artefact>();
 			Queryables = new ConcurrentDictionary<Type, IQueryable>();
@@ -217,7 +224,13 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public int Add(Artefact artefact)
 		{
-			Console.WriteLine("Add({0} artefact #{1})", artefact.GetType().FullName, artefact.Id);
+			Console.WriteLine("Add({0} artefact #{1})", artefact.GetType().FullName,
+			artefact.Id.HasValue ? artefact.Id.ToString() : "(null)",
+			OperationContext.Current == null ? "(OpCtx=null)" :
+				OperationContext.Current.ToString());
+//				.RequestContext == null ? "(RqCtx=null)" :
+//				OperationContext.Current.RequestContext.RequestMessage == null ? "(RqMsg=null)" :
+//					OperationContext.Current.RequestContext.RequestMessage.ToString());
 			ITransaction transaction = null;
 			int id = -1;
 			try
@@ -259,7 +272,14 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public int GetId(Artefact artefact)
 		{
-			Console.WriteLine("GetId({0} artefact #{1})", artefact.GetType().FullName, artefact.Id);
+			Console.WriteLine("GetId({0} artefact #{1})", artefact.GetType().FullName,
+			artefact.Id.HasValue ? artefact.Id.ToString() : "(null)",
+			OperationContext.Current == null ? "(OpCtx=null)" :
+								OperationContext.Current.ToString());
+//				.RequestContext == null ? "(RqCtx=null)" :
+//				OperationContext.Current.RequestContext.RequestMessage == null ? "(RqMsg=null)" :
+//					OperationContext.Current.RequestContext.RequestMessage.ToString());
+
 			try
 			{
 				return artefact.IsTransient ? (artefact.Id = (int)Session.GetIdentifier(artefact)).Value : artefact.Id.Value;
@@ -278,7 +298,12 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public Artefact GetById(int id)
 		{
-			Console.WriteLine("GetById(#{0})", id);
+			Console.WriteLine("GetById(#{0})", id, OperationContext.Current == null ? "(OpCtx=null)" :
+								OperationContext.Current.ToString());
+//				.RequestContext == null ? "(RqCtx=null)" :
+//				OperationContext.Current.RequestContext.RequestMessage == null ? "(RqMsg=null)" :
+//					OperationContext.Current.RequestContext.RequestMessage.ToString());
+
 			try
 			{
 //				return _artefactCache.ContainsKey(id) && (_artefactCache[id].UpdateAge > ArtefactUpdateAgeLimit)
@@ -307,7 +332,14 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public void Update(Artefact artefact)
 		{
-			Console.WriteLine("Update({0} artefact #{1})", artefact.GetType().FullName, artefact.Id);
+			Console.WriteLine("Update({0} artefact #{1})",  artefact.GetType().FullName,
+			artefact.Id.HasValue ? artefact.Id.ToString() : "(null)",
+			OperationContext.Current == null ? "(OpCtx=null)" :
+								OperationContext.Current.ToString());
+//				.RequestContext == null ? "(RqCtx=null)" :
+//				OperationContext.Current.RequestContext.RequestMessage == null ? "(RqMsg=null)" :
+//					OperationContext.Current.RequestContext.RequestMessage.ToString());
+
 			ITransaction transaction = null;
 			try
 			{
@@ -343,7 +375,14 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public void Remove(Artefact artefact)
 		{
-			Console.WriteLine("Remove({0} artefact #{1})", artefact.GetType().FullName, artefact.Id);
+			Console.WriteLine("Remove({0} artefact #{1})",  artefact.GetType().FullName,
+			artefact.Id.HasValue ? artefact.Id.ToString() : "(null)",
+			OperationContext.Current == null ? "(OpCtx=null)" :
+								OperationContext.Current.ToString());
+//				.RequestContext == null ? "(RqCtx=null)" :
+//				OperationContext.Current.RequestContext.RequestMessage == null ? "(RqMsg=null)" :
+//					OperationContext.Current.RequestContext.RequestMessage.ToString());
+
 			ITransaction transaction = null;
 //			int id = -1;
 			try
@@ -387,27 +426,28 @@ namespace Artefacts.Service
 			Expression serverSideExpression = null;
 			object serverId = null;
 			IQueryable serverSideQuery = null;
-			try
-			{
+//			try
+//			{
 				serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
 				serverId = serverSideExpression.Id();
-				Console.WriteLine("QueryPreload(\"{0}\") = {1}", serverSideExpression, serverId);
+//serverId = QueryFormatterVisitor.ToString();
+				Console.WriteLine("QueryPreload(\"{0}\") = Q#{1}", serverSideExpression.FormatString(), serverId);
 				if (!QueryCache.ContainsKey(serverId))
 				{
 					serverSideQuery = _nhQueryProvider.CreateQuery(serverSideExpression);				
 					QueryCache[serverId] = serverSideQuery;
 				}
-			}
-			catch (Exception ex)
-			{
-				Console.Write("\n--- Repository Exception ---\n{0}: {1}\nStackTrace:\n  {2}\n\n",
-					ex.GetType().FullName, ex.Message, ex.StackTrace.Trim('\n').Insert(0, "\n").Replace("\n", "\n  "));
-				FaultException fEx = Error(ex);
-				fEx.Data.Add("serverSideExpression", expression.NodeFromBinary().ToString());// serverSideExpression.ToString());
-				fEx.Data.Add("serverId", serverId.ToString());
-				fEx.Data.Add("serverSideQuery", serverSideQuery.ToString());
-				throw fEx;
-			}
+//			}
+//			catch (Exception ex)
+//			{
+//				Console.Write("\n--- Repository Exception ---\n{0}: {1}\nStackTrace:\n  {2}\n\n",
+//					ex.GetType().FullName, ex.Message, ex.StackTrace.Trim('\n').Insert(0, "\n").Replace("\n", "\n  "));
+//				FaultException fEx = Error(ex);
+//				fEx.Data.Add("serverSideExpression", expression.NodeFromBinary().ToString());// serverSideExpression.ToString());
+//				fEx.Data.Add("serverId", serverId.ToString());
+//				fEx.Data.Add("serverSideQuery", serverSideQuery.ToString());
+//				throw fEx;
+//			}
 			return serverId;
 		}
 
@@ -422,8 +462,8 @@ namespace Artefacts.Service
 		{
 			IQueryable<Artefact> serverSideQuery = null;
 			int[] results = null;
-			try
-			{
+//			try
+//			{
 				serverSideQuery = (IQueryable<Artefact>)QueryCache[queryId];
 				results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
 					serverSideQuery.Skip(startIndex) : // with a new custom server-side query provider, and implement caching??
@@ -439,21 +479,21 @@ namespace Artefacts.Service
 //					else
 //						_artefactCache[artefactId] = artefact;
 //				}
-				Console.Write("QueryResults({0}, {1}, {2}) = \"{3}\"", queryId, startIndex, count, results);	
+				Console.WriteLine("QueryResults(Q#{0}, {1}, {2}) = \"{3}\"", queryId, startIndex, count, results);	
 				return results;
-			}
-			catch (Exception ex)
-			{
-				Console.Write("\n--- Repository Exception ---\n{0}: {1}\nStackTrace:\n  {2}\n\n",
-					ex.GetType().FullName, ex.Message, ex.StackTrace.Trim('\n').Insert(0, "\n").Replace("\n", "\n  "));
-				FaultException fEx = Error(ex);
-				fEx.Data.Add("queryId", queryId.ToString());
-				fEx.Data.Add("startIndex", startIndex.ToString());
-				fEx.Data.Add("count", count.ToString());
-				fEx.Data.Add("serverSideQuery", serverSideQuery.ToString());
-				fEx.Data.Add("results", results.ToString());
-				throw fEx;
-			}
+//			}
+//			catch (Exception ex)
+//			{
+//				Console.Write("\n--- Repository Exception ---\n{0}: {1}\nStackTrace:\n  {2}\n\n",
+//					ex.GetType().FullName, ex.Message, ex.StackTrace.Trim('\n').Insert(0, "\n").Replace("\n", "\n  "));
+//				FaultException fEx = Error(ex);
+//				fEx.Data.Add("queryId", queryId.ToString());
+//				fEx.Data.Add("startIndex", startIndex.ToString());
+//				fEx.Data.Add("count", count.ToString());
+//				fEx.Data.Add("serverSideQuery", serverSideQuery.ToString());
+//				fEx.Data.Add("results", results.ToString());
+//				throw fEx;
+//			}
 		}
 
 		/// <summary>
@@ -466,22 +506,22 @@ namespace Artefacts.Service
 		{
 			Expression serverSideExpression = null;
 			object result = null;
-			try
-			{
+//			try
+//			{
 				serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
 				result = _nhQueryProvider.Execute(serverSideExpression);
-				Console.WriteLine("QueryExecute(\"{0}\") = {1}", serverSideExpression, result);
+				Console.WriteLine("QueryExecute(Q#{0}:{1}) = {2}", serverSideExpression.Id(), serverSideExpression.FormatString(), result);
 				return result;
-			}
-			catch (Exception ex)
-			{
-				Console.Write("\n--- Repository Exception ---\n{0}: {1}\nStackTrace:\n  {2}\n\n",
-					ex.GetType().FullName, ex.Message, ex.StackTrace.Trim('\n').Insert(0, "\n").Replace("\n", "\n  "));
-				FaultException fEx = Error(ex);
-				fEx.Data.Add("serverSideExpression", expression.NodeFromBinary().ToString());// serverSideExpression.ToString());
-				fEx.Data.Add("result", result.ToString());
-				throw fEx;
-			}			
+//			}
+//			catch (Exception ex)
+//			{
+//				Console.Write("\n--- Repository Exception ---\n{0}: {1}\nStackTrace:\n  {2}\n\n",
+//					ex.GetType().FullName, ex.Message, ex.StackTrace.Trim('\n').Insert(0, "\n").Replace("\n", "\n  "));
+//				FaultException fEx = Error(ex);
+//				fEx.Data.Add("serverSideExpression", expression.NodeFromBinary().ToString());// serverSideExpression.ToString());
+//				fEx.Data.Add("result", result.ToString());
+//				throw fEx;
+//			}			
 		}
 		#endregion
 

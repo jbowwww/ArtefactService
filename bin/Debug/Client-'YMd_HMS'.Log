@@ -1,0 +1,209 @@
+2014-07-10 22:00:31:145 ClientTest.Init: Initialising...
+2014-07-10 22:00:31:191 Artefacts.Service.RepositoryClientProxy: Initialising
+2014-07-10 22:00:33:397 
+Service Artefact Repository: Artefacts.Service.RepositoryClientProxy
+2014-07-10 22:00:33:398 
+2014-07-10 22:00:33:684 
+FS Creator: Artefacts.FileSystem.FileSystemArtefactCreator
+2014-07-10 22:00:33:684 
+2014-07-10 22:00:33:684 ClientTest.Init: Already initialised
+2014-07-10 22:00:33:700 
+########
+# RunTest: Start: IQueryable<Artefact> _clientProxy.Artefacts
+########
+2014-07-10 22:00:33:700 
+2014-07-10 22:00:33:756 51 artefacts currently in repository
+2014-07-10 22:00:33:922 [Host: HostId=a8c00a01]
+2014-07-10 22:00:34:053 [Directory: ]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/collection3 Directory=#(null) Attributes=Directory CreationTime=18/08/2009 6:34:58 PM AccessTime=10/07/2014 8:56:33 PM ModifyTime=18/08/2009 6:34:58 PM]
+    [Artefact: Id=32769 TimeCreated=28/06/2014 6:01:55 PM TimeChecked=28/06/2014 6:01:55 PM TimeUpdated=10/07/2014 9:47:44 PM]
+2014-07-10 22:00:34:170 [File: Size=21636, Name=505_conga_hi.wav, NameWithoutExtension=505_conga_hi, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/505_conga_hi.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:11:50 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:11:50 AM]
+    [Artefact: Id=32770 TimeCreated=28/06/2014 6:01:57 PM TimeChecked=28/06/2014 6:01:57 PM TimeUpdated=10/07/2014 9:47:47 PM]
+2014-07-10 22:00:34:280 [Directory: ]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1 Directory=#(null) Attributes=Directory CreationTime=18/08/2009 6:34:54 PM AccessTime=10/07/2014 8:56:33 PM ModifyTime=18/08/2009 6:34:54 PM]
+    [Artefact: Id=65536 TimeCreated=28/06/2014 6:19:04 PM TimeChecked=28/06/2014 6:19:04 PM TimeUpdated=10/07/2014 9:47:45 PM]
+2014-07-10 22:00:34:393 [Directory: ]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/hiphop1 Directory=#(null) Attributes=Directory CreationTime=18/08/2009 6:34:54 PM AccessTime=10/07/2014 8:57:07 PM ModifyTime=18/08/2009 6:34:54 PM]
+    [Artefact: Id=65537 TimeCreated=28/06/2014 6:19:14 PM TimeChecked=28/06/2014 6:19:14 PM TimeUpdated=10/07/2014 9:47:45 PM]
+2014-07-10 22:00:34:504 [Directory: ]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/pianos_organs Directory=#(null) Attributes=Directory CreationTime=18/08/2009 6:34:52 PM AccessTime=10/07/2014 8:57:09 PM ModifyTime=18/08/2009 6:34:52 PM]
+    [Artefact: Id=65538 TimeCreated=28/06/2014 6:19:17 PM TimeChecked=28/06/2014 6:19:17 PM TimeUpdated=10/07/2014 9:47:46 PM]
+2014-07-10 22:00:34:620 [File: Size=28724, Name=505_conga_lo.wav, NameWithoutExtension=505_conga_lo, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/505_conga_lo.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:09:24 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:09:24 AM]
+    [Artefact: Id=65539 TimeCreated=28/06/2014 6:19:22 PM TimeChecked=28/06/2014 6:19:22 PM TimeUpdated=10/07/2014 9:47:48 PM]
+2014-07-10 22:00:34:735 [File: Size=118080, Name=505_ride.wav, NameWithoutExtension=505_ride, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/505_ride.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:12:36 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:12:36 AM]
+    [Artefact: Id=65540 TimeCreated=28/06/2014 6:19:23 PM TimeChecked=28/06/2014 6:19:23 PM TimeUpdated=10/07/2014 9:47:49 PM]
+2014-07-10 22:00:34:849 [File: Size=14256, Name=505_rimshot.wav, NameWithoutExtension=505_rimshot, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/505_rimshot.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:13:06 AM AccessTime=15/02/2014 10:05:05 AM ModifyTime=18/12/2006 12:13:06 AM]
+    [Artefact: Id=65541 TimeCreated=28/06/2014 6:19:24 PM TimeChecked=28/06/2014 6:19:24 PM TimeUpdated=10/07/2014 9:47:50 PM]
+2014-07-10 22:00:34:975 [File: Size=57600, Name=505_tom_low.wav, NameWithoutExtension=505_tom_low, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/505_tom_low.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:13:26 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:13:26 AM]
+    [Artefact: Id=65542 TimeCreated=28/06/2014 6:19:25 PM TimeChecked=28/06/2014 6:19:25 PM TimeUpdated=10/07/2014 9:47:51 PM]
+2014-07-10 22:00:35:086 [File: Size=57880, Name=505_tom_mid.wav, NameWithoutExtension=505_tom_mid, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/505_tom_mid.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:13:50 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:13:50 AM]
+    [Artefact: Id=65543 TimeCreated=28/06/2014 6:19:26 PM TimeChecked=28/06/2014 6:19:26 PM TimeUpdated=10/07/2014 9:47:52 PM]
+2014-07-10 22:00:35:197 [File: Size=36800, Name=break1.wav, NameWithoutExtension=break1, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/break1.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:14:40 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:14:40 AM]
+    [Artefact: Id=65544 TimeCreated=28/06/2014 6:19:26 PM TimeChecked=28/06/2014 6:19:26 PM TimeUpdated=10/07/2014 9:47:52 PM]
+2014-07-10 22:00:35:311 [File: Size=7164, Name=chh1.wav, NameWithoutExtension=chh1, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/chh1.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:14:56 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:14:56 AM]
+    [Artefact: Id=65545 TimeCreated=28/06/2014 6:19:27 PM TimeChecked=28/06/2014 6:19:27 PM TimeUpdated=10/07/2014 9:47:53 PM]
+2014-07-10 22:00:35:430 [File: Size=28166, Name=chh2.wav, NameWithoutExtension=chh2, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/chh2.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:15:12 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:15:12 AM]
+    [Artefact: Id=65546 TimeCreated=28/06/2014 6:19:28 PM TimeChecked=28/06/2014 6:19:28 PM TimeUpdated=10/07/2014 9:47:54 PM]
+2014-07-10 22:00:35:549 [File: Size=9622, Name=chh3.wav, NameWithoutExtension=chh3, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/chh3.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:15:24 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:15:24 AM]
+    [Artefact: Id=65547 TimeCreated=28/06/2014 6:19:29 PM TimeChecked=28/06/2014 6:19:29 PM TimeUpdated=10/07/2014 9:47:55 PM]
+2014-07-10 22:00:35:664 [File: Size=120354, Name=crash1.wav, NameWithoutExtension=crash1, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/crash1.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:15:40 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:15:40 AM]
+    [Artefact: Id=65548 TimeCreated=28/06/2014 6:19:30 PM TimeChecked=28/06/2014 6:19:30 PM TimeUpdated=10/07/2014 9:47:56 PM]
+2014-07-10 22:00:35:778 [File: Size=221952, Name=crash2.wav, NameWithoutExtension=crash2, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/crash2.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:16:12 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:16:12 AM]
+    [Artefact: Id=65549 TimeCreated=28/06/2014 6:19:30 PM TimeChecked=28/06/2014 6:19:30 PM TimeUpdated=10/07/2014 9:47:57 PM]
+2014-07-10 22:00:35:889 [File: Size=704824, Name=effect1.wav, NameWithoutExtension=effect1, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/effect1.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:16:44 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:16:44 AM]
+    [Artefact: Id=65550 TimeCreated=28/06/2014 6:19:31 PM TimeChecked=28/06/2014 6:19:31 PM TimeUpdated=10/07/2014 9:47:58 PM]
+2014-07-10 22:00:36:002 [File: Size=126168, Name=effect2.wav, NameWithoutExtension=effect2, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/effect2.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:17:12 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:17:12 AM]
+    [Artefact: Id=65551 TimeCreated=28/06/2014 6:19:32 PM TimeChecked=28/06/2014 6:19:32 PM TimeUpdated=10/07/2014 9:47:58 PM]
+2014-07-10 22:00:36:115 [File: Size=92760, Name=effect_scratch1.wav, NameWithoutExtension=effect_scratch1, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/effect_scratch1.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:17:22 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:17:22 AM]
+    [Artefact: Id=65552 TimeCreated=28/06/2014 6:19:33 PM TimeChecked=28/06/2014 6:19:33 PM TimeUpdated=10/07/2014 9:47:59 PM]
+2014-07-10 22:00:36:224 [File: Size=245404, Name=effect_scratch2.wav, NameWithoutExtension=effect_scratch2, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/effect_scratch2.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:17:34 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:17:34 AM]
+    [Artefact: Id=65553 TimeCreated=28/06/2014 6:19:34 PM TimeChecked=28/06/2014 6:19:34 PM TimeUpdated=10/07/2014 9:48:00 PM]
+2014-07-10 22:00:36:338 [File: Size=7716, Name=finger_snap.wav, NameWithoutExtension=finger_snap, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/finger_snap.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:17:44 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:17:44 AM]
+    [Artefact: Id=65554 TimeCreated=28/06/2014 6:19:34 PM TimeChecked=28/06/2014 6:19:34 PM TimeUpdated=10/07/2014 9:48:01 PM]
+2014-07-10 22:00:36:452 [File: Size=728668, Name=firearm.wav, NameWithoutExtension=firearm, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/firearm.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:18:12 AM AccessTime=15/02/2014 10:05:09 AM ModifyTime=18/12/2006 12:18:12 AM]
+    [Artefact: Id=65555 TimeCreated=28/06/2014 6:19:35 PM TimeChecked=28/06/2014 6:19:35 PM TimeUpdated=10/07/2014 9:48:02 PM]
+2014-07-10 22:00:36:566 [File: Size=58500, Name=fist.wav, NameWithoutExtension=fist, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/fist.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:18:28 AM AccessTime=15/02/2014 10:05:11 AM ModifyTime=18/12/2006 12:18:28 AM]
+    [Artefact: Id=65556 TimeCreated=28/06/2014 6:19:36 PM TimeChecked=28/06/2014 6:19:36 PM TimeUpdated=10/07/2014 9:48:03 PM]
+2014-07-10 22:00:36:678 [File: Size=125668, Name=hit01.wav, NameWithoutExtension=hit01, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/hit01.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:18:46 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:18:46 AM]
+    [Artefact: Id=65557 TimeCreated=28/06/2014 6:19:37 PM TimeChecked=28/06/2014 6:19:37 PM TimeUpdated=10/07/2014 9:48:04 PM]
+2014-07-10 22:00:36:791 [File: Size=51876, Name=kick1.wav, NameWithoutExtension=kick1, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/kick1.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:19:00 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:19:00 AM]
+    [Artefact: Id=65558 TimeCreated=28/06/2014 6:19:37 PM TimeChecked=28/06/2014 6:19:37 PM TimeUpdated=10/07/2014 9:48:04 PM]
+2014-07-10 22:00:36:917 [File: Size=35480, Name=kick2.wav, NameWithoutExtension=kick2, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/kick2.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:19:16 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:19:16 AM]
+    [Artefact: Id=65559 TimeCreated=28/06/2014 6:19:38 PM TimeChecked=28/06/2014 6:19:38 PM TimeUpdated=10/07/2014 9:48:05 PM]
+2014-07-10 22:00:37:033 [File: Size=50216, Name=kick3.wav, NameWithoutExtension=kick3, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/kick3.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:19:36 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:19:36 AM]
+    [Artefact: Id=65560 TimeCreated=28/06/2014 6:19:39 PM TimeChecked=28/06/2014 6:19:39 PM TimeUpdated=10/07/2014 9:48:06 PM]
+2014-07-10 22:00:37:148 [File: Size=23262, Name=kick4.wav, NameWithoutExtension=kick4, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/kick4.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:19:54 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:19:54 AM]
+    [Artefact: Id=65561 TimeCreated=28/06/2014 6:19:40 PM TimeChecked=28/06/2014 6:19:40 PM TimeUpdated=10/07/2014 9:48:07 PM]
+2014-07-10 22:00:37:262 [File: Size=11740, Name=kick5.wav, NameWithoutExtension=kick5, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/kick5.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:20:04 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:20:04 AM]
+    [Artefact: Id=65562 TimeCreated=28/06/2014 6:19:41 PM TimeChecked=28/06/2014 6:19:41 PM TimeUpdated=10/07/2014 9:48:08 PM]
+2014-07-10 22:00:37:378 [File: Size=129690, Name=ohh1.wav, NameWithoutExtension=ohh1, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/ohh1.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:20:34 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:20:34 AM]
+    [Artefact: Id=65563 TimeCreated=28/06/2014 6:19:41 PM TimeChecked=28/06/2014 6:19:41 PM TimeUpdated=10/07/2014 9:48:09 PM]
+2014-07-10 22:00:37:494 [File: Size=42276, Name=ohh2.wav, NameWithoutExtension=ohh2, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/ohh2.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:20:42 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:20:42 AM]
+    [Artefact: Id=65564 TimeCreated=28/06/2014 6:19:42 PM TimeChecked=28/06/2014 6:19:42 PM TimeUpdated=10/07/2014 9:48:09 PM]
+2014-07-10 22:00:37:612 [File: Size=102040, Name=ohh3.wav, NameWithoutExtension=ohh3, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/ohh3.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:20:48 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:20:48 AM]
+    [Artefact: Id=65565 TimeCreated=28/06/2014 6:19:43 PM TimeChecked=28/06/2014 6:19:43 PM TimeUpdated=10/07/2014 9:48:10 PM]
+2014-07-10 22:00:37:724 [File: Size=16992, Name=percussion1.wav, NameWithoutExtension=percussion1, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/percussion1.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:20:58 AM AccessTime=15/02/2014 10:05:14 AM ModifyTime=18/12/2006 12:20:58 AM]
+    [Artefact: Id=65566 TimeCreated=28/06/2014 6:19:44 PM TimeChecked=28/06/2014 6:19:44 PM TimeUpdated=10/07/2014 9:48:11 PM]
+2014-07-10 22:00:37:840 [File: Size=85778, Name=ride1.wav, NameWithoutExtension=ride1, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/ride1.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:21:06 AM AccessTime=15/02/2014 10:05:13 AM ModifyTime=18/12/2006 12:21:06 AM]
+    [Artefact: Id=65567 TimeCreated=28/06/2014 6:19:45 PM TimeChecked=28/06/2014 6:19:45 PM TimeUpdated=10/07/2014 9:48:12 PM]
+2014-07-10 22:00:37:962 [File: Size=12300, Name=shaker1.wav, NameWithoutExtension=shaker1, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/shaker1.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:21:16 AM AccessTime=15/02/2014 10:05:15 AM ModifyTime=18/12/2006 12:21:16 AM]
+    [Artefact: Id=65568 TimeCreated=28/06/2014 6:19:45 PM TimeChecked=28/06/2014 6:19:45 PM TimeUpdated=10/07/2014 9:48:13 PM]
+2014-07-10 22:00:38:079 [File: Size=34328, Name=shaker2.wav, NameWithoutExtension=shaker2, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/shaker2.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:21:28 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:21:28 AM]
+    [Artefact: Id=65569 TimeCreated=28/06/2014 6:19:46 PM TimeChecked=28/06/2014 6:19:46 PM TimeUpdated=10/07/2014 9:48:14 PM]
+2014-07-10 22:00:38:194 [File: Size=25580, Name=shaker3.wav, NameWithoutExtension=shaker3, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/shaker3.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:21:46 AM AccessTime=15/02/2014 10:05:20 AM ModifyTime=18/12/2006 12:21:46 AM]
+    [Artefact: Id=65570 TimeCreated=28/06/2014 6:19:47 PM TimeChecked=28/06/2014 6:19:47 PM TimeUpdated=10/07/2014 9:48:15 PM]
+2014-07-10 22:00:38:315 [File: Size=14686, Name=snare1.wav, NameWithoutExtension=snare1, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/snare1.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:21:54 AM AccessTime=15/02/2014 10:05:19 AM ModifyTime=18/12/2006 12:21:54 AM]
+    [Artefact: Id=65571 TimeCreated=28/06/2014 6:19:48 PM TimeChecked=28/06/2014 6:19:48 PM TimeUpdated=10/07/2014 9:48:15 PM]
+2014-07-10 22:00:38:433 [File: Size=64516, Name=snare2.wav, NameWithoutExtension=snare2, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/snare2.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:22:02 AM AccessTime=26/05/2013 9:59:14 PM ModifyTime=18/12/2006 12:22:02 AM]
+    [Artefact: Id=65572 TimeCreated=28/06/2014 6:19:49 PM TimeChecked=28/06/2014 6:19:49 PM TimeUpdated=10/07/2014 9:48:16 PM]
+2014-07-10 22:00:38:551 [File: Size=47936, Name=snare3.wav, NameWithoutExtension=snare3, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/snare3.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:22:12 AM AccessTime=15/02/2014 10:05:19 AM ModifyTime=18/12/2006 12:22:12 AM]
+    [Artefact: Id=65573 TimeCreated=28/06/2014 6:19:49 PM TimeChecked=28/06/2014 6:19:49 PM TimeUpdated=10/07/2014 9:48:17 PM]
+2014-07-10 22:00:38:666 [File: Size=55992, Name=snare4.wav, NameWithoutExtension=snare4, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/snare4.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:22:20 AM AccessTime=15/02/2014 10:05:18 AM ModifyTime=18/12/2006 12:22:20 AM]
+    [Artefact: Id=65574 TimeCreated=28/06/2014 6:19:50 PM TimeChecked=28/06/2014 6:19:50 PM TimeUpdated=10/07/2014 9:48:18 PM]
+2014-07-10 22:00:38:782 [File: Size=259368, Name=vocal_hit_it.wav, NameWithoutExtension=vocal_hit_it, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/vocal_hit_it.wav Directory=#(null) Attributes=Normal CreationTime=18/12/2006 12:22:36 AM AccessTime=15/02/2014 10:05:17 AM ModifyTime=18/12/2006 12:22:36 AM]
+    [Artefact: Id=65575 TimeCreated=28/06/2014 6:19:51 PM TimeChecked=28/06/2014 6:19:51 PM TimeUpdated=10/07/2014 9:48:19 PM]
+2014-07-10 22:00:38:896 [Directory: ]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/loops Directory=#(null) Attributes=Directory CreationTime=18/08/2009 6:34:58 PM AccessTime=10/07/2014 8:57:11 PM ModifyTime=18/08/2009 6:34:58 PM]
+    [Artefact: Id=65576 TimeCreated=28/06/2014 6:19:52 PM TimeChecked=28/06/2014 6:19:52 PM TimeUpdated=10/07/2014 9:48:20 PM]
+2014-07-10 22:00:39:010 [File: Size=71471, Name=107CanIGetaLoop1.MP3, NameWithoutExtension=107CanIGetaLoop1, Extension=.MP3]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/hiphop1/107CanIGetaLoop1.MP3 Directory=#(null) Attributes=Normal CreationTime=15/07/2004 8:52:16 PM AccessTime=26/05/2013 9:59:14 PM ModifyTime=15/07/2004 8:52:16 PM]
+    [Artefact: Id=65577 TimeCreated=28/06/2014 6:19:53 PM TimeChecked=28/06/2014 6:19:53 PM TimeUpdated=10/07/2014 9:48:21 PM]
+2014-07-10 22:00:39:136 [File: Size=85264, Name=HHopLoop1.mp3, NameWithoutExtension=HHopLoop1, Extension=.mp3]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/hiphop1/HHopLoop1.mp3 Directory=#(null) Attributes=Normal CreationTime=15/07/2004 8:56:22 PM AccessTime=26/05/2013 9:59:14 PM ModifyTime=15/07/2004 8:56:22 PM]
+    [Artefact: Id=65578 TimeCreated=28/06/2014 6:19:53 PM TimeChecked=28/06/2014 6:19:53 PM TimeUpdated=10/07/2014 9:48:21 PM]
+2014-07-10 22:00:39:253 [File: Size=85264, Name=HHopLoop2.mp3, NameWithoutExtension=HHopLoop2, Extension=.mp3]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/hiphop1/HHopLoop2.mp3 Directory=#(null) Attributes=Normal CreationTime=15/07/2004 8:56:28 PM AccessTime=26/05/2013 9:59:14 PM ModifyTime=15/07/2004 8:56:28 PM]
+    [Artefact: Id=65579 TimeCreated=28/06/2014 6:19:54 PM TimeChecked=28/06/2014 6:19:54 PM TimeUpdated=10/07/2014 9:48:22 PM]
+2014-07-10 22:00:39:363 [File: Size=1277928, Name=funky_piano_loop.wav, NameWithoutExtension=funky_piano_loop, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/pianos_organs/funky_piano_loop.wav Directory=#(null) Attributes=Normal CreationTime=11/02/2007 8:40:30 PM AccessTime=15/02/2014 10:04:49 AM ModifyTime=11/02/2007 8:40:30 PM]
+    [Artefact: Id=65580 TimeCreated=28/06/2014 6:19:55 PM TimeChecked=28/06/2014 6:19:55 PM TimeUpdated=10/07/2014 9:48:23 PM]
+2014-07-10 22:00:39:483 [File: Size=336416, Name=piano_short_echo.wav, NameWithoutExtension=piano_short_echo, Extension=.wav]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/pianos_organs/piano_short_echo.wav Directory=#(null) Attributes=Normal CreationTime=11/02/2007 7:07:34 PM AccessTime=15/02/2014 10:04:47 AM ModifyTime=11/02/2007 7:07:34 PM]
+    [Artefact: Id=65581 TimeCreated=28/06/2014 6:19:56 PM TimeChecked=28/06/2014 6:19:56 PM TimeUpdated=10/07/2014 9:48:24 PM]
+2014-07-10 22:00:39:605 [File: Size=656775, Name=ClubTracksDnB.mp3, NameWithoutExtension=ClubTracksDnB, Extension=.mp3]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/loops/ClubTracksDnB.mp3 Directory=#(null) Attributes=Normal CreationTime=15/07/2004 8:54:46 PM AccessTime=26/05/2013 9:59:14 PM ModifyTime=15/07/2004 8:54:46 PM]
+    [Artefact: Id=65582 TimeCreated=28/06/2014 6:20:08 PM TimeChecked=28/06/2014 6:20:08 PM TimeUpdated=10/07/2014 9:48:25 PM]
+2014-07-10 22:00:39:714 [File: Size=81085, Name=DnBLoop1.mp3, NameWithoutExtension=DnBLoop1, Extension=.mp3]
+  [FileSystemEntry: Drive=#(null) Path=/media/Scarydoor/mystuff/moozik/samples/mycollections/dnb1/loops/DnBLoop1.mp3 Directory=#(null) Attributes=Normal CreationTime=15/07/2004 8:55:56 PM AccessTime=26/05/2013 9:59:14 PM ModifyTime=15/07/2004 8:55:56 PM]
+    [Artefact: Id=65583 TimeCreated=28/06/2014 6:20:09 PM TimeChecked=28/06/2014 6:20:09 PM TimeUpdated=10/07/2014 9:48:26 PM]
+2014-07-10 22:00:39:769 
+########
+# RunTest: Success: IQueryable<Artefact> _clientProxy.Artefacts
+########
+2014-07-10 22:00:39:769 
+2014-07-10 22:00:39:769 
+########
+# RunTest: Start: Host.Current static property
+########
+2014-07-10 22:00:39:769 
+2014-07-10 22:00:39:770 [Host: HostId=a8c00a01]
+2014-07-10 22:00:39:770 
+########
+# RunTest: Success: Host.Current static property
+########
+2014-07-10 22:00:39:770 
+2014-07-10 22:00:39:770 
+########
+# RunTest: Start: FileSystemArtefactCreator
+########
+2014-07-10 22:00:39:770 
+2014-07-10 22:00:39:887 51 artefacts currently in repository
+0 drives
+2014-07-10 22:01:22:959 
+########
+# RunTest: Success: FileSystemArtefactCreator
+########
+2014-07-10 22:01:22:959 
+2014-07-10 22:01:22:959 
+########
+# RunTest: Start: int _clientProxy.Artefacts.Count()
+########
+2014-07-10 22:01:22:959 
+2014-07-10 22:01:23:071 51 artefacts currently in repository
+0 drives
+2014-07-10 22:01:23:071 
+########
+# RunTest: Success: int _clientProxy.Artefacts.Count()
+########
+2014-07-10 22:01:23:071 
+2014-07-10 22:01:23:071 
+--- Client exiting ---
+

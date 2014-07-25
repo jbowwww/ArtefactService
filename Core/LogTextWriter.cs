@@ -27,24 +27,24 @@ namespace Artefacts
 			_outputThread = new Thread(() =>
 			{
 				string o;
-					using (FileStream _fs = File.Open(filePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
-					{
-				_innerWriter = new StreamWriter(_fs);
-				_innerWriter.NewLine = newline;
-				while (Thread.VolatileRead(ref _outputRun) == 1 || _outputQueue.Count > 0)
+				using (FileStream _fs = File.Open(filePath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
 				{
-					if (_outputQueue.Count > 0)
+					_innerWriter = new StreamWriter(_fs);
+					_innerWriter.NewLine = newline;
+					while (Thread.VolatileRead(ref _outputRun) == 1 || _outputQueue.Count > 0)
 					{
-						while (_outputQueue.TryDequeue(out o))
-							_innerWriter.Write(o);
-						_innerWriter.Flush();
+						if (_outputQueue.Count > 0)
+						{
+							while (_outputQueue.TryDequeue(out o))
+								_innerWriter.Write(o);
+							_innerWriter.Flush();
+						}
+						else
+							Thread.Sleep(_outputThreadDelay);
 					}
-					else
-						Thread.Sleep(_outputThreadDelay);
-				}
 //				_fs.Close();
 				_innerWriter.Close();
-					}
+				}
 			});
 			_outputThread.Priority = ThreadPriority.BelowNormal;
 			_outputThread.Start();

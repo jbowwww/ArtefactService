@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace Artefacts.Service
 {
@@ -18,37 +19,13 @@ namespace Artefacts.Service
 	/// </remarks>
 	public abstract class ExpressionVisitor
 	{
-		/// <summary>
-		/// Visitation method stack updater.
-		/// </summary>
-		/// <exception cref="ArgumentNullException">Is thrown when an argument passed to a method is invalid because it is <see langword="null" /></exception>
-		/// <remarks>
-		/// Used by visitation methods in <see cref="ExpressionVisitor"/> (inside <see langword="using"/> statements that
-		/// wrap the method body) to push expressions onto the stack at each method call, and automatically pop them back
-		/// off when returning from the method
-		//</remarks>
-//		public class VisitationMethodStackUpdater : IDisposable
-//		{
-//			private Stack<Expression> _stack;
-//			
-//			public VisitationMethodStackUpdater(Stack<Expression> stack, Expression pushExpression)
-//			{
-//				if (_stack == null)
-//					throw new ArgumentNullException("stack");
-//				if (pushExpression == null)
-//					throw new ArgumentNullException("pushExpression");				
-//				_stack = stack;
-//				_stack.Push(pushExpression);
-//			}
-//			
-//			public void Dispose()
-//			{
-//				_stack.Pop();
-//			}
-//		}
-//		
-//		public Stack<Expression> VisitStack = new Stack<Expression>();
-		
+		protected static Expression StripQuotes(Expression e)
+		{
+			while (e != null && e.NodeType == ExpressionType.Quote)
+				e = ((UnaryExpression)e).Operand;
+			return e;
+		}
+
 		public virtual Expression Visit(Expression exp)
 		{
 			if (exp == null)
@@ -121,19 +98,17 @@ namespace Artefacts.Service
 		#region Expression visitation methods
 		protected virtual Expression VisitUnary(UnaryExpression u)
 		{
-//			using (IDisposable vmsu = new VisitationMethodStackUpdater(VisitStack, u))
-//			{
-				Expression operand = this.Visit(u.Operand);
-				if (operand != u.Operand)
-					return Expression.MakeUnary(u.NodeType, operand, u.Type, u.Method);
-				return u;
-//			}
+			Expression operand = this.Visit(u.Operand);
+			if (operand != u.Operand)
+				return Expression.MakeUnary(u.NodeType, operand, u.Type, u.Method);
+			return u;
 		}
  
 		protected virtual Expression VisitBinary(BinaryExpression b)
 		{
 //			using (IDisposable vmsu = new VisitationMethodStackUpdater(VisitStack, b))
 //			{
+//				_sb.Append(b.ToString());
 				Expression left = this.Visit(b.Left);
 				Expression right = this.Visit(b.Right);
 				Expression conversion = this.Visit(b.Conversion);
@@ -152,6 +127,7 @@ namespace Artefacts.Service
 		{
 //			using (IDisposable vmsu = new VisitationMethodStackUpdater(VisitStack, b))
 //			{
+//				_sb.Append(b.ToString());
 				Expression expr = this.Visit(b.Expression);
 				if (expr != b.Expression)
 					return Expression.TypeIs(expr, b.TypeOperand);
@@ -161,13 +137,15 @@ namespace Artefacts.Service
  
 		protected virtual Expression VisitConstant(ConstantExpression c)
 		{
-			return c;
+//			_sb.Append(c.ToString());
+				return c;
 		}
  
 		protected virtual Expression VisitConditional(ConditionalExpression c)
 		{
 //			using (IDisposable vmsu = new VisitationMethodStackUpdater(VisitStack, c))
 //			{
+//				_sb.Append(c.ToString());
 				Expression test = this.Visit(c.Test);
 				Expression ifTrue = this.Visit(c.IfTrue);
 				Expression ifFalse = this.Visit(c.IfFalse);
@@ -186,6 +164,7 @@ namespace Artefacts.Service
 		{
 //			using (IDisposable vmsu = new VisitationMethodStackUpdater(VisitStack, m))
 //			{
+//				_sb.Append(m.ToString());
 				Expression exp = this.Visit(m.Expression);
 				if (exp != m.Expression)
 					return Expression.MakeMemberAccess(exp, m.Member);
@@ -197,7 +176,12 @@ namespace Artefacts.Service
 		{
 //			using (IDisposable vmsu = new VisitationMethodStackUpdater(VisitStack, m))
 //			{
-			Expression obj = m.Object != null ? this.Visit(m.Object) : null;
+				Expression obj = m.Object != null ? this.Visit(m.Object) : null;
+//				_sb.Append(string.Concat(m.Method.IsGenericMethod ?
+//					string.Concat(m.Method.Name, "<",
+//						string.Join<Type>(", ", m.Method.GetGenericArguments()), ">")
+//						: m.Method.Name, "("));
+					
 				IEnumerable<Expression> args = this.VisitExpressionList(m.Arguments);
 				if (obj != m.Object || args != m.Arguments)
 					return Expression.Call(obj, m.Method, args);
