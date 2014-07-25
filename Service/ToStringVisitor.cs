@@ -330,7 +330,7 @@ namespace Artefacts.Service
 			{
 				case ExpressionType.MemberAccess:
 					Visit(m.Expression);
-					_sb.AppendFormat(".", m.Member.Name);
+					_sb.AppendFormat(".{0}", m.Member.Name);
 					break;
 				default:
 						throw new ApplicationException(string.Format("Unsupported  MemberExpression type (shouldn't happen: All ExpressionTypes are handled) \"{0}\"", m.NodeType));
@@ -358,7 +358,17 @@ namespace Artefacts.Service
 					else
 						_sb.AppendFormat( ".{0}", m.Method.Name);
 					_sb.Append("(");
-					VisitExpressionList(isExtensionMethod ? m.Arguments.Skip(1).ToList().AsReadOnly() : m.Arguments);
+//					VisitExpressionList(isExtensionMethod ? m.Arguments.Skip(1).ToList().AsReadOnly() : m.Arguments);
+					foreach(Expression e in isExtensionMethod ? m.Arguments.Skip(1).ToList().AsReadOnly() : m.Arguments)
+	{
+						Visit(e);
+						_sb.Append(", ");
+	}
+					if (m.Arguments.Count > (isExtensionMethod ? 1 : 0))
+//					{
+//						if (!_sb[_sb.Length - 2 
+						_sb.Remove(_sb.Length - 2, 2);
+//					}
 					_sb.Append(")");
 					break;
 				default:
@@ -372,8 +382,8 @@ namespace Artefacts.Service
 			switch (lambda.NodeType)
 			{
 				case ExpressionType.Lambda:
-					if (!string.IsNullOrWhiteSpace(lambda.Name))
-						_sb.Append(lambda.Name);
+//					if (!string.IsNullOrWhiteSpace(lambda.Name))
+//						_sb.Append(lambda.Name);
 					_sb.Append("(");
 //					VisitExpressionList(lambda.Parameters);
 foreach(ParameterExpression pe in lambda.Parameters)
@@ -382,7 +392,10 @@ foreach(ParameterExpression pe in lambda.Parameters)
 						_sb.Append(", ");
 	}
 					if (lambda.Parameters.Count > 0)
-						_sb.Remove(_sb.Length - 3, 2);
+//					{
+//						if (!_sb[_sb.Length - 2 
+						_sb.Remove(_sb.Length - 2, 2);
+//					}
 					_sb.Append(") => ");
 					Visit(lambda.Body);
 					break;

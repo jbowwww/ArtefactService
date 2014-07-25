@@ -1,3 +1,6 @@
+
+--- Client starting ---
+
 2014-07-25 08:32:40:476 ClientTest.Init: Initialising...
 2014-07-25 08:32:42:465 ServiceHost: Opening
 2014-07-25 08:32:42:553 ServiceHost: Opened
@@ -991,4 +994,6 @@ FS Creator: Artefacts.FileSystem.FileSystemArtefactCreator
 2014-07-25 08:33:33:886 
 2014-07-25 08:33:33:886 
 --- Client exiting ---
+
+^[OF
 
