@@ -223,22 +223,22 @@ namespace Artefacts.Service
 		public Artefact this[int index] {
 			get
 			{
-				if (_resultIds == null)
+				if (_result == null)
 				{
-					_resultIds = Repository.Channel.QueryResults(ServerId);	//, pageStartIndex, Paging.PageSize);
-					_results = new TArtefact[_resultIds.Length];
+					_result = Repository.Channel.QueryResults(ServerId);	//, pageStartIndex, Paging.PageSize);
+					_results = new TArtefact[_result.Count];
 				}
 				if (_results[index] == null)
 				{
 //					int pageStartIndex = index - index % Paging.PageSize;
 //					_resultChunk.CopyTo(_results, pageStartIndex);
-					_results[index] = Repository.Channel.GetById(_resultIds[index]);
+					_results[index] = Repository.Channel.GetById(_result[index]);
 				}
 				return _results[index];
 			}
 		}
 		private Artefact[] _results;
-		private int[] _resultIds;
+		private QueryResult<Artefact> _result;
 
 		/// <summary>
 		/// The paging.

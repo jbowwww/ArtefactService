@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Collections;
 
 namespace Artefacts
 {
-	public static class Extensions
+	public static partial class Extensions
 	{
 		public static string Grep(this string s, string sGrep)
 		{
@@ -34,6 +35,24 @@ namespace Artefacts
 //				sw.Remove(iNL).Insert(iNL, string.Concat(wrap, indent))
 //			
 //		}
+		
+		public static string ToString(this object o)
+		{
+			if (o == null)
+				return "(null)";
+			Type T = o.GetType();
+			if (T.HasElementType)
+			{
+				StringBuilder sb = new StringBuilder(string.Concat(o.ToString(), " { "));
+				object[] array = ((IEnumerable<object>)o).ToArray();
+				foreach (object element in array)
+					sb.Append(string.Concat(element.ToString(), ", "));
+				if (array.Length > 0)
+					sb.Remove(sb.Length - 2, 2);
+				return sb.ToString();
+			}
+			return o.ToString();
+		}
 		
 		public static string ToString(this object[] array)
 		{

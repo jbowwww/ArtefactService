@@ -29,7 +29,7 @@ namespace Artefacts.Service
 		protected override Expression VisitMemberAccess(MemberExpression m)
 		{
 			Expression mExpression = Visit(m.Expression);
-			if (mExpression != null && mExpression.NodeType == ExpressionType.Constant)
+			if (mExpression != null && mExpression.NodeType == ExpressionType.Constant && ((ConstantExpression)mExpression).Value != null)
 			{
 				const BindingFlags bf = BindingFlags.GetField | BindingFlags.GetProperty
 				                        | BindingFlags.Instance | BindingFlags.Static

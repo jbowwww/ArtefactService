@@ -224,7 +224,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public int Add(Artefact artefact)
 		{
-			Console.WriteLine("Add({0} artefact #{1})", artefact.GetType().FullName,
+			Console.WriteLine("Add(#{1}:{0})", artefact.GetType().FullName,
 			artefact.Id.HasValue ? artefact.Id.ToString() : "(null)",
 			OperationContext.Current == null ? "(OpCtx=null)" :
 				OperationContext.Current.ToString());
@@ -272,7 +272,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public int GetId(Artefact artefact)
 		{
-			Console.WriteLine("GetId({0} artefact #{1})", artefact.GetType().FullName,
+			Console.WriteLine("GetId(#{1}:{0})", artefact.GetType().FullName,
 			artefact.Id.HasValue ? artefact.Id.ToString() : "(null)",
 			OperationContext.Current == null ? "(OpCtx=null)" :
 								OperationContext.Current.ToString());
@@ -298,7 +298,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public Artefact GetById(int id)
 		{
-			Console.WriteLine("GetById(#{0})", id, OperationContext.Current == null ? "(OpCtx=null)" :
+			Console.Write("GetById(#{0}) = ", id, OperationContext.Current == null ? "(OpCtx=null)" :
 								OperationContext.Current.ToString());
 //				.RequestContext == null ? "(RqCtx=null)" :
 //				OperationContext.Current.RequestContext.RequestMessage == null ? "(RqMsg=null)" :
@@ -316,7 +316,7 @@ namespace Artefacts.Service
 					
 				if (artefact.Id != id)
 					throw new ApplicationException(string.Format("GetById(id={0}).Id != {0}", id));
-//				Type T = artefact.GetType();
+				Console.WriteLine(artefact);//.GetType();
 				return artefact;
 			}
 			catch (Exception ex)
@@ -332,7 +332,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public void Update(Artefact artefact)
 		{
-			Console.WriteLine("Update({0} artefact #{1})",  artefact.GetType().FullName,
+			Console.WriteLine("Update(#{1}:{0})",  artefact.GetType().FullName,
 			artefact.Id.HasValue ? artefact.Id.ToString() : "(null)",
 			OperationContext.Current == null ? "(OpCtx=null)" :
 								OperationContext.Current.ToString());
@@ -375,7 +375,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public void Remove(Artefact artefact)
 		{
-			Console.WriteLine("Remove({0} artefact #{1})",  artefact.GetType().FullName,
+			Console.WriteLine("Remove(#{1}:{0})",  artefact.GetType().FullName,
 			artefact.Id.HasValue ? artefact.Id.ToString() : "(null)",
 			OperationContext.Current == null ? "(OpCtx=null)" :
 								OperationContext.Current.ToString());
@@ -430,8 +430,7 @@ namespace Artefacts.Service
 //			{
 				serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
 				serverId = serverSideExpression.Id();
-//serverId = QueryFormatterVisitor.ToString();
-				Console.WriteLine("QueryPreload(\"{0}\") = Q#{1}", serverSideExpression.FormatString(), serverId);
+				Console.WriteLine("QueryPreload(Q#{1}: {0})", serverSideExpression.FormatString(), serverId);
 				if (!QueryCache.ContainsKey(serverId))
 				{
 					serverSideQuery = _nhQueryProvider.CreateQuery(serverSideExpression);				
@@ -458,16 +457,15 @@ namespace Artefacts.Service
 		/// <param name="queryId">Query identifier.</param>
 		/// <param name="startIndex">Start index.</param>
 		/// <param name="count">Count.</param>
-		public int[] QueryResults(object queryId, int startIndex = 0, int count = -1)
+		public QueryResult<Artefact> QueryResults(object queryId, int startIndex = 0, int count = -1)
 		{
 			IQueryable<Artefact> serverSideQuery = null;
-			int[] results = null;
+//			int[] results = null;
+			QueryResult<Artefact> results;
 //			try
 //			{
 				serverSideQuery = (IQueryable<Artefact>)QueryCache[queryId];
-				results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
-					serverSideQuery.Skip(startIndex) : // with a new custom server-side query provider, and implement caching??
-					serverSideQuery.Skip(startIndex).Take(count)).Select((a) => a.Id.Value).ToArray();
+			results = new QueryResult<Artefact>(serverSideQuery, startIndex, count);
 //				foreach (int artefactId in results)
 //				{
 //					Artefact artefact = GetById(artefactId);
@@ -479,7 +477,7 @@ namespace Artefacts.Service
 //					else
 //						_artefactCache[artefactId] = artefact;
 //				}
-				Console.WriteLine("QueryResults(Q#{0}, {1}, {2}) = \"{3}\"", queryId, startIndex, count, results);	
+				Console.WriteLine("QueryResults(Q#{0}, {1}, {2}) = {3}", queryId, startIndex, count, results);	
 				return results;
 //			}
 //			catch (Exception ex)
@@ -510,7 +508,7 @@ namespace Artefacts.Service
 //			{
 				serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
 				result = _nhQueryProvider.Execute(serverSideExpression);
-				Console.WriteLine("QueryExecute(Q#{0}:{1}) = {2}", serverSideExpression.Id(), serverSideExpression.FormatString(), result);
+				Console.WriteLine("QueryExecute(Q#{0}: {1}) = {2}", serverSideExpression.Id(), serverSideExpression.FormatString(), result);
 				return result;
 //			}
 //			catch (Exception ex)

@@ -11,7 +11,7 @@ namespace Artefacts
 		private bool _lastCharWasNewLine = true;
 		public readonly List<TextWriter> Outputs = new List<TextWriter>();	
 		public bool UseTimeStamp = false;
-		public string TimeStampFormat = "yyyy-MM-dd HH:mm:s:fff";		//"s";
+		public string TimeStampFormat = "HH:mm:s:fff ";		//"s";
 		#endregion
 		
 		/// <summary>
@@ -57,7 +57,7 @@ namespace Artefacts
 		/// <remarks>implemented abstract member of TextWriter</remarks>
 		public override void Write(char value)
 		{
-			string timeStamp = DateTime.Now.ToString(TimeStampFormat) + " ";
+			string timeStamp = DateTime.Now.ToString(TimeStampFormat);
 			foreach (TextWriter output in Outputs)
 			{
 				if (output != null)
@@ -78,7 +78,7 @@ namespace Artefacts
 		/// <remarks>implemented abstract member of TextWriter</remarks>
 		public override void Write(char[] buffer)
 		{
-			string timeStamp = DateTime.Now.ToString(TimeStampFormat) + " ";
+			string timeStamp = DateTime.Now.ToString(TimeStampFormat);
 			foreach (TextWriter output in Outputs)
 			{
 				if (output != null)

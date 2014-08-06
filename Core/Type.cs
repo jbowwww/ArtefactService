@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace Artefacts.Service
+namespace Artefacts
 {
 	/// <summary>
 	/// <see cref="System.Type" /> extension methods
 	/// </summary>
-	internal static class Type_Extension
+	public static partial class Extensions
 	{
 		/// <summary>
 		/// Gets the type of the element.

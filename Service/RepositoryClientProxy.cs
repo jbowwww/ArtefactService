@@ -204,7 +204,8 @@ namespace Artefacts.Service
 		{
 //			IQueryable<TArtefact> query = Expression.PropertyOrField()
 				var g6= ((IQueryProvider)this).CreateQuery<TArtefact>(
-				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) },
+				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) }, //Expression.Constant(null)));
+//					Expression.Variable(typeof(IRepository), "Repository")));
 					Expression.Property(null, typeof(Repository).GetProperty("Session", BindingFlags.Static | BindingFlags.Public))));
 //				Expression.Call(
 //					typeof(NHibernate.Linq.LinqExtensionMethods).GetMethods()
@@ -321,7 +322,7 @@ namespace Artefacts.Service
 		/// <param name="queryId">Query identifier.</param>
 		/// <param name="startIndex">Start index.</param>
 		/// <param name="count">Count.</param>
-		public int[] QueryResults(object queryId, int startIndex = 0, int count = -1)
+		public QueryResult<Artefact> QueryResults(object queryId, int startIndex = 0, int count = -1)
 		{
 			return Channel.QueryResults(queryId, startIndex, count);
 		}
@@ -437,24 +438,24 @@ namespace Artefacts.Service
 				Expression instanceExp = mce.Object ?? (mce.Arguments.Count > 0 ? mce.Arguments[0] : null);
 				if (instanceExp != null && instanceExp.IsQueryable())
 				{
-					int[] r = Channel.QueryResults(Channel.QueryPreload(ExpressionVisitor.Visit(instanceExp).ToBinary()));
+					QueryResult<Artefact> r = Channel.QueryResults(Channel.QueryPreload(ExpressionVisitor.Visit(instanceExp).ToBinary()));
 					string methodName = mce.Method.Name;
 					if (methodName.Equals("First"))
 					{
-						if (r.Length == 0)
+						if (r.Count == 0)
 							throw new IndexOutOfRangeException("First() method callled on empty array");
 						return Channel.GetById(r[0]);
 					}
 					else if (methodName.Equals("FirstOrDefault"))
-						return r.Length == 0 ? null : Channel.GetById(r[0]);
+						return r.Count == 0 ? null : Channel.GetById(r[0]);
 					if (methodName.Equals("Last"))
 					{
-						if (r.Length == 0)
+						if (r.Count == 0)
 							throw new IndexOutOfRangeException("Last() method callled on empty array");
-						return Channel.GetById(r[r.Length - 1]);
+						return Channel.GetById(r[r.Count - 1]);
 					}
 					else if (methodName.Equals("LastOrDefault"))
-						return r.Length == 0 ? null : Channel.GetById(r[r.Length - 1]);
+						return r.Count == 0 ? null : Channel.GetById(r[r.Count - 1]);
 					else
 						throw new NotSupportedException("Method \"" + methodName + "\" not supported");
 				}

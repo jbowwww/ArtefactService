@@ -120,7 +120,7 @@ namespace Artefacts.Service
 		/// <param name="startIndex">Start index.</param>
 		/// <param name="count">Count.</param>
 		[OperationContract]
-		int[] QueryResults(object queryId, int startIndex = 0, int count = -1);
+		QueryResult<Artefact> QueryResults(object queryId, int startIndex = 0, int count = -1);
 
 		/// <summary>
 		/// Queries the execute.

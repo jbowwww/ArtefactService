@@ -68,8 +68,8 @@
     <Compile Include="ServerQueryVisitor.cs" />
     <Compile Include="Extensions\Expression.cs" />
     <Compile Include="Extensions\ServiceModel.cs" />
-    <Compile Include="Extensions\Type.cs" />
     <Compile Include="ToStringVisitor.cs" />
+    <Compile Include="QueryResult.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

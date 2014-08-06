@@ -15,7 +15,10 @@ namespace Artefacts
 		TextWriter _innerWriter;
 		string _prefix;
 		string _suffix;
-
+		
+		public bool TimestampStream = true;
+		public string TimestampFormat = "yyyy-MM-dd";
+		
 		public override Encoding Encoding {
 			get { return Encoding.Default; }
 		}
@@ -31,6 +34,8 @@ namespace Artefacts
 				{
 					_innerWriter = new StreamWriter(_fs);
 					_innerWriter.NewLine = newline;
+					if (TimestampStream)
+						_innerWriter.WriteLine(string.Concat(DateTime.Now.ToString(TimestampFormat), " Open"));
 					while (Thread.VolatileRead(ref _outputRun) == 1 || _outputQueue.Count > 0)
 					{
 						if (_outputQueue.Count > 0)
@@ -43,7 +48,8 @@ namespace Artefacts
 							Thread.Sleep(_outputThreadDelay);
 					}
 //				_fs.Close();
-				_innerWriter.Close();
+					_innerWriter.WriteLine(string.Concat(DateTime.Now.ToString(TimestampFormat), " Close"));
+					_innerWriter.Close();
 				}
 			});
 			_outputThread.Priority = ThreadPriority.BelowNormal;

@@ -51,34 +51,46 @@ public override Expression Visit(Expression exp)
 				return p;
 		}
 
-		protected override Expression VisitMemberAccess(MemberExpression m)
-		{
-			if (m.Member.DeclaringType.Namespace.ToLower().CompareTo("artefacts.service") == 0)	//.Equals(typeof(Repository)))// && m.Expression == null)
-			{
-				object value = null;
-				object container = null;
-				if (m.Expression != null)
-				{
-					Expression mExp = this.Visit(m.Expression);
-					if (!(mExp is ConstantExpression))
-						throw new ApplicationException("m.Expression should be null or a ConstantExpression (after processing with ServerQueryVisitor)");
-					container = ((ConstantExpression)mExp).Value;
-				}
-				switch (m.Member.MemberType)
-				{
-					case MemberTypes.Field:
-						value = ((FieldInfo)m.Member).GetValue(container);
-						break;
-					case MemberTypes.Property:
-						value = ((PropertyInfo)m.Member).GetValue(container, null);		// TODO: Need to handle indexer properties? IndexExpression does not derive from MemberExpression
-						break;
-					default:
-						throw new ApplicationException(string.Format("Unknown MemberType in MemberExpression: \"{0}\"", m.Member.MemberType.ToString()));
-				}
-				return Expression.Constant(value);
-			}
-			return base.VisitMemberAccess(m);
-		}
+//protected override Expression VisitMethodCall(MethodCallExpression m)
+//		{
+//			if (m.Arguments.Count == 1 && m.Arguments[0].NodeType == ExpressionType.Constant
+//			 && ((ConstantExpression)m.Arguments[0]).Value == null && m.Method.Name == "Query"
+//			 && m.Method.IsStatic && m.Method.IsGenericMethod
+//			 && typeof(Artefact).IsAssignableFrom(m.Method.GetGenericArguments()[0]))
+//			{
+//				return Expression.Call(m.Method, Expression.Property(Expression.Constant(Repository), "Session"));
+//			}
+//			return m;
+//		}
+		
+//		protected override Expression VisitMemberAccess(MemberExpression m)
+//		{
+//			if (m.Member.DeclaringType.Namespace.ToLower().CompareTo("artefacts.service") == 0)	//.Equals(typeof(Repository)))// && m.Expression == null)
+//			{
+//				object value = null;
+//				object container = null;
+//				if (m.Expression != null)
+//				{
+//					Expression mExp = this.Visit(m.Expression);
+//					if (!(mExp is ConstantExpression))
+//						throw new ApplicationException("m.Expression should be null or a ConstantExpression (after processing with ServerQueryVisitor)");
+//					container = ((ConstantExpression)mExp).Value;
+//				}
+//				switch (m.Member.MemberType)
+//				{
+//					case MemberTypes.Field:
+//						value = ((FieldInfo)m.Member).GetValue(container);
+//						break;
+//					case MemberTypes.Property:
+//						value = ((PropertyInfo)m.Member).GetValue(container, null);		// TODO: Need to handle indexer properties? IndexExpression does not derive from MemberExpression
+//						break;
+//					default:
+//						throw new ApplicationException(string.Format("Unknown MemberType in MemberExpression: \"{0}\"", m.Member.MemberType.ToString()));
+//				}
+//				return Expression.Constant(value);
+//			}
+//			return base.VisitMemberAccess(m);
+//		}
 	}
 }
 

@@ -5,6 +5,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Runtime.CompilerServices;
+using System.Reflection;
+using NHibernate.Impl;
+using NHibernate;
 
 namespace Artefacts.Service
 {
@@ -329,7 +332,10 @@ namespace Artefacts.Service
 			switch (m.NodeType)
 			{
 				case ExpressionType.MemberAccess:
-					Visit(m.Expression);
+					if (m.Expression != null)
+						Visit(m.Expression);
+					else
+						_sb.Append(m.Member.DeclaringType.FullName);
 					_sb.AppendFormat(".{0}", m.Member.Name);
 					break;
 				default:
@@ -343,33 +349,41 @@ namespace Artefacts.Service
 			switch (m.NodeType)
 			{
 				case ExpressionType.Call:
-					bool isExtensionMethod = m.Method.IsDefined(typeof(ExtensionAttribute), false);
-					// m.Method.IsDefined(typeof(ext m.Method.IsStatic && m.Method.CallingConvention.HasFlag(System.Reflection.CallingConventions.HasThis);
-					if (m.Object != null)
-						Visit(m.Object);
-					else if (isExtensionMethod)
-						Visit(m.Arguments[0]);
-					else if (m.Method.IsStatic)
-						_sb.Append(m.Method.DeclaringType.FullName);
+					if (m.Arguments.Count == 1 && m.Arguments[0].NodeType == ExpressionType.MemberAccess
+			 		 &&	typeof(ISession).IsAssignableFrom(m.Arguments[0].Type) && m.Method.Name == "Query"
+			  		 &&	m.Method.IsStatic && m.Method.IsGenericMethod
+			 		 &&	typeof(Artefact).IsAssignableFrom(m.Method.GetGenericArguments()[0]))
+			 			_sb.AppendFormat( "Query<{1}>()", m.Method.Name, m.Method.GetGenericArguments()[0].FullName);
 					else
-						throw new ApplicationException(string.Format("MethodCallExpression has null instance for a non-static method \"{0}.{1}\"", m.Method.DeclaringType.FullName, m.Method.Name));
-					if (m.Method.IsGenericMethod)
-						_sb.AppendFormat( ".{0}<{1}>", m.Method.Name, string.Join(", ", m.Method.GetGenericArguments().Select<Type, string>((T) => T.FullName)));
-					else
-						_sb.AppendFormat( ".{0}", m.Method.Name);
-					_sb.Append("(");
-//					VisitExpressionList(isExtensionMethod ? m.Arguments.Skip(1).ToList().AsReadOnly() : m.Arguments);
-					foreach(Expression e in isExtensionMethod ? m.Arguments.Skip(1).ToList().AsReadOnly() : m.Arguments)
-	{
-						Visit(e);
-						_sb.Append(", ");
-	}
-					if (m.Arguments.Count > (isExtensionMethod ? 1 : 0))
-//					{
-//						if (!_sb[_sb.Length - 2 
-						_sb.Remove(_sb.Length - 2, 2);
-//					}
-					_sb.Append(")");
+					{
+						bool isExtensionMethod = m.Method.IsDefined(typeof(ExtensionAttribute), false);
+						// m.Method.IsDefined(typeof(ext m.Method.IsStatic && m.Method.CallingConvention.HasFlag(System.Reflection.CallingConventions.HasThis);
+						if (m.Object != null)
+							Visit(m.Object);
+						else if (isExtensionMethod)
+							Visit(m.Arguments[0]);
+						else if (m.Method.IsStatic)
+							_sb.Append(m.Method.DeclaringType.FullName);
+						else
+							throw new ApplicationException(string.Format("MethodCallExpression has null instance for a non-static method \"{0}.{1}\"", m.Method.DeclaringType.FullName, m.Method.Name));
+						if (m.Method.IsGenericMethod)
+							_sb.AppendFormat( ".{0}<{1}>", m.Method.Name, string.Join(", ", m.Method.GetGenericArguments().Select<Type, string>((T) => T.FullName)));
+						else
+							_sb.AppendFormat( ".{0}", m.Method.Name);
+						_sb.Append("(");
+	//					VisitExpressionList(isExtensionMethod ? m.Arguments.Skip(1).ToList().AsReadOnly() : m.Arguments);
+						foreach(Expression e in isExtensionMethod ? m.Arguments.Skip(1).ToList().AsReadOnly() : m.Arguments)
+		{
+							Visit(e);
+							_sb.Append(", ");
+		}
+						if (m.Arguments.Count > (isExtensionMethod ? 1 : 0))
+	//					{
+	//						if (!_sb[_sb.Length - 2 
+							_sb.Remove(_sb.Length - 2, 2);
+	//					}
+						_sb.Append(")");
+					}
 					break;
 				default:
 						throw new ApplicationException(string.Format("Unsupported  MethodCallExpression type (shouldn't happen: All ExpressionTypes are handled) \"{0}\"", m.NodeType));
