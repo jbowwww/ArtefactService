@@ -99,17 +99,17 @@ namespace Artefacts.FileSystem
 		/// <remarks>Artefacts.CreatorBase implementation</remarks>
 		public override void Run(object param)
 		{
-//			foreach (Disk disk in Disk.Disks)
-//			{
-//				Disk dbDisk = Disks.FirstOrDefault((d) => disk.Serial.ToLower().CompareTo(d.Serial.ToLower()) == 0);
-//				if (dbDisk == null)
-//					Repository.Add(disk);
-//				else
-//				{
-//					dbDisk.CopyMembersFrom(disk);
-//					Repository.Update(dbDisk.Update());
-//				}
-//			}
+			foreach (Disk disk in Disk.Disks)
+			{
+				Disk dbDisk = Disks.FirstOrDefault((d) => disk.Serial.ToLower().CompareTo(d.Serial.ToLower()) == 0);
+				if (dbDisk == null)
+					Repository.Add(disk);
+				else
+				{
+					dbDisk.CopyMembersFrom(disk);
+					Repository.Update(dbDisk.Update());
+				}
+			}
 			
 			int recursionDepth = -1;
 			Drive drive;

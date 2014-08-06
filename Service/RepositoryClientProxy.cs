@@ -171,9 +171,9 @@ namespace Artefacts.Service
 				//(IQueryable<Artefact>)this;		//
 				//			Queryables.Add(typeof(Artefact), Artefacts);
 				Host.Current = BuildBaseQuery<Host>().Where(host => Host.GetHostId() == host.HostId).FirstOrDefault() ?? new Host();
-				_clientId = Channel.Connect(Host.Current);
+//				_clientId = Channel.Connect(Host.Current);
 				if (Host.Current.IsTransient)
-					Channel.Add(Host.Current);
+ 					Channel.Add(Host.Current);
 				else
 					Channel.Update(Host.Current.Update());
 				

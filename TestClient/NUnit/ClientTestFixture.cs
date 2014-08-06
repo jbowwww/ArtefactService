@@ -178,8 +178,8 @@ namespace Artefacts.TestClient
 		public void QueryAllArtefacts()
 		{
 			Console.WriteLine("{0} artefacts currently in repository", _clientProxy.Artefacts.Count());
-			foreach (Artefact artefact in _clientProxy.Artefacts)
-				Console.WriteLine(artefact.ToString());
+//			foreach (Artefact artefact in _clientProxy.Artefacts)
+//				Console.WriteLine(artefact.ToString());
 //					string.Format("{0}: Id={1} TimeCreated={2} TimeUpdated={3} TimeChecked={4}",
 //					artefact.GetType().Name, artefact.Id, artefact.TimeCreated, artefact.TimeUpdated, artefact.TimeChecked));
 		}
@@ -208,13 +208,13 @@ namespace Artefacts.TestClient
 				Console.WriteLine(artefact.ToString());
 		}
 
-		[Test, TestMethod(Order=35, Name="Host.Current static property")]
+		[Test, TestMethod(Order=05, Name="Host.Current static property")]
 		public void TestHostArtefactCurrent()
 		{
 			Console.WriteLine(Host.Current.ToString());
 		}
 		
-		[Test, TestMethod(Order=50, Name="int _clientProxy.Artefacts.Count()")]
+//		[Test, TestMethod(Order=50, Name="int _clientProxy.Artefacts.Count()")]
 		public void TestQueryArtefactsDrivesCount()
 		{
 			Console.WriteLine("{0} artefacts currently in repository\n{1} drives",
