@@ -118,6 +118,7 @@
     <None Include="Outputs\140602-0550-ImprovedClientSideQueryVisitor\server.txt" />
     <None Include="runoptions_future.txt" />
     <None Include="Outputs\140725-0835-CustomExpressionStringFormatter95PCWorking.txt" />
+    <None Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Outputs\140602-0420-SeparateClientAndServer-ConsoleLog\" />

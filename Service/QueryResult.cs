@@ -9,14 +9,19 @@ namespace Artefacts.Service
 	public class QueryResult<TArtefact> where TArtefact : Artefact
 	{
 		#region Fields
+		public class TypedArtefactId
+		{
+			public Type Type;
+			public int Id;
+		}
 		[DataMember(Name="Results")]
-		private int[] _results = null;
+		private TypedArtefactId[] _results = null;
 		#endregion
 		
 		#region Properties & Indexers
 		public bool HasResults { get { return _results != null; } }
 		public int Count { get { return _results == null ? -1 : _results.Length; } }
-		public int this[int index]
+		public TypedArtefactId this[int index]
 		{
 			get { return _results[index]; }
 		}
@@ -24,9 +29,16 @@ namespace Artefacts.Service
 		
 		public QueryResult(IQueryable<TArtefact> query, int startIndex = 0, int count = -1)
 		{
-			_results = (count == -1 ? // TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
-				query.Skip(startIndex) : // with a new custom server-side query provider, and implement caching??
-				query.Skip(startIndex).Take(count)).Select((a) => a.Id.Value).ToArray();
+		// TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
+		// with a new custom server-side query provider, and implement caching??
+			_results =
+				(count == -1 ? 	query.Skip(startIndex) : query.Skip(startIndex).Take(count))
+				.Select((a) =>
+					new TypedArtefactId()
+					{
+						Type = a.GetType(),
+						Id = a.Id.Value
+					}).ToArray();
 		}
 		
 		public override string ToString()

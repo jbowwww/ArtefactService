@@ -24,7 +24,7 @@ namespace Artefacts.TestClient
 		private int _init = 0;
 		private int _exit = 0;
 		private readonly TimeSpan _defaultTimeout = new TimeSpan(0, 0, 10);
-		private const int _serviceHostStartDelay = 2200;
+		private const int _serviceHostStartDelay = 6200;
 		private const int _serviceHostStopTimeout = 2200;
 		private readonly Type[] _artefactTypes = new Type[]
 			#region Artefact known types
@@ -84,7 +84,9 @@ namespace Artefacts.TestClient
 		{
 			Exit();	
 		}
+		#endregion
 
+		#region Init/Exit methods
 		/// <summary>
 		/// Init this instance.
 		/// </summary>

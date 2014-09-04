@@ -49,8 +49,12 @@ namespace Artefacts
 		}
 
 		[DataMember]
-		public virtual string HostId { get; set; }
-
+		public virtual string HostId {
+			get { return _hostId; }
+			set { base.Id = (_hostId = value).GetHashCode(); }
+		}
+		private string _hostId = null;
+		
 // TODO: Connection closing/timeout
 		public virtual int ConnectionId { get; set; }
 

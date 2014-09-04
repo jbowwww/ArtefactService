@@ -86,7 +86,7 @@ namespace Artefacts.Service
 		/// <returns>The by identifier.</returns>
 		/// <param name="id">Identifier.</param>
 		[OperationContract]
-		Artefact GetById(int id);
+		Artefact GetById(int id, Type T = null);
 
 		/// <summary>
 		/// Update the specified artefact.

@@ -35,6 +35,15 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Core" />
+    <Reference Include="FluentNHibernate">
+      <HintPath>..\..\..\..\Resources\CS\NHibernate\jagregory-fluent-nhibernate-4d2348d\src\FluentNHibernate\bin\Debug\FluentNHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate">
+      <HintPath>..\..\..\..\Resources\CS\NHibernate\Required_Bins\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="Iesi.Collections">
+      <HintPath>..\..\..\..\Resources\CS\NHibernate\Required_Bins\Iesi.Collections.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -50,10 +59,12 @@
     <Compile Include="LogTextWriter.cs" />
     <Compile Include="MultiTextWriter.cs" />
     <Compile Include="Type.cs" />
+    <Compile Include="Artefacts\Mappings\AutoMapperConfiguration.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="Artefacts\Mappings\blank.hbm.xml" />
+    <None Include="Artefacts\Mappings\ArtefactMapping.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Artefacts\Mappings\Artefact.hbm.xml" />

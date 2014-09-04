@@ -296,8 +296,12 @@ namespace Artefacts.Service
 		/// <returns>The by identifier.</returns>
 		/// <param name="id">Identifier.</param>
 		/// <remarks>IRepository implementation</remarks>
-		public Artefact GetById(int id)
+		public Artefact GetById(int id, Type T = null)
 		{
+			if (T == null)
+				T = typeof(Artefact);
+			else if (!T.IsSubclassOf(typeof(Artefact)))
+				throw new TypeMismatchException("T should be a subclass of Artefact");
 			Console.Write("GetById(#{0}) = ", id, OperationContext.Current == null ? "(OpCtx=null)" :
 								OperationContext.Current.ToString());
 //				.RequestContext == null ? "(RqCtx=null)" :
@@ -312,7 +316,7 @@ namespace Artefacts.Service
 				if (_artefactCache.ContainsKey(id) && _artefactCache[id].UpdateAge < ArtefactUpdateAgeLimit)
 					artefact = _artefactCache[id];
 				else
-					artefact = _artefactCache[id] = Session.Get<Artefact>(id);
+					artefact = _artefactCache[id] = (Artefact)Session.Get(T, id, LockMode.Read);			//.Get<Artefact>(id);
 					
 				if (artefact.Id != id)
 					throw new ApplicationException(string.Format("GetById(id={0}).Id != {0}", id));

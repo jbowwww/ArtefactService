@@ -177,38 +177,16 @@ namespace Artefacts.Service
 		public object ServerId {
 			get; private set;
 		}
-		#region Removed/disabled/experimental represenations of Expression
-		/// <summary>
-		/// Gets <see cref="Queryable`1[TArtefact].Expression"/> as string.
-		/// </summary>
-//		public string ExpressionAsString {
-//			get; private set;
-//		}
-
-		/// <summary>
-		/// Gets <see cref="Queryable`1[TArtefact].Expression"/> as <see cref="Serialize.Linq.ExpressionNode"/> .
-		/// </summary>
-//		public ExpressionNode ExpressionAsNode {
-//			get; private set;
-//		}
 		
-		/// <summary>
-		/// Gets <see cref="Queryable`1[TArtefact].Expression"/> as binary.
-		/// </summary>
-//		public byte[] ExpressionAsBinary {
-//			get; private set;
-//		}
-		#endregion
-
 		/// <summary>
 		/// Gets the count.
 		/// </summary>
 		public int Count {
 			get
 			{
-				BindingFlags bf = BindingFlags.Static | BindingFlags.Public;
-				MethodInfo method = typeof(System.Linq.Queryable).GetMethod("Count", bf, null,
-					new Type[] {}, /*new Type[] { typeof(IQueryable<>).MakeGenericType(ElementType) }, */ null);	//new ParameterModifier[] { new ParameterModifier(1) })
+//				BindingFlags bf = BindingFlags.Static | BindingFlags.Public;
+//				MethodInfo method = typeof(System.Linq.Queryable).GetMethod("Count", bf, null,
+//					new Type[] {}, /*new Type[] { typeof(IQueryable<>).MakeGenericType(ElementType) }, */ null);	//new ParameterModifier[] { new ParameterModifier(1) })
 //				return _count >= 0 ? _count : _count =
 //					(int)Repository.Execute(Expression.Call(method, Expression));
 				return _count >= 0 && IsUpToDate ? _count : _count = this.Count();
@@ -232,7 +210,7 @@ namespace Artefacts.Service
 				{
 //					int pageStartIndex = index - index % Paging.PageSize;
 //					_resultChunk.CopyTo(_results, pageStartIndex);
-					_results[index] = Repository.Channel.GetById(_result[index]);
+					_results[index] = Repository.Channel.GetById(_result[index].Id, _result[index].Type);
 				}
 				return _results[index];
 			}

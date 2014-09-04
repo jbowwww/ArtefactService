@@ -1,12 +1,21 @@
 
 using NHibernate;
 using NHibernate.Cfg;
+using NHibernate.Driver;
+using FluentNHibernate.Cfg;
+using FluentNHibernate.Cfg.Db;
+using FluentNHibernate.Automapping;
+using Artefacts.Core;
+using System.Reflection;
+using System.Linq;
+using NHibernate.Tool.hbm2ddl;
 
 namespace Artefacts.Service
 {
 	public static class NhBootStrap
 	{
 		#region Private fields
+		private static IAutomappingConfiguration _mapping = new AutoMapperConfiguration();
 		private static Configuration _configuration;
 		private static ISessionFactory _sessionFactory;
 		private static ISession _nhSession;
@@ -20,24 +29,30 @@ namespace Artefacts.Service
 			{
 				if (_configuration == null)
 				{
-					_configuration = new Configuration()
-						.Configure("Configuration/hibernate_server.cfg.xml")
-						.DataBaseIntegration((p) =>
-					{
-//						p.ConnectionReleaseMode = ConnectionReleaseMode.OnClose;
-						p.SchemaAction = SchemaAutoAction.Update;		//.Create;	//.Recreate; 			//.Update;
-					});
-
-					// not needed because hibernate.server.cfg adds mappings to the required assemblies
-//					foreach (Assembly artefactTypeAssembly in Artefact.ArtefactTypes
-//							.ConvertAll<Assembly>((input) => input.Assembly)
-//							.Distinct().Where((assembly) => assembly.GetName().Name != "Artefacts"))
-//						_configuration.AddAssembly(artefactTypeAssembly);
-	
+					_configuration = Fluently.Configure().Database(
+						MySQLConfiguration.Standard.ConnectionString("Database=Artefacts3;Data Source=192.168.1.10;User Id=root"))
+						.Mappings(m => m.AutoMappings
+//							.Add(AutoMap.AssemblyOf<Artefact>(_mapping))
+							.Add(AutoMap.Assemblies(_mapping,
+								Artefact.ArtefactTypes.ConvertAll<Assembly>(T => T.Assembly).Distinct())))
+//						.Database(MySQLConfiguration.Standard.c);
+						.BuildConfiguration();
+//						IPersistenceConfigurer pc;
 					
-//					SchemaValidator validator = new SchemaValidator(_configuration);
-//					validator.Validate();
-//					new SchemaExport(_configuration);
+					
+//					SchemaExport exporter = new SchemaExport(_configuration);
+//					exporter.
+					SchemaValidator validator = new SchemaValidator(_configuration);
+					try {
+						validator.Validate();
+						_configuration.DataBaseIntegration(db => db.SchemaAction = SchemaAutoAction.Update);
+					}
+					catch (HibernateException hEx) {
+						_configuration.DataBaseIntegration(db => db.SchemaAction = SchemaAutoAction.Create);
+					}
+					
+					
+
 				}
 				return _configuration;
 			}

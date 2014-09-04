@@ -273,7 +273,7 @@ namespace Artefacts.Service
 		/// <returns>The by identifier.</returns>
 		/// <param name="id">Identifier.</param>
 		/// <remarks>IRepository implementation</remarks>
-		public Artefact GetById(int id)
+		public Artefact GetById(int id, Type T = null)
 		{
 			return Channel.GetById(id);
 		}
@@ -444,18 +444,20 @@ namespace Artefacts.Service
 					{
 						if (r.Count == 0)
 							throw new IndexOutOfRangeException("First() method callled on empty array");
-						return Channel.GetById(r[0]);
+						return Channel.GetById(r[0].Id, r[0].Type);
 					}
 					else if (methodName.Equals("FirstOrDefault"))
-						return r.Count == 0 ? null : Channel.GetById(r[0]);
+						return r.Count == 0 ? null :
+					 Channel.GetById(r[0].Id, r[0].Type);
 					if (methodName.Equals("Last"))
 					{
 						if (r.Count == 0)
 							throw new IndexOutOfRangeException("Last() method callled on empty array");
-						return Channel.GetById(r[r.Count - 1]);
+						return Channel.GetById(r[r.Count - 1].Id, r[r.Count - 1].Type);
 					}
 					else if (methodName.Equals("LastOrDefault"))
-						return r.Count == 0 ? null : Channel.GetById(r[r.Count - 1]);
+						return r.Count == 0 ? null :
+						 Channel.GetById(r[r.Count - 1].Id, r[r.Count - 1].Type);
 					else
 						throw new NotSupportedException("Method \"" + methodName + "\" not supported");
 				}
