@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" 
-                   assembly="Core" 
-                   namespace="Artefacts"> 
-	<joined-subclass name="Host" extends="Artefact">
-		<key column="Id" />
-		<property name="HostId" unique="true" />
-	</joined-subclass>  
-</hibernate-mapping>

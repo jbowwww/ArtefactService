@@ -1,2 +1,0 @@
-
--C -LClient_`date +"%Y-%M-%d %H:%M:%S"`.Log
