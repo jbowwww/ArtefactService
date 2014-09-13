@@ -1,0 +1,6 @@
+2014-09-13 Open
+02:07:15:871 ClientTest.Init: Initialising...
+02:07:15:911 Artefacts.Service.RepositoryClientProxy: Initialising
+02:07:16:026 	Binding: System.ServiceModel.NetTcpBinding
+	Address: net.tcp://localhost:3334/ArtefactRepository
+02:07:16:026 

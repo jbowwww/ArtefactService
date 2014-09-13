@@ -1,0 +1,28 @@
+2014-09-13 Open
+01:59:27:728 --- Artefacts.Service.ArtefactHost starting ---
+01:59:27:782 localhost:ServiceHost (2411) [Normal] @ 2014-09-13T01:59:27
+------------
+
+01:59:27:782 
+01:59:27:784 Artefacts.Service.ArtefactHost: Plugin directory "Plugins/" (1 plugins):
+01:59:27:784 	Plugins/ArtefactFileSystem.dll: 5 artefact types
+01:59:27:788 		Artefacts.FileSystem.Directory Artefacts.FileSystem.Disk Artefacts.FileSystem.Drive Artefacts.FileSystem.File Artefacts.FileSystem.FileSystemEntry
+01:59:27:789 Artefacts.Service.ArtefactHost: 1 plugins loaded
+01:59:29:157 ServiceHost: Opening
+01:59:29:212 ServiceHost: Opened
+01:59:29:212 System.ServiceModel.ServiceHost
+01:59:33:089 QueryPreload(Q#-1652228404: Query<Artefacts.Artefact>())
+01:59:33:181 QueryPreload(Q#-931891802: Query<Artefacts.Host>())
+01:59:33:283 QueryPreload(Q#-60966201: Query<Artefacts.Host>().Where<Artefacts.Host>((host) => (Artefacts.Host.GetHostId() == host.HostId)))
+01:59:33:338 QueryPreload(Q#-60966201: Query<Artefacts.Host>().Where<Artefacts.Host>((host) => (Artefacts.Host.GetHostId() == host.HostId)))
+01:59:34:035 QueryResults(Q#-60966201, 0, -1) = QueryResult(Count=1): { Artefacts.Service.QueryResult`1+TypedArtefactId[Artefacts.Artefact] }}
+02:01:58:112 QueryPreload(Q#-1652228404: Query<Artefacts.Artefact>())
+02:01:58:203 QueryPreload(Q#-931891802: Query<Artefacts.Host>())
+02:01:58:288 QueryPreload(Q#-60966201: Query<Artefacts.Host>().Where<Artefacts.Host>((host) => (Artefacts.Host.GetHostId() == host.HostId)))
+02:07:7:240 QueryPreload(Q#-60966201: Query<Artefacts.Host>().Where<Artefacts.Host>((host) => (Artefacts.Host.GetHostId() == host.HostId)))
+02:07:7:312 QueryResults(Q#-60966201, 0, -1) = QueryResult(Count=1): { Artefacts.Service.QueryResult`1+TypedArtefactId[Artefacts.Artefact] }}
+02:07:16:600 QueryPreload(Q#-1652228404: Query<Artefacts.Artefact>())
+02:07:16:698 QueryPreload(Q#-931891802: Query<Artefacts.Host>())
+02:07:16:785 QueryPreload(Q#-60966201: Query<Artefacts.Host>().Where<Artefacts.Host>((host) => (Artefacts.Host.GetHostId() == host.HostId)))
+02:07:59:303 QueryPreload(Q#-60966201: Query<Artefacts.Host>().Where<Artefacts.Host>((host) => (Artefacts.Host.GetHostId() == host.HostId)))
+02:07:59:364 QueryResults(Q#-60966201, 0, -1) = QueryResult(Count=1): { Artefacts.Service.QueryResult`1+TypedArtefactId[Artefacts.Artefact] }}

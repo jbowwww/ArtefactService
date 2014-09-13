@@ -52,12 +52,13 @@ namespace Artefacts.TestClient
 //		private static IArtefactService _proxy = null;
 //		private static IRepository<Artefact> _repoProxy = null;
 //		private static RepositoryClientProxy<Artefact> _clientProxy = null;
-		private TextWriter ConsoleOut = null;
-		private TextWriter ConsoleError = null;
-		private readonly bool UseServiceHostAsync = true;
-		private readonly bool UseServiceHostProc = false;
 		#endregion
 
+		protected TextWriter ConsoleOut = null;
+		protected TextWriter ConsoleError = null;
+		protected readonly bool UseServiceHostAsync = false;
+		protected readonly bool UseServiceHostProc = false;
+		
 		#region Construction & disposal
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Artefacts.TestClient.ClientTests"/> class.
@@ -102,7 +103,7 @@ namespace Artefacts.TestClient
 				
 				if (UseServiceHostAsync)
 				{
-					_serviceHostThread = ArtefactHost.GetOrCreateAsyncThread(_artefactTypes, _defaultTimeout);
+					_serviceHostThread = ArtefactHost.GetOrCreateAsyncThread(_artefactTypes, _defaultTimeout, Console.Out, Console.Error);
 //					_shLogWriter = new LogTextWriter(_serviceHostLogFilePath);
 					Thread.Sleep(_serviceHostStartDelay);
 				}
@@ -113,6 +114,7 @@ namespace Artefacts.TestClient
 						IEnumerable<string> args =
 							_artefactTypes.Select<Type, string>((T) => string.Concat("-A", Path.GetFileName(T.Assembly.Location))).Distinct()
 							.Concat(_artefactTypes.Select<Type, string>((T) => string.Concat("-T", T.FullName)));
+						Console.WriteLine ("\nService Host Command Line: {0}\n", string.Join (" ", args));
 						_serviceHostProcess = ArtefactHost.ExecuteViaCommandLine("ServiceHost.exe", string.Join(" ", args));
 //						AppDomain.CurrentDomain.ExecuteAssembly("ServiceHost.exe", args.ToArray());
 						Thread.Sleep(_serviceHostStartDelay);

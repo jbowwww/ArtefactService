@@ -194,32 +194,32 @@ namespace Artefacts.Service
 					ex.GetType().FullName, ex.Message, ex.Action, ex.Code.Namespace, ex.Code.Name, ex.Reason.GetMatchingTranslation(),
 					ex.Detail.ToString().Trim('\n').Insert(0, "  ").Replace("\n", "\n  "),
 					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
-				_serviceHost.Abort();
 			}
 			catch (FaultException ex)
 			{
 				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  Action: {2}\n  Fault: {3}{4}: {5}\n  StackTrace:\n{6}\n------------\n\n",
 					ex.GetType().FullName, ex.Message, ex.Action, ex.Code.Name, ex.Code.Name, ex.Reason.GetMatchingTranslation(),
 					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
-				_serviceHost.Abort();
 			}
-//			catch (CommunicationException ex)
-//			{
-//				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  StackTrace:\n{2}\n------------\n\n",
-//					ex.GetType().FullName, ex.Message,
-//					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
-//				_serviceHost.Abort();
-//			}
+			catch (CommunicationException ex)
+			{
+				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  StackTrace:\n{2}\n------------\n\n",
+					ex.GetType().FullName, ex.Message,
+					ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
+			}
 			catch (Exception ex)
 			{
 				Console.Error.Write("\n--- Service Host Exception ---\n{0}: {1}\n  StackTrace:\n{2}\n------------\n\n",
 					ex.GetType().FullName, ex.Message, ex.StackTrace.Trim('\n').Insert(0, "  ").Replace("\n", "\n  "));
-				_serviceHost.Abort();
 			}
 			finally
 			{
 				Console.Write("\n--- {0} exiting ---\nService host state: {1}\n------------\n\n",
 					hostTypeName, _serviceHost == null ? "(null)" : _serviceHost.State.ToString());
+				if (_serviceHost.State == CommunicationState.Opened)
+					_serviceHost.Close ();
+				else
+					_serviceHost.Abort();
 				_output.Close();
 				Console.SetOut(consoleOut);
 				Console.SetError(consoleError);
