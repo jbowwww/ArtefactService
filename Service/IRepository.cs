@@ -31,8 +31,13 @@ namespace Artefacts.Service
 	///	object QueryExecute(byte[] binary);
 	///
 	/// </remarks>
-	[ServiceContract(Name = "IRepository", Namespace = "http://teknowledge.net.au/Artefacts/Service/",
-		SessionMode = SessionMode.Allowed, ProtectionLevel = System.Net.Security.ProtectionLevel.None)]
+	[ServiceContract(
+		Name = "IRepository",
+		Namespace = "http://teknowledge.net.au/Artefacts/Service/",
+		SessionMode = SessionMode.Allowed,
+		ProtectionLevel = System.Net.Security.ProtectionLevel.None
+//		CallbackContract = typeof()
+	)]
 	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
 	public interface IRepository
 	{
@@ -41,14 +46,14 @@ namespace Artefacts.Service
 		/// Connect the specified host.
 		/// </summary>
 		/// <param name="host">Host.</param>
-		[OperationContract]
+		[OperationContract(IsInitiating=true)]
 		int Connect(Host host);
 		
 		/// <summary>
 		/// Disconnect the specified clientId.
 		/// </summary>
 		/// <param name="clientId">Client identifier.</param>
-		[OperationContract]
+		[OperationContract(IsTerminating=true)]
 		void Disconnect(Host host);
 		#endregion
 		
@@ -107,10 +112,10 @@ namespace Artefacts.Service
 		/// <summary>
 		/// Creates the query.
 		/// </summary>
-		/// <returns>The query.</returns>
+		/// <returns>The query async result</returns>
 		/// <param name="expression">Expression.</param>
-		[OperationContract]
-		object QueryPreload(byte[] expression);
+		[OperationContract(IsOneWay=true, ReplyAction="http://teknowledge.net.au/Artefacts/Service/ResponseQueryPreload/")]
+		void QueryPreload(byte[] expression);
 
 		/// <summary>
 		/// Queries the results.
@@ -120,7 +125,7 @@ namespace Artefacts.Service
 		/// <param name="startIndex">Start index.</param>
 		/// <param name="count">Count.</param>
 		[OperationContract]
-		QueryResult<Artefact> QueryResults(object queryId, int startIndex = 0, int count = -1);
+		QueryResult QueryResults(object queryId, int startIndex = 0, int count = -1);
 
 		/// <summary>
 		/// Queries the execute.

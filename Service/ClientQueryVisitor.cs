@@ -10,20 +10,12 @@ namespace Artefacts.Service
 {
 	public class ClientQueryVisitor : ClientQueryVisitor<Artefact>
 	{
-		public ClientQueryVisitor(IRepository repository, IDictionary<object, IQueryable> queryCache)
-			: base(repository, queryCache) { }
 	}
 
 	public class ClientQueryVisitor<TArtefact> : ExpressionVisitor where TArtefact : Artefact
 	{
-		private IDictionary<object, IQueryable> _queryCache;
-
-		public IRepository Repository { get; private set; }
-		
-		public ClientQueryVisitor(IRepository repository, IDictionary<object, IQueryable> queryCache)
+		public ClientQueryVisitor()
 		{
-			Repository = repository;
-			_queryCache = queryCache;
 		}
 
 		protected override Expression VisitMemberAccess(MemberExpression m)

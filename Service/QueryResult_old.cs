@@ -6,7 +6,7 @@ using System.Text;
 namespace Artefacts.Service
 {
 	[DataContract]
-	public class QueryResult// where TArtefact : Artefact
+	public class QueryResult<TArtefact> where TArtefact : Artefact
 	{
 		#region Fields
 		[DataContract]
@@ -31,7 +31,7 @@ namespace Artefacts.Service
 		}
 		#endregion
 		
-		public QueryResult(IQueryable<Artefact> query, int startIndex = 0, int count = -1)
+		public QueryResult(IQueryable<TArtefact> query, int startIndex = 0, int count = -1)
 		{
 		// TODO: Is NhQueryable's caching sufficient here or should I use Queryable<>
 		// with a new custom server-side query provider, and implement caching??

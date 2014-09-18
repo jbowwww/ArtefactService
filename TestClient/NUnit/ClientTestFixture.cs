@@ -45,7 +45,7 @@ namespace Artefacts.TestClient
 		private readonly FileStream _serviceHostLog = null;
 		private TextWriter _shLogWriter = null;
 
-		private RepositoryClientProxy _clientProxy = null;
+		private RepositoryClientProxy<Artefact> _clientProxy = null;
 		private FileSystemArtefactCreator _fsCreator = null;
 //		private static ChannelFactory<IArtefactService> _proxyFactory = null;
 //		private static ChannelFactory<IRepository<Artefact>> _repoProxyFactory = null;
@@ -121,7 +121,7 @@ namespace Artefacts.TestClient
 					}
 				}
 				
-				_clientProxy = new RepositoryClientProxy(new NetTcpBinding(), "net.tcp://localhost:3334/ArtefactRepository");
+				_clientProxy = new RepositoryClientProxy<Artefact>(new NetTcpBinding(), "net.tcp://localhost:3334/ArtefactRepository");
 				Console.WriteLine("\nService Artefact Repository: {0}\n", _clientProxy.ToString());
 				_fsCreator = new FileSystemArtefactCreator(_clientProxy)
 				{
@@ -180,7 +180,7 @@ namespace Artefacts.TestClient
 		[Test, TestMethod(Order=10, Name="IQueryable<Artefact> _clientProxy.Artefacts")]
 		public void QueryAllArtefacts()
 		{
-			Console.WriteLine("{0} artefacts currently in repository", _clientProxy.Artefacts.Count());
+			Console.WriteLine("{0} artefacts currently in repository", _clientProxy.Count());
 //			foreach (Artefact artefact in _clientProxy.Artefacts)
 //				Console.WriteLine(artefact.ToString());
 //					string.Format("{0}: Id={1} TimeCreated={2} TimeUpdated={3} TimeChecked={4}",
@@ -190,12 +190,11 @@ namespace Artefacts.TestClient
 		/// <summary>
 		/// Tests the query artefacts_ linq_ statement.
 		/// </summary>
-//		[Test, TestMethod(Order=20, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ statement")]
+		[Test, TestMethod(Order=20, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ statement")]
 		public void TestQueryArtefacts_Linq_Statement()
 		{
-			var q = from a in _clientProxy.Artefacts
-				        where a.Id > 32799
-			        select a;
+			var q = from a in _clientProxy
+				where a.Id > 32799 select a;
 			foreach (Artefact artefact in q)
 				Console.WriteLine(artefact.ToString());
 		}
@@ -203,10 +202,10 @@ namespace Artefacts.TestClient
 		/// <summary>
 		/// Tests the query artefacts_ linq_ method.
 		/// </summary>
-//		[Test, TestMethod(Order=30, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ method syntax")]
+		[Test, TestMethod(Order=30, Name="IEnumerator<Artefact> _clientProxy.Artefacts using LINQ method syntax")]
 		public void TestQueryArtefacts_Linq_Method()
 		{
-			var q = _clientProxy.Artefacts.Where((a) => a.Id > 32799);
+			var q = _clientProxy.Where((a) => a.Id > 32799);
 			foreach (Artefact artefact in q)
 				Console.WriteLine(artefact.ToString());
 		}
@@ -214,23 +213,24 @@ namespace Artefacts.TestClient
 		[Test, TestMethod(Order=05, Name="Host.Current static property")]
 		public void TestHostArtefactCurrent()
 		{
-			Console.WriteLine(Host.Current.ToString());
+			Console.WriteLine(Host.Current != null ? Host.Current.ToString() : "(null)");
 		}
 		
-//		[Test, TestMethod(Order=50, Name="int _clientProxy.Artefacts.Count()")]
+		[Test, TestMethod(Order=50, Name="int _clientProxy.Artefacts.Count()")]
 		public void TestQueryArtefactsDrivesCount()
 		{
 			Console.WriteLine("{0} artefacts currently in repository\n{1} drives",
-				_clientProxy.Artefacts.Count(), _fsCreator.Drives.Count());
+				_clientProxy.Count(), _fsCreator.Drives.Count());
+
 		}
 
 		/// <summary>
 		/// Tests the file system artefact creator.
 		/// </summary>
-		[Test, TestMethod(Order=40, Name="FileSystemArtefactCreator")]
+//		[Test, TestMethod(Order=40, Name="FileSystemArtefactCreator")]
 		public void TestFileSystemArtefactCreator()
 		{
-			Console.WriteLine("{0} artefacts currently in repository\n{1} drives", _clientProxy.Artefacts.Count(), _fsCreator.Drives.Count());
+			Console.WriteLine("{0} artefacts currently in repository\n{1} drives", _clientProxy.Count(), _fsCreator.Drives.Count());
 //				var q = _fsCreator.Drives.Where((a) => a.Id > 32799);
 			//a.GetType().FullName == typeof(Drive).FullName && 
 			foreach (Drive artefact in _fsCreator.Drives)

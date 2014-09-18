@@ -33,7 +33,7 @@ namespace Artefacts.FileSystem
 			set { BaseUri = new UriBuilder(BaseUri.Scheme, BaseUri.Host, BaseUri.Port, BaseUri.LocalPath, value).Uri; }
 		}
 
-		public RepositoryClientProxy Repository { get; private set; }
+		public RepositoryClientProxy<Artefact> Repository { get; private set; }
 //		public SynchronizedReadOnlyCollection<FileSystemEntry> files = new SynchronizedReadOnlyCollection<FileSystemEntry>(this, )
 		//		public IQueryable Artefacts { get; private set; }
 		public IQueryable<FileSystemEntry> FileEntries;
@@ -73,7 +73,7 @@ namespace Artefacts.FileSystem
 		/// Initializes a new instance of the <see cref="Artefacts.FileSystem.FileSystemArtefactCreator"/> class.
 		/// </summary>
 		/// <param name="repository">Repository.</param>
-		public FileSystemArtefactCreator(RepositoryClientProxy repository)
+		public FileSystemArtefactCreator(RepositoryClientProxy<Artefact> repository)
 		{
 			if (Singleton != null)
 				throw new InvalidOperationException("FileSystemArtefactCreator.c'tor: Singleton is not null");
@@ -85,11 +85,20 @@ namespace Artefacts.FileSystem
 				throw new ArgumentNullException("repository");
 			Repository = repository;
 
-			FileEntries = Repository.BuildBaseQuery<FileSystemEntry>();
-			Files = Repository.BuildBaseQuery<File>();
-			Directories = Repository.BuildBaseQuery<Directory>();
-			Drives = Repository.BuildBaseQuery<Drive>();
-			Disks = Repository.BuildBaseQuery<Disk>();
+//			IQueryable<FileSystemEntry> 
+			FileEntries = new RepositoryClientProxy<FileSystemEntry>(repository.Binding, repository.Address);
+			;
+//			FileEntries = (from a in repository where a is FileSystemEntry select a).Cast<FileSystemEntry>;
+//			FileEntries = Repository.OfType<FileSystemEntry>();//.AsQueryable<FileSystemEntry>();
+//			Files = Repository.OfType<File>();//.AsQueryable<File>();
+//			Directories = Repository.OfType<Directory>();//.AsQueryable<Directory>();
+//			Drives = Repository.OfType<Drive>();//.AsQueryable<Drive>();
+//			Disks = Repository.OfType<Disk>();//.AsQueryable<Disk>();
+//			FileEntries = Repository.BuildBaseQuery<FileSystemEntry>();
+//			Files = Repository.BuildBaseQuery<File>();
+//			Directories = Repository.BuildBaseQuery<Directory>();
+//			Drives = Repository.BuildBaseQuery<Drive>();
+//			Disks = Repository.BuildBaseQuery<Disk>();
 		}
 
 		/// <summary>

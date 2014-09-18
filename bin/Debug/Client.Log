@@ -1,6 +1,62 @@
-2014-09-13 Open
-02:07:15:871 ClientTest.Init: Initialising...
-02:07:15:911 Artefacts.Service.RepositoryClientProxy: Initialising
-02:07:16:026 	Binding: System.ServiceModel.NetTcpBinding
+2014-09-18 Open
+08:32:58:123 ClientTest.Init: Initialising...
+08:32:58:154 Artefacts.Service.RepositoryClientProxy`1[[Artefacts.Artefact, Core, Version=1.0.5374.15373, Culture=neutral, PublicKeyToken=null]]: Initialising
+	Binding: System.ServiceModel.NetTcpBinding
 	Address: net.tcp://localhost:3334/ArtefactRepository
-02:07:16:026 
+08:32:58:154 
+08:32:58:598 Artefacts.Service.RepositoryClientProxy`1[[Artefacts.Artefact, Core, Version=1.0.5374.15373, Culture=neutral, PublicKeyToken=null]]: Initialised
+08:32:58:598 
+08:32:58:598 
+Service Artefact Repository: Artefacts.Service.RepositoryClientProxy`1[Artefacts.Artefact]
+08:32:58:598 
+08:32:58:604 Artefacts.Service.RepositoryClientProxy`1[[Artefacts.FileSystem.FileSystemEntry, ArtefactFileSystem, Version=1.0.5374.15375, Culture=neutral, PublicKeyToken=null]]: Initialising
+	Binding: System.ServiceModel.NetTcpBinding
+	Address: net.tcp://localhost:3334/ArtefactRepository
+08:32:58:604 
+08:32:58:612 Artefacts.Service.RepositoryClientProxy`1[[Artefacts.FileSystem.FileSystemEntry, ArtefactFileSystem, Version=1.0.5374.15375, Culture=neutral, PublicKeyToken=null]]: Initialised
+08:32:58:612 
+08:32:58:612 
+FS Creator: Artefacts.FileSystem.FileSystemArtefactCreator
+08:32:58:612 
+08:32:58:613 ClientTest.Init: Already initialised
+08:32:58:663 
+########
+# RunTest: Start: Host.Current static property
+########
+08:32:58:666 
+08:32:58:670 (null)
+08:32:58:670 
+########
+# RunTest: Success: Host.Current static property
+########
+08:32:58:670 
+08:32:58:670 
+########
+# RunTest: Start: IQueryable<Artefact> _clientProxy.Artefacts
+########
+08:32:58:670 
+08:33:10:930 
+########
+# RunTest: Failed: IQueryable<Artefact> _clientProxy.Artefacts
+########
+08:33:10:930 
+08:33:10:937 System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00000] in <filename unknown>:0 
+  at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in <filename unknown>:0 
+  at Artefacts.TestClient.Program+<RunTests>c__AnonStorey1+<RunTests>c__AnonStorey0.<>m__0 () [0x00017] in /home/jk/Code/Projects/NET/ArtefactService/TestClient/Program.cs:76 
+  at Artefacts.TestClient.Program.RunTest (System.String name, System.Action testMethod, System.IO.TextWriter output) [0x00023] in /home/jk/Code/Projects/NET/ArtefactService/TestClient/Program.cs:93 
+08:33:10:937 
+08:33:10:940    ------ Inner Exception ------
+  System.InvalidOperationException: The communication object System.ServiceModel.MonoInternal.ClientRuntimeChannel is not at created state but at Opening state.
+    at System.ServiceModel.Channels.CommunicationObject.ThrowIfDisposedOrImmutable () [0x00000] in <filename unknown>:0 
+    at System.ServiceModel.Channels.CommunicationObject.ProcessOpening () [0x00000] in <filename unknown>:0 
+    at System.ServiceModel.Channels.CommunicationObject.Open (TimeSpan timeout) [0x00000] in <filename unknown>:0 
+    at System.ServiceModel.Channels.CommunicationObject.Open () [0x00000] in <filename unknown>:0 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.DoProcess (System.Reflection.MethodBase method, System.String operationName, System.Object[] parameters) [0x00000] in <filename unknown>:0 
+    at System.ServiceModel.MonoInternal.ClientRuntimeChannel.Process (System.Reflection.MethodBase method, System.String operationName, System.Object[] parameters) [0x00000] in <filename unknown>:0 
+  
+08:33:10:942 
+########
+# RunTest: Start: IEnumerator<Artefact> _clientProxy.Artefacts using LINQ statement
+########
+08:33:10:942 

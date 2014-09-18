@@ -1,19 +1,18 @@
 using System;
+//using TextWriter=System.IO.TextWriter;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using TextWriter=System.IO.TextWriter;
 using System.Linq;
 using System.Linq.Expressions;
+using Serialize.Linq.Extensions;
+using NHibernate.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Description;
 using System.ServiceModel.Channels;
 using Serialize.Linq.Nodes;
 using System.Reflection;
 using System.Diagnostics;
-using Serialize.Linq.Extensions;
-using System.Collections;
-using NHibernate.Linq;
 
 namespace Artefacts.Service
 {
@@ -36,12 +35,22 @@ namespace Artefacts.Service
 	/// 
 	/// </remarks>
 	[ServiceKnownType("GetArtefactTypes", typeof(Artefact))]
-	public class RepositoryClientProxy : IRepository, IOrderedQueryable<Artefact>, IQueryProvider, IDisposable
+	public class RepositoryClientProxy<TArtefact> : IQueryProvider, IOrderedQueryable<TArtefact>, IDisposable
+		where TArtefact : Artefact
 	{
-		#region Fields & properties
-		private bool _init;
-		private bool _close;
-		private readonly string _proxyTypeName;
+		#region Private fields
+		private readonly string _proxyTypeName = typeof(RepositoryClientProxy<TArtefact>).FullName;
+		private bool _init = false;
+		private bool _close = false;
+		private ChannelFactory<IRepository> _channelFactory;
+		private IRepository _channel;
+		private ExpressionVisitor _expressionVisitor;
+		private PagingOptions _defaultPagingOptions;
+		private Expression _expression;
+		private Queryable<TArtefact> _artefacts;
+		private Dictionary<object, IQueryable> _queryCache;
+		#endregion
+
 		#region Service channel
 		/// <summary>
 		/// The binding.
@@ -54,63 +63,43 @@ namespace Artefacts.Service
 		public readonly string Address;
 
 		/// <summary>
-		/// The channel factory.
-		/// </summary>
-		public ChannelFactory<IRepository> ChannelFactory;
-
-		/// <summary>
 		/// The channel.
 		/// </summary>
-		public IRepository Channel;
-		
-		private int _clientId;
-		#endregion
-		
-		#region Queries
-		/// <summary>
-		/// The _query cache.
-		/// </summary>
-		public Dictionary<object, IQueryable> QueryCache;
-
-		/// <summary>
-		/// An expression visitor used in constructor
-		/// </summary>
-		public ExpressionVisitor ExpressionVisitor;
+		public IRepository Channel {
+			get { return _channel; }
+		}
 
 		/// <summary>
 		/// Gets the default paging options.
 		/// </summary>
-		public PagingOptions DefaultPagingOptions { get; set; }
-		#endregion
-
-		#region Collections/Enumerables/Queryables
-		/// <summary>
-		/// Gets or sets the artefacts.
-		/// </summary>
-		/// <remarks>IRepository implementation</remarks>
-		public IQueryable<Artefact> Artefacts { get; private set;}		//{ get { return Channel.Artefacts; } }
-
-		/// <summary>
-		/// Gets or sets the queryables.
-		/// </summary>
-		/// <remarks>IRepository implementation</remarks>
-		public IDictionary<Type, IQueryable> Queryables { get; private set; }
+		public PagingOptions DefaultPagingOptions {
+			get { return _defaultPagingOptions; }
+		}
 		#endregion
 
 		#region IQueryable implementation
+		/// <summary>
+		/// Gets the type of the element.
+		/// </summary>
 		public Type ElementType {
-			get { return typeof(Artefact); }
+			get { return typeof(TArtefact); }
 		}
 
+		/// <summary>
+		/// Gets the expression.
+		/// </summary>
+		/// <value>The expression.</value>
 		public Expression Expression {
 			get { return _expression; }
 		}
-		private readonly Expression _expression = Expression.Parameter(typeof(IRepository), "Repository");
 
+		/// <summary>
+		/// Gets the provider.
+		/// </summary>
+		/// <value>The provider.</value>
 		public IQueryProvider Provider {
 			get { return this; }
 		}
-		#endregion
 		#endregion
 		
 		#region Construction & disposal methods
@@ -122,13 +111,13 @@ namespace Artefacts.Service
 		/// <param name="visitor">Client side <see cref="ExpressionVisitor"/> </param>
 		public RepositoryClientProxy(Binding binding, string address, bool init = true)
 		{
-			_init = _close = false;
-			_proxyTypeName = GetType().FullName;
 			if (Repository.Context != null)
 				throw new ApplicationException("Repository.Context != null");
-			Repository.Context = this;
+//			Repository.Context = this;
+
 			Binding = binding;
 			Address = address;
+
 			if (init)
 				Init();
 		}
@@ -158,26 +147,16 @@ namespace Artefacts.Service
 			else
 			{ 
 				_init = true;
-				Console.WriteLine("{0}: Initialising", _proxyTypeName);
-				ChannelFactory = new ChannelFactory<IRepository>(Binding, Address);
-				Console.WriteLine ("\tBinding: {0}\n\tAddress: {1}\n", Binding.ToString (), Address.ToString ());
-	//			ApplyChannelFactoryBehaviours(_channelFactory);
-				Channel = ChannelFactory.CreateChannel();
-				Queryables = new ConcurrentDictionary<Type, IQueryable>();
-				QueryCache = new Dictionary<object, IQueryable>();
-				DefaultPagingOptions = new PagingOptions();
-				ExpressionVisitor = new ClientQueryVisitor(this, QueryCache);
-				Artefacts = BuildBaseQuery<Artefact>();
-				// ((IQueryProvider)this).CreateQuery<Artefact>(Expression.Property(Expression, "Artefacts"));
-				//(IQueryable<Artefact>)this;		//
-				//			Queryables.Add(typeof(Artefact), Artefacts);
-				Host.Current = BuildBaseQuery<Host>().Where(host => Host.GetHostId() == host.HostId).FirstOrDefault() ?? new Host();
-//				_clientId = Channel.Connect(Host.Current);
-				if (Host.Current.IsTransient)
- 					Channel.Add(Host.Current);
-				else
-					Channel.Update(Host.Current.Update());
-				Console.WriteLine ("Artefacts.Host.Current: {0}\n", Host.Current.ToString ());
+				Console.WriteLine("{0}: Initialising\n\tBinding: {1}\n\tAddress: {2}\n", _proxyTypeName, Binding.ToString (), Address.ToString ());
+				_channelFactory = new ChannelFactory<IRepository>(Binding, Address);
+//				ApplyChannelFactoryBehaviours(_channelFactory);
+				_channel = _channelFactory.CreateChannel();
+				_defaultPagingOptions = new PagingOptions();
+				_expressionVisitor = new ClientQueryVisitor();
+				_queryCache = new Dictionary<object, IQueryable>();
+				_expression = Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) },
+					Expression.Property(null, typeof(Repository).GetProperty("Session", BindingFlags.Static | BindingFlags.Public)));
+				_artefacts = (Queryable<TArtefact>)CreateQuery(_expression);
 				Console.WriteLine ("{0}: Initialised\n", _proxyTypeName);
 			}
 		}
@@ -193,33 +172,10 @@ namespace Artefacts.Service
 			{
 				_close = true;
 				Console.WriteLine("{0}: Closing", _proxyTypeName);
-				Channel.Disconnect(Host.Current);
-				ChannelFactory.Close();
+				_channel.Disconnect(Host.Current);
+				_channelFactory.Close();
 				Console.WriteLine ("{0}: Closed\n", _proxyTypeName);
 			}
-		}
-		
-		/// <summary>
-		/// Builds the base query.
-		/// </summary>
-		/// <returns>The base query.</returns>
-		/// <typeparam name="TArtefact">The 1st type parameter.</typeparam>
-		public IQueryable<TArtefact> BuildBaseQuery<TArtefact>() where TArtefact : Artefact
-		{
-//			IQueryable<TArtefact> query = Expression.PropertyOrField()
-				var g6= ((IQueryProvider)this).CreateQuery<TArtefact>(
-				Expression.Call(typeof(LinqExtensionMethods), "Query", new Type[] { typeof(TArtefact) }, //Expression.Constant(null)));
-//					Expression.Variable(typeof(IRepository), "Repository")));
-					Expression.Property(null, typeof(Repository).GetProperty("Session", BindingFlags.Static | BindingFlags.Public))));
-//				Expression.Call(
-//					typeof(NHibernate.Linq.LinqExtensionMethods).GetMethods()
-//						.First((mi) => mi.Name.Equals("Query") && mi.GetGenericArguments().Length == 1)
-//							.MakeGenericMethod(typeof(TArtefact)), Expression.Property(Expression.Constant(null),
-//						typeof(Repository).GetProperty("Session", BindingFlags.Static | BindingFlags.Public))));
-					//"Query", new Type[] { typeof(TArtefact) }));
-			Queryables[typeof(TArtefact)] = g6;
-			return g6;
-//			return Artefacts.OfType<TArtefact>();
 		}
 
 		/// <summary>
@@ -238,17 +194,7 @@ namespace Artefacts.Service
 //			}
 		}
 		#endregion
-		
-		public int Connect(Host host)
-		{
-			throw new NotImplementedException();
-		}
-		
-		public void Disconnect(Host host)
-		{
-			throw new NotImplementedException();
-		}
-		
+
 		#region Add/Get/Update/Remove singular artefact operations
 		/// <summary>
 		/// Add the specified artefact.
@@ -257,7 +203,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public int Add(Artefact artefact)
 		{
-			return (artefact.Id = Channel.Add(artefact)).Value;
+			return (artefact.Id = _channel.Add(artefact)).Value;
 		}
 
 		/// <summary>
@@ -268,7 +214,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public int GetId(Artefact artefact)
 		{
-			return Channel.GetId(artefact);
+			return _channel.GetId(artefact);
 		}
 
 		/// <summary>
@@ -279,7 +225,7 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public Artefact GetById(int id, Type T = null)
 		{
-			return Channel.GetById(id);
+			return _channel.GetById(id);
 		}
 
 		/// <summary>
@@ -291,7 +237,7 @@ namespace Artefacts.Service
 		{
 			if (artefact.TimeUpdatesCommitted < artefact.TimeUpdated)
 			{
-				Channel.Update(artefact);
+				_channel.Update(artefact);
 				artefact.TimeUpdatesCommitted = DateTime.Now;
 			}
 		}
@@ -303,64 +249,10 @@ namespace Artefacts.Service
 		/// <remarks>IRepository implementation</remarks>
 		public void Remove(Artefact artefact)
 		{
-			Channel.Remove(artefact);
+			_channel.Remove(artefact);
 		}
 		#endregion
-		
-		#region Query methods
-		/// <summary>
-		/// Creates the query.
-		/// </summary>
-		/// <returns>The query.</returns>
-		/// <param name="expression">Expression.</param>
-		/// <remarks>IRepository implementation</remarks>
-		public object QueryPreload(byte[] expression)	//ExpressionNode expression)
-		{
-			return Channel.QueryPreload(expression);
-		}
 	
-		/// <summary>
-		/// Queries the results.
-		/// </summary>
-		/// <returns>The results.</returns>
-		/// <param name="queryId">Query identifier.</param>
-		/// <param name="startIndex">Start index.</param>
-		/// <param name="count">Count.</param>
-		public QueryResult<Artefact> QueryResults(object queryId, int startIndex = 0, int count = -1)
-		{
-			return Channel.QueryResults(queryId, startIndex, count);
-		}
-
-		/// <summary>
-		/// Queries the execute.
-		/// </summary>
-		/// <returns>The execute.</returns>
-		/// <param name="expression">Expression.</param>
-		public object QueryExecute(byte[] expression)		// ExpressionNode expression)
-		{
-			return Channel.QueryExecute(expression);		//binary);
-		}
-		#endregion
-
-		/// <summary>
-		/// Gets the enumerator.
-		/// </summary>
-		/// <returns>The enumerator.</returns>
-		/// <remarks><see cref="System.Collections.Generic.IEnumerable[Artefact]" /> implementation</remarks>
-		public IEnumerator<Artefact> GetEnumerator()
-		{
-			return Artefacts.GetEnumerator();
-		}
-
-		/// <summary>
-		/// Gets the enumerator.
-		/// </summary>
-		/// <remarks>IEnumerable implementation</remarks>
-		System.Collections.IEnumerator IEnumerable.GetEnumerator()
-		{
-			return (IEnumerator)GetEnumerator();
-		}
-
 		#region IQueryProvider implementation
 		/// <summary>
 		/// Creates the query.
@@ -370,14 +262,6 @@ namespace Artefacts.Service
 		/// <remarks>IQueryProvider implementation</remarks>
 		public IQueryable CreateQuery(Expression expression)
 		{
-//			Type T = expression.GetElementType();
-//			MethodInfo mi = GetType().GetMethod("CreateQuery",
-//				                BindingFlags.Instance | BindingFlags.NonPublic);
-//				.MakeGenericMethod(T);
-
-//			Debug.Assert(mi != null);// && mi.IsGenericMethod);
-//			return (IQueryable)mi.Invoke(this, new object[] { expression });
-
 			return (IQueryable)((IQueryProvider)this).CreateQuery<Artefact>(expression);
 		}
 
@@ -397,22 +281,27 @@ namespace Artefacts.Service
 			if (!typeof(Artefact).IsAssignableFrom(typeof(TElement)))
 				throw new ArgumentOutOfRangeException("TElement", typeof(TElement), "Should be subclass of Artefact");
 
-			// TODO
-			// 31.5.14
-			// Should send expression to server here, take return identifier (that is baed on something simple and cheap to calculate)
-			// and supply it to constructor/property init'er of Queryable. That way when Queryable.*Enumerator*
-			// is used it can just supply the cheap simple identifier to the server operation in exchange for results (or maybe a
-			// similar method of returning id's only, .. .. dunno .. )
+			Expression parsedExpression = _expressionVisitor.Visit(expression);
+		object parsedExpressionId = parsedExpression.FormatString(); //parsedExpression.Id();
+			if (!_queryCache.ContainsKey(parsedExpressionId))
+				_queryCache[parsedExpressionId] =
+					(IQueryable)typeof(Queryable<TArtefact>)//.MakeGenericType(typeof(TElement))
+					.GetConstructors()[0]
+//						.GetConstructor(new Type[] { typeof(RepositoryClientProxy<>), typeof(Expression) })
+						.Invoke(new object[] { this, parsedExpression, parsedExpressionId });
+			return (IQueryable<TElement>)_queryCache[parsedExpressionId];
+		}
 
-			Expression parsedExpression = ExpressionVisitor.Visit(expression);
-			object id = parsedExpression.Id();
-			IQueryable query;
-			if (QueryCache.TryGetValue(id, out query))
-				return (IQueryable<TElement>)query;
-			QueryCache[id] = (IQueryable)typeof(Queryable<>).MakeGenericType(typeof(TElement))
-				.GetConstructor(new Type[] { typeof(RepositoryClientProxy), typeof(Expression) })
-				.Invoke(new object[] { this, parsedExpression });
-			return (IQueryable<TElement>)QueryCache[id];
+		/// <summary>
+		/// Execute the specified expression.
+		/// </summary>
+		/// <param name="expression">Expression.</param>
+		/// <typeparam name="TResult">The 1st type parameter.</typeparam>
+		/// <returns>The query result</returns>
+		/// <remarks>IQueryProvider implementation</remarks>
+		TResult IQueryProvider.Execute<TResult>(Expression expression)
+		{
+			return (TResult)Execute(expression);
 		}
 
 		/// <summary>
@@ -431,60 +320,28 @@ namespace Artefacts.Service
 		/// </remarks>
 		public object Execute(Expression expression)
 		{
-//			if (expression.IsEnumerable() && typeof(TArtefact).IsAssignableFrom(expression.Type) && _queryCache.ContainsKey(expression))
-//				return _queryCache[expression];
-//			if (expression.IsEnumerable())
-//				throw new InvalidOperationException();
+			return _channel.QueryExecute(_expressionVisitor.Visit(expression).ToBinary());
+		}
+		#endregion
 
-			if (typeof(Artefact).IsAssignableFrom(expression.Type) && expression.IsMethodCallExpression())
-			{
-				MethodCallExpression mce = (MethodCallExpression)expression;
-				Expression instanceExp = mce.Object ?? (mce.Arguments.Count > 0 ? mce.Arguments[0] : null);
-				if (instanceExp != null && instanceExp.IsQueryable())
-				{
-					QueryResult<Artefact> r = Channel.QueryResults(Channel.QueryPreload(ExpressionVisitor.Visit(instanceExp).ToBinary()));
-
-					string methodName = mce.Method.Name;
-					if (methodName.Equals("First"))
-					{
-						if (r.Count == 0)
-							throw new IndexOutOfRangeException("First() method callled on empty array");
-						return Channel.GetById(r[0].Id, r[0].Type);
-					}
-					else if (methodName.Equals("FirstOrDefault"))
-						return r.Count == 0 ? null :
-					 Channel.GetById(r[0].Id, r[0].Type);
-					if (methodName.Equals("Last"))
-					{
-						if (r.Count == 0)
-							throw new IndexOutOfRangeException("Last() method callled on empty array");
-						return Channel.GetById(r[r.Count - 1].Id, r[r.Count - 1].Type);
-					}
-					else if (methodName.Equals("LastOrDefault"))
-						return r.Count == 0 ? null :
-						 Channel.GetById(r[r.Count - 1].Id, r[r.Count - 1].Type);
-					else
-						throw new NotSupportedException("Method \"" + methodName + "\" not supported");
-				}
-			}
-
-			Expression parsedExpression = ExpressionVisitor.Visit(expression);
-			return !typeof(Artefact).IsAssignableFrom(parsedExpression.Type) ||
-				parsedExpression.NodeType != ExpressionType.Constant ?
-					Channel.QueryExecute(parsedExpression.ToBinary())
-					: ((ConstantExpression)parsedExpression).Value;		//.ToExpressionNode());	
+		#region IEnumerable implementation
+		/// <summary>
+		/// Gets the enumerator.
+		/// </summary>
+		/// <returns>The enumerator.</returns>
+		/// <remarks><see cref="System.Collections.Generic.IEnumerable[Artefact]" /> implementation</remarks>
+		public IEnumerator<TArtefact> GetEnumerator()
+		{
+			return _artefacts.GetEnumerator();
 		}
 
 		/// <summary>
-		/// Execute the specified expression.
+		/// Gets the enumerator.
 		/// </summary>
-		/// <param name="expression">Expression.</param>
-		/// <typeparam name="TResult">The 1st type parameter.</typeparam>
-		/// <returns>The query result</returns>
-		/// <remarks>IQueryProvider implementation</remarks>
-		TResult IQueryProvider.Execute<TResult>(Expression expression)
+		/// <remarks>IEnumerable implementation</remarks>
+		System.Collections.IEnumerator IEnumerable.GetEnumerator()
 		{
-			return (TResult)Execute(expression);
+			return (IEnumerator)GetEnumerator();
 		}
 		#endregion
 	}

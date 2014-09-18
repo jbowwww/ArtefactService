@@ -110,7 +110,7 @@ namespace Artefacts.Service
 		private Random _randomGenerator;
 		private Dictionary<int, Artefact> _artefactCache;
 		private Dictionary<object, int> _countCache;
-//		private Dictionary<object, QueryResult<Artefact>> _queryResultCache;
+//		private Dictionary<object, QueryResult> _queryResultCache;
 		private ConcurrentQueue<object> _queryExecuteQueue;
 		private INhQueryProvider _nhQueryProvider;
 		private BinaryFormatter _binaryFormatter;
@@ -164,7 +164,7 @@ namespace Artefacts.Service
 			_randomGenerator = new Random(DateTime.Now.Second);
 			_artefactCache = new Dictionary<int, Artefact>();
 			_countCache = new Dictionary<object, int>();
-			//_queryResultCache = new Dictionary<object, QueryResult<Artefact>>();
+			//_queryResultCache = new Dictionary<object, QueryResult>();
 			_queryExecuteQueue = new ConcurrentQueue<object>();
 			_nhQueryProvider = new DefaultQueryProvider(Session.GetSessionImplementation());
 			_binaryFormatter = new BinaryFormatter();
@@ -423,23 +423,18 @@ namespace Artefacts.Service
 		/// <summary>
 		/// Creates the query.
 		/// </summary>
-		/// <returns>The query identifier</returns>
+		/// <returns>The query async result</returns>
 		/// <param name="expression">Expression.</param>
-		public object QueryPreload(byte[] expression)	//ExpressionNode expression)
+		public void QueryPreload(byte[] expression)	//ExpressionNode expression)
 		{
-			Expression serverSideExpression = null;
-			object serverId = null;
-			IQueryable serverSideQuery = null;
-//			try
-//			{
-				serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
-				serverId = serverSideExpression.Id();
-				Console.WriteLine("QueryPreload(Q#{1}: {0})", serverSideExpression.FormatString(), serverId);
-				if (!QueryCache.ContainsKey(serverId))
-				{
-					serverSideQuery = _nhQueryProvider.CreateQuery(serverSideExpression);				
-					QueryCache[serverId] = serverSideQuery;
-				}
+			Expression serverSideExpression = QueryVisitor.Visit(expression.FromBinary());
+//			object serverId = serverSideExpression.Id();
+			string serverText = serverSideExpression.FormatString();
+			object serverId = serverText;
+//			IAsyncResult r = new QueryAcsyncResult(serverId, serverText);
+			if (!QueryCache.ContainsKey(serverId))
+				QueryCache[serverId] = _nhQueryProvider.CreateQuery(serverSideExpression);
+
 //			}
 //			catch (Exception ex)
 //			{
@@ -451,7 +446,7 @@ namespace Artefacts.Service
 //				fEx.Data.Add("serverSideQuery", serverSideQuery.ToString());
 //				throw fEx;
 //			}
-			return serverId;
+//			return serverId;
 		}
 
 		/// <summary>
@@ -461,15 +456,15 @@ namespace Artefacts.Service
 		/// <param name="queryId">Query identifier.</param>
 		/// <param name="startIndex">Start index.</param>
 		/// <param name="count">Count.</param>
-		public QueryResult<Artefact> QueryResults(object queryId, int startIndex = 0, int count = -1)
+		public QueryResult QueryResults(object queryId, int startIndex = 0, int count = -1)
 		{
 			IQueryable<Artefact> serverSideQuery = null;
 //			int[] results = null;
-			QueryResult<Artefact> results;
+			QueryResult results;
 //			try
 //			{
 				serverSideQuery = (IQueryable<Artefact>)QueryCache[queryId];
-			results = new QueryResult<Artefact>(serverSideQuery, startIndex, count);
+			results = new QueryResult(serverSideQuery, startIndex, count);
 //				foreach (int artefactId in results)
 //				{
 //					Artefact artefact = GetById(artefactId);

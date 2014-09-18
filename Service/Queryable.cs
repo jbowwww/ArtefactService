@@ -9,17 +9,13 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Artefacts.Service
 {
 	/// <summary>
-	/// Queryable.
+	/// Represents a query, 
 	/// </summary>
-	/// <remarks>
-	/// 30/5/14
-	/// -	Goign to try making this class (partially) serializable (by datacontractserializer) so that the Queryable<>
-	/// 	object itself can be used in parameters of repository method members. (operations)
-	/// </remarks>
 	public class Queryable<TArtefact> : IOrderedQueryable<TArtefact> where TArtefact : Artefact
 	{
 		/// <summary>
@@ -121,10 +117,11 @@ namespace Artefacts.Service
 		/// <summary>
 		/// Gets the provider.
 		/// </summary>
-		public RepositoryClientProxy Repository {
+		public RepositoryClientProxy<TArtefact> Repository {
 			get; private set;
 		}
 		
+		#region IQueryProvider implementation
 		/// <summary>
 		/// Gets the provider.
 		/// </summary>
@@ -152,17 +149,10 @@ namespace Artefacts.Service
 		/// <see cref="Queryable`1[TArtefact].AsString"/>, ..etc
 		/// </remarks>
 		public Expression Expression {
-			get { return _expression; }// _translatedExpression; }
-			private set
-			{
-				_expression = value;			//.ReduceAndCheck();
-				Id = _expression.Id();
-//				ExpressionAsString = _expression.ToString();
-//				ExpressionAsNode = _expression.ToExpressionNode();
-//				ExpressionAsBinary = _expression.ToBinary();
-			}
+			get;
+			private set;
 		}
-		private Expression _expression;
+		#endregion
 
 		/// <summary>
 		/// Gets the <see cref="Queryable`1[TArtefact].Expression"/> identifier.
@@ -177,7 +167,25 @@ namespace Artefacts.Service
 		public object ServerId {
 			get; private set;
 		}
-		
+
+		/// <summary>
+		/// Gets the expression data.
+		/// </summary>
+		/// <value>The expression data.</value>
+		public byte[] ExpressionData {
+			get;
+			private set;
+		}
+
+		/// <summary>
+		/// Gets the async result.
+		/// </summary>
+		/// <value>The async result.</value>
+		public IAsyncResult AsyncResult {
+			get;
+			private set;
+		}
+
 		/// <summary>
 		/// Gets the count.
 		/// </summary>
@@ -201,11 +209,11 @@ namespace Artefacts.Service
 		public Artefact this[int index] {
 			get
 			{
-				if (_result == null)
-				{
-					_result = Repository.Channel.QueryResults(ServerId);	//, pageStartIndex, Paging.PageSize);
-					_results = new TArtefact[_result.Count];
-				}
+//				if (_result == null)
+//				{
+//					_result = Repository.Channel.QueryResults(ServerId);	//, pageStartIndex, Paging.PageSize);
+//					_results = new TArtefact[_result.Count];
+//				}
 				if (_results[index] == null)
 				{
 //					int pageStartIndex = index - index % Paging.PageSize;
@@ -216,7 +224,7 @@ namespace Artefacts.Service
 			}
 		}
 		private Artefact[] _results;
-		private QueryResult<Artefact> _result;
+		private QueryResult _result;
 
 		/// <summary>
 		/// The paging.
@@ -237,7 +245,7 @@ namespace Artefacts.Service
 		/// 		SO, AFTER you are reasonably satisfied that this is working properly, you could consider refactoring the
 		/// 		code that sets the Id property (currently set in Expression set accessor)
 		/// </remarks>
-		public Queryable(RepositoryClientProxy repository, Expression expression)
+		public Queryable(RepositoryClientProxy<TArtefact> repository, Expression expression, object expressionId = null)
 		{
 			if (repository == null)
 				throw new ArgumentNullException("provider");
@@ -245,19 +253,27 @@ namespace Artefacts.Service
 				throw new ArgumentNullException("expression");
 			if (!expression.IsEnumerable())
 				throw new ArgumentOutOfRangeException("expression", expression, "Should implement System.Collections.IEnumerable");
-//			if (!typeof(TArtefact).IsAssignableFrom(expression.Type.GetElementType()))
-//				throw new ArgumentOutOfRangeException("expression", expression, "Should have an element type assignable to " + typeof(TArtefact).FullName);
 			TimeCreated = DateTime.Now;
 			TimeRetrieved = DateTime.MinValue;	
 			Repository = repository;
 			Expression = expression;
-			Id = expression.Id();
-			// TODO: See method remarks
-			ServerId = Repository.Channel.QueryPreload(expression.ToBinary());	//ToExpressionNode());
-//			Debug.Assert(ServerId.GetType().Equals(typeof(int)) && Id.GetType().Equals(typeof(int)) && ((int)ServerId == (int)Id));
-//			if (serverId != Id)
-//				throw new Exception(string.Format("serverId != Id ({0} != {1})", serverId, Id));
+			Id = expressionId ?? expression.Id();
 			Paging = Repository.DefaultPagingOptions;
+			Execute();
+		}
+
+		/// <summary>
+		/// Execute this instance.
+		/// </summary>
+		private async void Execute()
+		{
+			Task preloadQueryTask = Task.Factory.StartNew(() => {
+				ExpressionData = Expression.ToBinary();
+				Repository.Channel.QueryPreload(ExpressionData); });
+			Task<QueryResult> resultQueryTask = preloadQueryTask.ContinueWith<QueryResult>((x) => {
+				return (QueryResult)Repository.Channel.QueryResults(Id); });
+			_result = await resultQueryTask;
+			_count = _result.Count;
 		}
 
 		/// <summary>
@@ -269,15 +285,7 @@ namespace Artefacts.Service
 			return (int)Id;
 		}
 
-		/// <summary>
-		/// Retrieve this instance
-		/// </summary>
-//		internal void Retrieve()
-//		{
-//			Count = this.Count<Artefact>();
-//			TimeRetrieved = DateTime.Now;
-//		}
-
+		#region IEnumerable implementation
 		/// <summary>
 		/// Gets the enumerator.
 		/// </summary>
@@ -299,5 +307,6 @@ namespace Artefacts.Service
 		{
 			return (IEnumerator)GetEnumerator();
 		}
+		#endregion
 	}
 }
